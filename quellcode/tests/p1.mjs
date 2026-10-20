@@ -1,0 +1,16 @@
+import { createRequire } from 'module';
+const require = createRequire('/opt/npm-tools/node_modules/');
+const { chromium } = require('playwright');
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+const p = await b.newPage({ viewport: { width: 1280, height: 800 }, locale: 'de-CH' });
+p.on('pageerror', e => console.log('ERR', e.message));
+p.on('console', m => { if (m.type()==='error') console.log('CON', m.text()) });
+await p.addInitScript(() => localStorage.setItem('mn-state', JSON.stringify({ mode: 'plan' })));
+await p.goto('file:///home/claude/mn/dist/modunest-studio.html');
+await p.waitForFunction(() => window.__mn?.built, null, { timeout: 90000 }); await p.waitForTimeout(500);
+const r = await p.evaluate(async () => { const m = window.__mn; const b = await m.buildPlan(7, .03);
+  const out = b.parts.map(q => { return [q.name, q.qty || 1, openEdges(q.tris), +volume(q.tris).toFixed(1)] });
+  return { ok: b.sol.ok, msgs: b.sol.msgs, out, info: b.info } });
+console.log(JSON.stringify(r));
+await p.screenshot({ path: '/home/claude/mn/p1.png' });
+await b.close();

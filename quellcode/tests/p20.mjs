@@ -1,0 +1,13 @@
+import { createRequire } from 'module';
+const require = createRequire('/opt/npm-tools/node_modules/');
+const { chromium } = require('playwright');
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+const p = await b.newPage({ viewport: { width: 1000, height: 700 } });
+p.on('pageerror', e => console.log('ERR', e.message));
+await p.addInitScript(() => localStorage.setItem('mn-state', JSON.stringify({ mode:'single', r:8, plan:{W:140,D:110,H:90,fill:true,mods:[],one:{type:'box',div:1,lid:'plug'},alt:{W:280,D:180,H:160}} })));
+await p.goto('file:///home/claude/mn/dist/modunest-studio.html');
+await p.waitForFunction(() => window.__mn?.built, null, { timeout: 90000 }); await p.waitForTimeout(800);
+console.log(await p.evaluate(()=>[...document.querySelectorAll('.card input[type=checkbox]')].length));
+await p.evaluate(()=>{const i=[...document.querySelectorAll('.colors input[type=checkbox]')];i[1].click();cam.az=-.8;cam.el=.9;draw()});await p.waitForTimeout(500);
+await p.locator('#gl').screenshot({ path: '/home/claude/mn/p20.png' });
+await b.close();

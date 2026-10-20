@@ -1,0 +1,10 @@
+import fs from 'fs';
+const src=fs.readFileSync('planner.js','utf8');
+const f=new Function(src+';return{planSolve,PL,slotsFor}');const{planSolve,PL,slotsFor}=f();
+let r=planSolve(PL);console.log(r.ok,r.msgs,r.rows);
+r.items.forEach(t=>console.log(t.mod.name,t.x,t.y,t.w,t.d,t.h));
+console.log(r.keys.length,'keys',JSON.stringify(r.keys.slice(0,4)));
+const cov=r.items.reduce((s,t)=>s+t.w*t.d,0);console.log('cover',cov,280*180);
+console.log(JSON.stringify(slotsFor(r.items[0],r.keys)));
+console.log(planSolve({...PL,H:100}).msgs, planSolve({...PL,W:150,D:100}).msgs);
+console.log(planSolve({...PL,fill:false}).msgs);

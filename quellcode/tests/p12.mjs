@@ -1,0 +1,14 @@
+import { createRequire } from 'module';
+const require = createRequire('/opt/npm-tools/node_modules/');
+const { chromium } = require('playwright');
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+const p = await b.newPage({ viewport: { width: 1000, height: 800 } });
+p.on('pageerror', e => console.log('ERR', e.message));
+await p.addInitScript(() => localStorage.setItem('mn-state', JSON.stringify({ mode: 'plan', plan:{W:300,D:180,H:120,fill:true,mods:[{type:'drawer',w:140,d:100,h:100,nd:3,lid:'none'},{type:'box',w:100,d:80,h:60,div:1,lid:'plug'},{type:'tall',w:60,d:80,h:100,div:0,lid:'none'},{type:'box',w:100,d:80,h:60,div:0,lid:'plug'}]} })));
+await p.goto('file:///home/claude/mn/dist/modunest-studio.html');
+await p.waitForFunction(() => window.__mn?.built, null, { timeout: 90000 }); await p.waitForTimeout(800);
+await p.evaluate(()=>{cam.az=-.7;cam.el=.55;cam.dist*=.7;draw()});await p.waitForTimeout(300);
+await p.locator('#gl').screenshot({ path: '/home/claude/mn/p12a.png' });
+await p.evaluate(()=>{cam.az=-.7;cam.el=-.6;draw()});await p.waitForTimeout(300);
+await p.locator('#gl').screenshot({ path: '/home/claude/mn/p12b.png' });
+await b.close();

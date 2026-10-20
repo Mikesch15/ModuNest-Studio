@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fdfaf2">
+<link rel="icon" href="data:,">
+<title>ModuNest Studio</title>
+<style>
+/*FONTFACES*/
+/*CSS*/
+:root{--bg:#f5f3ef;--card:#fffdf9;--line:#e4e0d7;--acc:#657a64;--acc2:#4f6350;--mut:#74776e}
+@media(prefers-color-scheme:dark){:root{--bg:#1d1f1b;--card:#272a24;--line:#383c33;--acc:#86a084;--acc2:#a3bba1;--mut:#a2a79a}}
+header{background:var(--card)}
+.brand{display:flex;gap:11px;align-items:center}.mark{width:36px;height:36px;border-radius:11px;background:var(--acc);display:grid;place-items:center;color:#fff;font-weight:800;font-size:19px}
+header h1 span{font-weight:400;color:var(--mut)}header p{margin:1px 0 0;color:var(--mut);font-size:12px}
+.stage{position:relative;height:38vh;min-height:240px}.stage #gl{height:100%;min-height:0}
+.vt{position:absolute;right:10px;top:10px;display:flex;gap:6px}.vt button{padding:6px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font:inherit;font-size:12px;cursor:pointer}.vt button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:2px 0 8px}.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px}.stat span{display:block;font-size:11px;color:var(--mut)}.stat strong{font-size:16px;font-variant-numeric:tabular-nums}
+.card p{margin:0;font-size:13px;color:var(--mut)}.btn{padding:11px;border-radius:10px;border:1px solid var(--acc);background:none;color:var(--acc);font:inherit;font-weight:600;cursor:pointer}
+.panel[data-mode=single] .addrow,.panel[data-mode=single] .mg,.panel[data-mode=single] .mh button,.panel[data-mode=single] .pfill{display:none}.panel[data-mode=plan] .tsel{display:none}
+.mrow{border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:8px}.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.mh button{border:0;background:none;color:var(--mut);cursor:pointer;font-size:16px}
+.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.mo{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:end;margin-top:6px}.mo>*{flex:1 1 70px;min-width:0}.mrow label{font-size:11px;color:var(--mut)}.mrow input[type=number],.mrow select{width:100%;padding:7px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+.addrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.addrow .btn{flex:1;padding:8px}#plmsgs{margin:0;padding-left:18px;font-size:13px}#plmsgs li.e{color:#b3402a;font-weight:600}#plmsgs li.i{color:var(--mut)}
+@media(max-width:520px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.stage{height:auto;flex:1;min-height:320px}}
+.panel{padding-bottom:24px}#cartlist{display:grid;gap:8px}#cartlist:empty{display:none}.crow{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.cno{flex:none;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}.cmain{flex:1;min-width:0;display:grid;gap:2px}.cmain input[type=text]{padding:4px 6px;border:1px solid transparent;background:none;font-weight:600}.cmain input[type=text]:focus{border-color:var(--line);background:var(--card)}.cmain small{color:var(--mut);font-size:12px;padding-left:6px}.cic{flex:none;width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:15px;cursor:pointer}.btn.pri{background:var(--acc);color:#fff;padding:13px}.btn:disabled{opacity:.5;cursor:default}#creditinfo{font-size:13px;margin:0;padding:8px 10px;border-radius:9px;background:var(--bg);color:var(--ink)!important}.gx{margin-left:8px;background:none!important;color:inherit!important;border:1px solid currentColor!important;width:auto}
+/* ---- Look «Art vom Hof»: Tinte auf Papier, Schreibschrift, runde Formen wie im Logo ---- */
+:root{--bg:#f6f0e4;--card:#fdfaf2;--ink:#1e1a17;--mut:#6f6458;--line:#e2d6c4;--acc:#1e1a17;--acc2:#3a322b;--on:#fdfaf2;--warm:#c46546;--r:18px}
+@media(prefers-color-scheme:dark){:root{--bg:#151412;--card:#1f1d1a;--ink:#f2ede3;--mut:#a59d8f;--line:#38332c;--acc:#f2ede3;--acc2:#d9d2c4;--on:#151412;--warm:#d98462}}
+html,body{background:var(--bg);color:var(--ink)}
+header{background:var(--card);border-bottom:3px solid var(--ink);box-shadow:0 3px 0 var(--card),0 5px 0 var(--warm);margin-bottom:5px;padding:8px 16px}
+.brand{gap:12px}.logo{width:56px;height:56px;flex:none;display:block;border-radius:50%;box-shadow:0 1px 3px rgba(30,26,23,.18)}
+header h1{font-family:Script,cursive;font-size:29px;font-weight:700;line-height:1.05;letter-spacing:.01em}
+header p{font-size:12px;color:var(--mut);margin-top:2px}
+.lang button{border-radius:999px;border-color:var(--ink);padding:5px 12px;font-weight:600}
+.card{border-radius:var(--r);box-shadow:0 1px 2px rgba(30,28,25,.05)}
+.card h2{font-family:Script,cursive;font-size:23px;line-height:1.1;letter-spacing:0;text-transform:none;color:var(--ink);font-weight:700}
+.card p{color:var(--mut)}
+#gl{border-radius:var(--r);border:1px solid var(--line);background:radial-gradient(circle at 50% 30%,#fffdf8,#ece2d0)}
+@media(prefers-color-scheme:dark){#gl{background:radial-gradient(circle at 50% 30%,#2b2823,#141311)}}
+.vt button{border-radius:999px;border-color:var(--line);background:var(--card)}.vt button.on{background:var(--acc);border-color:var(--acc);color:var(--on)}
+.seg button{border-radius:999px;background:var(--card)}.seg button.on{background:var(--acc);border-color:var(--acc);color:var(--on)}
+.btn{border-radius:999px;border-color:var(--ink);color:var(--ink)}.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--on)}
+input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px}input[type=range],input[type=checkbox]{accent-color:var(--warm)}
+.stat{border-radius:14px}.mrow{border-radius:14px;background:var(--bg)}
+#status b{color:var(--warm)}
+.cno{background:var(--warm);color:#fff}.crow{border-radius:14px}.cic{border-radius:999px}
+#gate div{justify-items:center;text-align:center}#gate input{text-align:center}#gate div>button{width:100%}
+.glogo{width:170px;height:170px}#gt{font-family:Script,cursive;font-size:34px;margin:0}
+#gate button{border-radius:999px;background:var(--acc);color:var(--on)}
+#gate #gx{position:fixed;top:14px;right:14px;width:44px!important;height:44px;padding:0;margin:0;border-radius:50%;font-size:18px;line-height:1}#gate input{background:var(--card)}
+.mo>.chk,.mo>label:last-child{flex:1 1 100%}.colors label:has(input[type=checkbox]){display:flex;align-items:center;gap:8px;color:var(--ink)}.colors input[type=checkbox]{width:20px;height:20px;flex:none;margin:0}
+@media(min-width:900px){main{height:calc(100vh - 83px)}}
+.lang{display:flex;gap:6px}.lang button{min-width:34px}#helpbtn{font-weight:700}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ib{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--warm);background:none;color:var(--warm);font:italic 700 14px/1 Georgia,serif;cursor:pointer;padding:0}
+.ib.on{background:var(--warm);color:#fff}
+.card p.info{background:var(--bg);border-left:3px solid var(--warm);border-radius:0 10px 10px 0;padding:9px 12px;color:var(--ink);font-size:13px;line-height:1.45}
+.vhint{position:absolute;left:10px;bottom:10px;right:10px;width:max-content;max-width:calc(100% - 20px);font-size:11px;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px;pointer-events:none;transition:opacity .6s}
+.vhint.gone{opacity:0}
+#help{position:fixed;inset:0;z-index:40;background:rgba(30,26,23,.45);display:none;place-items:center;padding:16px;overflow:auto}
+.hbox{background:var(--card);border-radius:22px;max-width:440px;width:100%;padding:22px 20px;display:grid;gap:10px;justify-items:center;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.hlogo{width:96px;height:96px}.hbox h2{font-family:Script,cursive;font-size:32px;margin:0}
+.hbox ol{margin:0;padding-left:22px;display:grid;gap:8px;font-size:14px;line-height:1.45;justify-self:stretch}.hbox ol li::marker{color:var(--warm);font-weight:700}
+.hbox p{margin:0;font-size:13px;color:var(--mut);text-align:center}
+#helpgo{width:100%;padding:13px;border-radius:999px;border:0;background:var(--acc);color:var(--on);font:inherit;font-weight:600;cursor:pointer}
+.ghelp{font-size:12px;color:var(--mut);margin:0}#gmsg{color:#b3402a}
+</style>
+</head>
+<body>
+<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
+<div id="help"><div class="hbox"><img class="logo hlogo" src="data:," alt="Art vom Hof"><h2 data-k="helpT"></h2><ol><li data-k="h1"></li><li data-k="h2"></li><li data-k="h3"></li><li data-k="h4"></li></ol><p data-k="helpTip"></p><button id="helpgo" data-k="helpGo"></button></div></div>
+<div id="gate"><div><img class="logo glogo" src="data:," alt="Art vom Hof"><h2 id="gt"></h2><p id="gd"></p><input type="text" id="gcode" placeholder="XXXX-XXXX-XXXX" autocomplete="off"><p class="ghelp" data-k="gateHelp"></p><div id="gmsg"></div><button id="gok"></button><button id="gx" class="gx">×</button></div></div>
+<main>
+ <section class="view"><div class="stage"><canvas id="gl"></canvas><div class="vhint" data-k="viewHint"></div><div class="vt"><button data-v="asm"></button><button data-v="print"></button></div></div><div id="status"></div></section>
+ <section class="panel" id="panel"><div class="stats" id="stats"></div></section>
+</main>
+<script src="config.js"></script>
+<script>
+'use strict';
+/* Einstellungen kommen aus config.js (window.MN_CONFIG); fehlt die Datei (z. B. offline), gilt der Testmodus */
+const CONFIG=Object.assign({requireCode:false,api:''},window.MN_CONFIG||{});
+const LOGO='LOGO_DATA';document.querySelectorAll('img.logo').forEach(i=>i.src=LOGO);document.querySelector('link[rel=icon]').href=LOGO;

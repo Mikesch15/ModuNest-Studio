@@ -1,0 +1,13 @@
+import { createRequire } from 'module';
+const require = createRequire('/opt/npm-tools/node_modules/');
+const { chromium } = require('playwright');
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'] });
+const p = await b.newPage({ viewport: { width: 390, height: 844 } });
+p.on('pageerror', e => console.log('ERR', e.message));
+await p.goto('file:///home/claude/mn/dist/modunest-studio.html');
+await p.waitForFunction(() => window.__mn?.built, null, { timeout: 90000 }); await p.waitForTimeout(800);
+await p.evaluate(()=>document.getElementById('modlist').scrollIntoView());await p.waitForTimeout(300);
+await p.screenshot({ path: '/home/claude/mn/p17.png' });
+await p.evaluate(()=>{document.querySelector('.seg button:nth-child(2)').click()});await p.waitForTimeout(2500);
+console.log(await p.evaluate(()=>JSON.stringify([S.mode,PL.W,PL.D,PL.H,document.querySelectorAll('.mrow').length])));
+await b.close();

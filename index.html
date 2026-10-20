@@ -94,14 +94,29 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 #gate button{border-radius:999px;background:var(--acc);color:var(--on)}
 #gate #gx{position:fixed;top:14px;right:14px;width:44px!important;height:44px;padding:0;margin:0;border-radius:50%;font-size:18px;line-height:1}#gate input{background:var(--card)}
 .mo>.chk,.mo>label:last-child{flex:1 1 100%}.colors label:has(input[type=checkbox]){display:flex;align-items:center;gap:8px;color:var(--ink)}.colors input[type=checkbox]{width:20px;height:20px;flex:none;margin:0}
-@media(min-width:900px){main{height:calc(100vh - 83px)}}#gmsg{color:#b3402a}
+@media(min-width:900px){main{height:calc(100vh - 83px)}}
+.lang{display:flex;gap:6px}.lang button{min-width:34px}#helpbtn{font-weight:700}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ib{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--warm);background:none;color:var(--warm);font:italic 700 14px/1 Georgia,serif;cursor:pointer;padding:0}
+.ib.on{background:var(--warm);color:#fff}
+.card p.info{background:var(--bg);border-left:3px solid var(--warm);border-radius:0 10px 10px 0;padding:9px 12px;color:var(--ink);font-size:13px;line-height:1.45}
+.vhint{position:absolute;left:10px;bottom:10px;right:10px;width:max-content;max-width:calc(100% - 20px);font-size:11px;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px;pointer-events:none;transition:opacity .6s}
+.vhint.gone{opacity:0}
+#help{position:fixed;inset:0;z-index:40;background:rgba(30,26,23,.45);display:none;place-items:center;padding:16px;overflow:auto}
+.hbox{background:var(--card);border-radius:22px;max-width:440px;width:100%;padding:22px 20px;display:grid;gap:10px;justify-items:center;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.hlogo{width:96px;height:96px}.hbox h2{font-family:Script,cursive;font-size:32px;margin:0}
+.hbox ol{margin:0;padding-left:22px;display:grid;gap:8px;font-size:14px;line-height:1.45;justify-self:stretch}.hbox ol li::marker{color:var(--warm);font-weight:700}
+.hbox p{margin:0;font-size:13px;color:var(--mut);text-align:center}
+#helpgo{width:100%;padding:13px;border-radius:999px;border:0;background:var(--acc);color:var(--on);font:inherit;font-weight:600;cursor:pointer}
+.ghelp{font-size:12px;color:var(--mut);margin:0}#gmsg{color:#b3402a}
 </style>
 </head>
 <body>
-<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><button id="langbtn"></button></div></header>
-<div id="gate"><div><img class="logo glogo" src="data:," alt="Art vom Hof"><h2 id="gt"></h2><p id="gd"></p><input type="text" id="gcode" placeholder="XXXX-XXXX-XXXX" autocomplete="off"><div id="gmsg"></div><button id="gok"></button><button id="gx" class="gx">×</button></div></div>
+<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
+<div id="help"><div class="hbox"><img class="logo hlogo" src="data:," alt="Art vom Hof"><h2 data-k="helpT"></h2><ol><li data-k="h1"></li><li data-k="h2"></li><li data-k="h3"></li><li data-k="h4"></li></ol><p data-k="helpTip"></p><button id="helpgo" data-k="helpGo"></button></div></div>
+<div id="gate"><div><img class="logo glogo" src="data:," alt="Art vom Hof"><h2 id="gt"></h2><p id="gd"></p><input type="text" id="gcode" placeholder="XXXX-XXXX-XXXX" autocomplete="off"><p class="ghelp" data-k="gateHelp"></p><div id="gmsg"></div><button id="gok"></button><button id="gx" class="gx">×</button></div></div>
 <main>
- <section class="view"><div class="stage"><canvas id="gl"></canvas><div class="vt"><button data-v="asm"></button><button data-v="print"></button></div></div><div id="status"></div></section>
+ <section class="view"><div class="stage"><canvas id="gl"></canvas><div class="vhint" data-k="viewHint"></div><div class="vt"><button data-v="asm"></button><button data-v="print"></button></div></div><div id="status"></div></section>
  <section class="panel" id="panel"><div class="stats" id="stats"></div></section>
 </main>
 <script src="config.js"></script>
@@ -601,6 +616,24 @@ async function buildPlan(res,tol){
 
 /* ================= Texte ================= */
 const L={
+ helpBtn:['Anleitung','Help'],helpT:['So funktioniert’s','How it works'],
+ h1:['Wähle oben «Einzelbox» (eine Kiste) oder «Planer» (mehrere Kisten, die zusammen einen Platz füllen, z. B. eine Schublade).','Choose «Single box» (one box) or «Planner» (several boxes that fill a space together, e.g. a drawer).'],
+ h2:['Gib die Masse in Millimetern ein und passe Fächer, Deckel und Aussehen an. Die 3D-Vorschau zeigt jede Änderung sofort.','Enter the size in millimetres and adjust compartments, lids and look. The 3D preview updates instantly.'],
+ h3:['Unter «Herunterladen» holst du die Dateien. Dafür brauchst du die Bestellnummer deines Etsy-Kaufs. Jede Kiste zählt 1.','Get your files under «Download». You need the order number of your Etsy purchase. Each box counts 1.'],
+ h4:['Öffne die 3MF-Datei in Bambu Studio (oder die STL-Dateien in deinem Slicer) und drucke ohne Stützen.','Open the 3MF file in Bambu Studio (or the STL files in your slicer) and print without supports.'],
+ helpTip:['Tipp: Drucke zuerst das kleine Passungs-Teststück (ganz unten). Bei jedem Abschnitt erklärt dir das ⓘ, was die Einstellungen bewirken.','Tip: print the small fit test piece first (at the bottom). In every section, the ⓘ explains what the settings do.'],
+ helpGo:['Los geht’s','Let’s go'],infoBtn:['Erklärung','Explanation'],
+ viewHint:['Ziehen: drehen · Zoom: 2 Finger/Mausrad · Doppeltipp: zurück','Drag: rotate · Zoom: 2 fingers/wheel · Double-tap: reset'],
+ gateHelp:['Die Bestellnummer findest du bei Etsy unter «Käufe» (Profil → Käufe und Bewertungen) oder in der Bestätigungs-E-Mail.','You find the order number on Etsy under «Purchases» (profile → Purchases and reviews) or in the confirmation e-mail.'],
+ i_mode:['Einzelbox: eine einzelne Kiste, innen in Fächer aufgeteilt. Planer: mehrere Kisten, die zusammen einen vorhandenen Platz füllen (z. B. eine Schublade oder ein Regalfach). Sie werden mit kleinen Verbindern zusammengehalten.','Single box: one box, divided into compartments. Planner: several boxes that together fill an existing space (e.g. a drawer or shelf). They are held together with small connectors.'],
+ i_space:['Einzelbox: die Aussenmasse der Kiste. Planer: der Platz, der gefüllt werden soll – miss z. B. das Innenmass deiner Schublade und ziehe 1–2 mm Luft ab. «Platz ausfüllen» streckt die Kisten, bis kein Spalt bleibt.','Single box: the outer size of the box. Planner: the space to fill – e.g. measure the inside of your drawer and subtract 1–2 mm. «Fill the space» stretches the boxes so no gap is left.'],
+ i_plmods:['Art: normale Box, hoher Behälter oder Schubladenbox. Spalten/Reihen: feste Fächer. Trennwände: herausnehmbare Wände (nur ohne Fächer). Deckel: Steck-, Schiebe- oder Klappdeckel. Einsatz-Tablett: flache Schale, die oben in der Box liegt. Die Beschriftung erscheint auf dem Steckdeckel. Im Planer fügst du mit den Knöpfen weitere Kisten hinzu.','Type: normal box, tall container or drawer box. Columns/rows: fixed compartments. Dividers: removable walls (only without compartments). Lid: plug-in, sliding or hinged. Insert tray: a shallow tray resting in the top of the box. The label appears on the plug-in lid. In the planner, add more boxes with the buttons.'],
+ i_plset:['Wandstärke: dicker = stabiler, braucht mehr Filament. Eckenradius: wie rund die Ecken sind. Stapelbar: Fuss und Rand, damit Kisten sicher aufeinander stehen. Scharfe Ecken an Nähten: keine Ritzen zwischen Nachbarkisten. Füllstücke: kleine Teile für Lücken, wo mehrere Ecken zusammenkommen. Oberfläche: Muster auf den freien Aussenseiten.','Wall thickness: thicker = sturdier, uses more filament. Corner radius: how round the corners are. Stackable: foot and rim so boxes sit securely on top of each other. Sharp corners at seams: no gaps between neighbouring boxes. Fillers: small parts for gaps where several corners meet. Surface: pattern on the free outer sides.'],
+ i_plmsg:['Hier prüft die App, ob alles passt und druckbar ist. Rote Meldungen musst du beheben (z. B. Masse ändern), sonst ist der Download gesperrt.','The app checks here whether everything fits and is printable. Red messages must be fixed (e.g. change sizes), otherwise downloading is blocked.'],
+ i_colors:['Die Farben sind für die Vorschau und werden in der 3MF-Datei als Vorschlag für Bambu Studio mitgegeben. Die echte Farbe bestimmt dein Filament.','Colours are for the preview and are passed to Bambu Studio in the 3MF file as a suggestion. The real colour depends on your filament.'],
+ i_cart:['Ist der Warenkorb leer, lädt der Knopf die aktuelle Konfiguration herunter. Möchtest du mehrere verschiedene Konfigurationen, lege sie mit «+ Zum Warenkorb hinzufügen» ab und lade alle zusammen als ein ZIP herunter. Mit ↺ holst du eine Konfiguration zurück in den Editor.','If the cart is empty, the button downloads the current configuration. For several different configurations, add them with «+ Add to cart» and download them all as one ZIP. ↺ loads a configuration back into the editor.'],
+ i_vis:['Blendet Teile in der Vorschau aus, damit du hineinsehen kannst. Der Download enthält immer alle Teile.','Hides parts in the preview so you can look inside. The download always contains all parts.'],
+ i_fit:['Jeder Drucker druckt etwas anders. Das Teststück zeigt, welches Spiel bei dir passt; die gewählte Nummer gilt dann für Verbinder, Deckel und Schubladen.','Every printer prints slightly differently. The test piece shows which clearance suits yours; the chosen number then applies to connectors, lids and drawers.'],
  tag:['Dein Ordnungssystem. Deine Masse. Dein Druck.','Your storage system. Your size. Your print.'],
  dims:['Aussenmasse','Outer size'],width:['Breite','Width'],depth:['Tiefe','Depth'],height:['Höhe','Height'],wall:['Wandstärke','Wall thickness'],corners:['Eckenradius','Corner radius'],
  layout:['Innenaufteilung','Compartments'],cols:['Spalten','Columns'],rows:['Reihen','Rows'],layoutHint:['Bei aktivem Einsatz-Tablett gilt die Aufteilung für den Einsatz.','With the insert tray enabled, this layout applies to the tray.'],
@@ -671,10 +704,14 @@ function ui(){
  c=card('vis');const vv=document.createElement('div');vv.className='colors';S.hide=S.hide||{};
  ['cBox','cLid','cTray','cKey'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='checkbox';i.checked=!S.hide[k];i.onchange=()=>{S.hide[k]=!i.checked;present(false);save()};l.append(i,s);vv.append(l)});c.append(vv);
  c=card('fit');para(c,'fitText');btn(c,'fitDl',downloadFit);seg(c,'fit','fitPick',[[1,'1'],[2,'2'],[3,'3'],[4,'4'],[5,'5']])}
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();applyLang()}
+/* ⓘ-Knopf je Abschnitt: blendet den Text i_<Titel> ein */
+function addInfo(){panel.querySelectorAll('.card>h2').forEach(h=>{const k='i_'+h.dataset.k;if(!L[k])return;const w=document.createElement('div');w.className='ch';h.replaceWith(w);
+ const b=document.createElement('button');b.className='ib';b.textContent='i';b.setAttribute('aria-expanded','false');const p=document.createElement('p');p.className='info';p.dataset.k=k;p.hidden=true;
+ b.onclick=()=>{p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden);b.setAttribute('aria-expanded',String(!p.hidden))};w.append(h,b);w.after(p)})}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();addInfo();applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
- document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';
+ document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');
  renderCart();
  document.getElementById('gt').textContent=tr('gateT');document.getElementById('gd').textContent=tr('gateD');document.getElementById('gok').textContent=tr('gateB');
  document.querySelectorAll('.vt button').forEach(b=>b.textContent=tr(b.dataset.v))}
@@ -785,6 +822,10 @@ async function exportCart(){if(!unlockedNow())return;let msg='';const keep=snap(
  catch(e){st.textContent=e.message}
  finally{applySnap(keep);buildUI();present(false);renderCart();if(msg)st.innerHTML+='<br><b>'+msg+'</b>'}}
 
+const help=document.getElementById('help');document.getElementById('helpbtn').onclick=()=>{help.style.display='grid'};
+document.getElementById('helpgo').onclick=()=>{help.style.display='none';try{localStorage.setItem('mn-help','1')}catch(e){}};
+try{if(!localStorage.getItem('mn-help'))help.style.display='grid'}catch(e){}
+document.getElementById('gl').addEventListener('pointerdown',()=>document.querySelector('.vhint').classList.add('gone'),{once:true});
 panel.dataset.mode=S.mode;buildUI();refresh();
 window.__mn={slotsFor,S,PL,buildPlan,planSolve,renderMods,buildAll,openEdges,volume,fitTestTris,arrange,get built(){return built}};
 </script>
