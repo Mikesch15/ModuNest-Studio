@@ -23,6 +23,7 @@ Version 2.9 + Änderungen vom 20.10.2026 (Kisten-Abrechnung, Design «Art vom Ho
 - `app.js` – Anordnung (`arrange`), Vorschau, UI-Karten, Export (STL/3MF), Ansicht-Schalter (`S.hide`).
 - `gate.js` – Freischaltung gegen Server (`CONFIG.requireCode/api`), Warenkorb (`CART`, ZIP-Export).
 - `head.html` – HTML/CSS (Look «Art vom Hof»: Tinte auf Papier, Schreibschrift `Script` = Dancing Script/OFL, runde Formen; Logo `logo.webp` (farbig, rund freigestellt) wird von assemble.py einmal als `LOGO` eingebettet) und `CONFIG` (aus config.js/`window.MN_CONFIG`, sonst Testmodus).
+- `admin.html` (nur bei Mike, nicht im Repo): eigenständige Admin-Seite im App-Design (Logo/Schrift eingebettet), lokal geöffnet; ruft admin/list, admin/create, admin/add. Server erlaubt für admin/* jede Origin (Schutz = ADMIN_KEY), für Kunden-Aufrufe nur ALLOWED_ORIGIN. admin/add setzt die Kisten-Gesamtzahl (upsert), nur Ziffern ≥6.
 - `backend/` – Supabase: `schema.sql`, Edge Functions `modunest` (redeem/consume/admin) und `etsy-webhook`, `admin.html`, `ANLEITUNG.md`.
 - `tests/` – Playwright-Skripte (p*.mjs, t*.mjs); nutzen Chromium unter /opt/pw-browsers; Pfade anpassen: /home/claude/mn/ → quellcode/, playwright z. B. aus /opt/node22/lib/node_modules. p21 simuliert noch die alte Abrechnung (n statt cfgs). Wichtige: `p18.mjs` (Geometrie-Bau/Teileliste/Volumen/offene Kanten), `p19.mjs` (Screenshots), `p21.mjs` (Gate/Warenkorb mit simuliertem Server), `p11.mjs` (Planer-Konfigurationen, Verbinder-Eckencheck).
 

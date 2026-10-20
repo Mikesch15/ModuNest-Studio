@@ -6,8 +6,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const ORIGIN = Deno.env.get("ALLOWED_ORIGIN") ?? "*";
 const TTL = 12 * 3600 * 1000; // Sitzung 12 h
-const cors = { "access-control-allow-origin": ORIGIN, "access-control-allow-headers": "content-type, x-admin-key", "access-control-allow-methods": "POST, GET, OPTIONS" };
-const json = (o: unknown, status = 200) => new Response(JSON.stringify(o), { status, headers: { ...cors, "content-type": "application/json" } });
+// Kunden-Aufrufe nur von ALLOWED_ORIGIN; Admin-Aufrufe (durch ADMIN_KEY geschuetzt) von ueberall,
+// damit admin.html auch lokal geoeffnet funktioniert (Origin "null").
+const corsFor = (origin: string) => ({ "access-control-allow-origin": origin, "access-control-allow-headers": "content-type, x-admin-key", "access-control-allow-methods": "POST, GET, OPTIONS", "vary": "origin" });
 
 const enc = new TextEncoder();
 const b64u = (u8: Uint8Array) => btoa(String.fromCharCode(...u8)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -31,8 +32,10 @@ function match(paid: number[][], b: number[][]) {
 const newCode = () => { const a = crypto.getRandomValues(new Uint8Array(12)); return Array.from(a, (x) => ALPHA[x % 32]).join(""); };
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   const path = new URL(req.url).pathname.split("/").filter(Boolean).slice(1).join("/"); // nach /modunest
+  const cors = corsFor(path.startsWith("admin/") ? (req.headers.get("origin") ?? "*") : ORIGIN);
+  const json = (o: unknown, status = 200) => new Response(JSON.stringify(o), { status, headers: { ...cors, "content-type": "application/json" } });
+  if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   const ip = (req.headers.get("x-forwarded-for") ?? "?").split(",")[0].trim();
   let b: any = {}; try { b = await req.json(); } catch (_) {}
 
@@ -89,15 +92,16 @@ Deno.serve(async (req) => {
     if (req.headers.get("x-admin-key") !== Deno.env.get("ADMIN_KEY")) return json({ error: "auth" }, 401);
     if (path === "admin/create") {
       const code = newCode();
-      const { error } = await sb.from("orders").insert({ source: "manual", code, credits: Math.max(1, Number(b.credits) | 0 || 3), note: String(b.note ?? "").slice(0, 200) });
+      const { error } = await sb.from("orders").insert({ source: "manual", code, credits: Math.max(1, Number(b.credits) | 0 || 6), note: String(b.note ?? "").slice(0, 200) });
       return error ? json({ error: error.message }, 500) : json({ code });
     }
     if (path === "admin/list") {
       const { data } = await sb.from("orders").select("source,receipt_id,code,credits,used,note,created_at").order("created_at", { ascending: false }).limit(200);
       return json({ orders: data });
     }
-    if (path === "admin/add") { // Etsy-Bestellung von Hand nachtragen: { receipt_id, credits }
-      const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: norm(b.receipt_id), credits: Number(b.credits) | 0 || 3, note: "manuell" }, { onConflict: "receipt_id" });
+    if (path === "admin/add") { // Etsy-Bestellung von Hand nachtragen oder Kisten-Gesamtzahl aendern: { receipt_id, credits }
+      const rid = norm(b.receipt_id); if (!/^\d{6,}$/.test(rid)) return json({ error: "receipt" }, 400);
+      const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: rid, credits: Math.max(1, Number(b.credits) | 0 || 6), note: "manuell" }, { onConflict: "receipt_id" });
       return error ? json({ error: error.message }, 500) : json({ ok: true });
     }
   }
