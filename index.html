@@ -61,11 +61,11 @@ header h1 span{font-weight:400;color:var(--mut)}header p{margin:1px 0 0;color:va
 .card p{margin:0;font-size:13px;color:var(--mut)}.btn{padding:11px;border-radius:10px;border:1px solid var(--acc);background:none;color:var(--acc);font:inherit;font-weight:600;cursor:pointer}
 .panel[data-mode=single] .addrow,.panel[data-mode=single] .mg,.panel[data-mode=single] .mh button,.panel[data-mode=single] .pfill{display:none}.panel[data-mode=plan] .tsel{display:none}
 .mrow{border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:8px}.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.mh button{border:0;background:none;color:var(--mut);cursor:pointer;font-size:16px}
-.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.mo{display:flex;gap:10px;align-items:end;margin-top:6px}.mrow label{font-size:11px;color:var(--mut)}.mrow input[type=number],.mrow select{width:100%;padding:7px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.mo{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:end;margin-top:6px}.mo>*{flex:1 1 70px;min-width:0}.mrow label{font-size:11px;color:var(--mut)}.mrow input[type=number],.mrow select{width:100%;padding:7px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
 .addrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.addrow .btn{flex:1;padding:8px}#plmsgs{margin:0;padding-left:18px;font-size:13px}#plmsgs li.e{color:#b3402a;font-weight:600}#plmsgs li.i{color:var(--mut)}
 @media(max-width:520px){.stats{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:900px){.stage{height:auto;flex:1;min-height:320px}}
-.crow{display:flex;gap:6px;margin:6px 0}.crow input{flex:1;min-width:0}.crow button{width:36px}.gx{margin-left:8px;background:none!important;color:inherit!important;border:1px solid currentColor!important;width:auto}#creditinfo{font-size:13px;margin:8px 0}
+.panel{padding-bottom:24px}#cartlist{display:grid;gap:8px}#cartlist:empty{display:none}.crow{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.cno{flex:none;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}.cmain{flex:1;min-width:0;display:grid;gap:2px}.cmain input[type=text]{padding:4px 6px;border:1px solid transparent;background:none;font-weight:600}.cmain input[type=text]:focus{border-color:var(--line);background:var(--card)}.cmain small{color:var(--mut);font-size:12px;padding-left:6px}.cic{flex:none;width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:15px;cursor:pointer}.btn.pri{background:var(--acc);color:#fff;padding:13px}.btn:disabled{opacity:.5;cursor:default}#creditinfo{font-size:13px;margin:0;padding:8px 10px;border-radius:9px;background:var(--bg);color:var(--ink)!important}.gx{margin-left:8px;background:none!important;color:inherit!important;border:1px solid currentColor!important;width:auto}
 </style>
 </head>
 <body>
@@ -75,7 +75,6 @@ header h1 span{font-weight:400;color:var(--mut)}header p{margin:1px 0 0;color:va
  <section class="view"><div class="stage"><canvas id="gl"></canvas><div class="vt"><button data-v="asm"></button><button data-v="print"></button></div></div><div id="status"></div></section>
  <section class="panel" id="panel"><div class="stats" id="stats"></div></section>
 </main>
-<div class="bar"><button id="b3mf"></button><button id="bstl" class="sec"></button></div>
 <script src="config.js"></script>
 <script>
 'use strict';
@@ -193,11 +192,11 @@ function stlOf(tris){const n=tris.length/9,b=new ArrayBuffer(84+n*50),dv=new Dat
   for(let k=0;k<9;k++){dv.setFloat32(o,tris[t+k],true);o+=4}o+=2}return new Uint8Array(b)}
 const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
 const crc32=u=>{let c=~0;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return ~c>>>0};
-function zip(files){const enc=new TextEncoder(),ch=[],cd=[];let off=0;
+function zip(files){const enc=new TextEncoder(),ch=[],cd=[];let off=0;const N=new Date(),dt=N.getHours()<<11|N.getMinutes()<<5|N.getSeconds()>>1,dd=(N.getFullYear()-1980)<<9|(N.getMonth()+1)<<5|N.getDate();
  for(const f of files){const nm=enc.encode(f.name),d=f.data,crc=crc32(d);
-  const lh=new DataView(new ArrayBuffer(30));lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(10,0,true);lh.setUint16(12,33,true);lh.setUint32(14,crc,true);lh.setUint32(18,d.length,true);lh.setUint32(22,d.length,true);lh.setUint16(26,nm.length,true);
+  const lh=new DataView(new ArrayBuffer(30));lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(10,dt,true);lh.setUint16(12,dd,true);lh.setUint32(14,crc,true);lh.setUint32(18,d.length,true);lh.setUint32(22,d.length,true);lh.setUint16(26,nm.length,true);
   ch.push(new Uint8Array(lh.buffer),nm,d);
-  const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(14,33,true);c.setUint32(16,crc,true);c.setUint32(20,d.length,true);c.setUint32(24,d.length,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
+  const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(12,dt,true);c.setUint16(14,dd,true);c.setUint32(16,crc,true);c.setUint32(20,d.length,true);c.setUint32(24,d.length,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
   cd.push(new Uint8Array(c.buffer),nm);off+=30+nm.length+d.length}
  let cs=0;for(const u of cd)cs+=u.length;const e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
  return new Blob([...ch,...cd,new Uint8Array(e.buffer)],{type:'application/zip'})}
@@ -589,7 +588,7 @@ const L={
  mode:['Modus','Mode'],mSingle:['Einzelbox','Single box'],mPlan:['Planer','Planner'],space:['Platz / Aussenmasse','Space / outer size'],fill:['Platz ausfüllen (Module strecken)','Fill the space (stretch modules)'],plmods:['Modul(e)','Module(s)'],add_box:['+ Box','+ Box'],add_tall:['+ Hoher Behälter','+ Tall container'],add_drawer:['+ Schublade','+ Drawer'],plset:['Bauweise','Construction'],plmsg:['Prüfung','Check'],
  mW:['Breite','Width'],mD:['Tiefe','Depth'],mH:['Höhe','Height'],divN:['Trennwände','Dividers'],lidPlug:['Deckel','Lid'],typeSel:['Art','Type'],lidSel:['Deckel','Lid'],filler:['Füllstücke für eingeschlossene Ecken (optional)','Filler pieces for enclosed corners (optional)'],sharpSeam:['Ecken an Nähten scharf bis zur Nachbarhöhe (kein Schmutz in den Fugen)','Sharp corners at seams up to the neighbour height (no dirt in the gaps)'],_old:['Ecken an Nähten scharf (kein Schmutz in den Fugen)','Sharp corners at seams (no dirt in the gaps)'],sbtype:['Art der Box','Box type'],tBox:['Box mit Fächern','Box with compartments'],tDrawer:['Schubladenbox','Drawer box'],nDrawers:['Schubladen','Drawers'],nDr:['Schubladen übereinander','Drawers stacked'],iDrw:['{0}: zu niedrig für mehr Schubladen, es sind {1}.','{0}: too low for more drawers; using {1}.'],tex:['Oberfläche (freie Aussenseiten)','Surface (free outer sides)'],tx_none:['glatt','smooth'],tx_ribs:['Rillen','Ribs'],tx_waves:['Wellen','Waves'],tx_facets:['Facetten','Facets'],lid_none:['ohne Deckel','no lid'],lid_plug:['Steckdeckel','Plug lid'],lid_slide:['Schiebedeckel','Sliding lid'],lid_hinge:['Klappdeckel','Hinged lid'],iPin:['{0}: Scharnierstift mitdrucken oder ein Stück 1,75-mm-Filament ({1} mm) einfädeln.','{0}: print the hinge pin or thread a piece of 1.75 mm filament ({1} mm).'],eDrawer:['Schubladen müssen in der vordersten Reihe liegen (Vorderseite frei). Verkleinere die Schubladen oder vergrössere die Breite.','Drawers must sit in the front row (front side free). Make the drawers narrower or the space wider.'],drawerBtn:['+ Schublade','+ Drawer'],iPlates:['Dieser Plan braucht ca. {0} Druckplatten. In Bambu Studio die Teile mit «Anordnen» auf Platten verteilen.','This plan needs about {0} build plates. In Bambu Studio use “Arrange” to spread the parts.'],eLidH:['{0}: für diesen Deckel ist die Höhe zu klein (mind. 35 mm).','{0}: too low for this lid (min. 35 mm).'],iSlide:['{0}: Schiebedeckel braucht eine freie Vorderseite (unten im Plan), sonst lässt er sich nicht herausziehen.','{0}: the sliding lid needs a free front side, otherwise it cannot be pulled out.'],iHinge:['{0}: Klappdeckel braucht oben freien Platz zum Aufklappen.','{0}: the hinged lid needs free space above to swing open.'],del:['Entfernen','Remove'],t_box:['Box','Box'],t_tall:['Hoher Behälter','Tall container'],t_drawer:['Schublade','Drawer'],sMods:['Module','Modules'],
  eEmpty:['Füge mindestens ein Modul hinzu.','Add at least one module.'],eTall:['{0}: Höhe {1} mm ist grösser als der Platz ({2} mm).','{0}: height {1} mm exceeds the space ({2} mm).'],eSmall:['{0}: zu klein (mind. {1}×{2}×{3} mm).','{0}: too small (min. {1}×{2}×{3} mm).'],eBig:['{0} passt nicht in den Platz.','{0} does not fit the space.'],eArea:['Die Module brauchen {0} cm² Grundfläche, verfügbar sind {1} cm².','The modules need {0} cm² of floor area; only {1} cm² available.'],eNoFit:['Die Module lassen sich nicht überlappungsfrei anordnen. Verkleinere ein Modul oder vergrössere den Platz.','The modules cannot be arranged without overlap. Shrink a module or enlarge the space.'],iFree:['{0} cm² bleiben frei. „Platz ausfüllen“ streckt die Module.','{0} cm² stay free. “Fill the space” stretches the modules.'],iShort:['{0} und {1} berühren sich nur kurz, dort gibt es keine Steckverbindung.','{0} and {1} touch only briefly; no connector there.'],okFit:['Alles passt: {0} Module, {1} Verbinder.','Everything fits: {0} modules, {1} connectors.'],
- gateT:['Freischalten','Unlock'],gateD:['Gib deine Etsy-Bestellnummer (oder deinen Code) ein, um Dateien herunterzuladen.','Enter your Etsy order number (or your code) to download files.'],gateB:['Freischalten','Unlock'],gateBad:['Nummer oder Code ungültig.','Invalid number or code.'],gateRate:['Zu viele Versuche. Bitte später erneut versuchen.','Too many attempts. Please try again later.'],gateNet:['Keine Verbindung zum Server.','Cannot reach the server.'],gateCfg:['Freischaltung ist nicht eingerichtet.','Unlock service is not configured.'],gateEmpty:['Keine Exporte mehr übrig für diese Bestellung.','No exports left for this order.'],demoMode:['Testmodus: Export ist frei.','Test mode: export is free.'],notUnlocked:['Noch nicht freigeschaltet (Vorschau ist frei).','Not unlocked yet (preview is free).'],creditLeft:['Freigeschaltet: {0} Export(e) übrig.','Unlocked: {0} export(s) left.'],cart:['Warenkorb','Cart'],cartHint:['Konfigurationen sammeln und gemeinsam als ZIP herunterladen (je Konfiguration 1 Export).','Collect configurations and download them together as one ZIP (1 export per configuration).'],addCart:['+ Aktuelle Konfiguration in den Warenkorb','+ Add current configuration to cart'],cartExp:['Warenkorb herunterladen (ZIP)','Download cart (ZIP)'],cartEmpty:['Warenkorb ist leer.','Cart is empty.'],cartLoad:['Laden','Load']
+ gateT:['Freischalten','Unlock'],gateD:['Gib deine Etsy-Bestellnummer (oder deinen Code) ein, um Dateien herunterzuladen.','Enter your Etsy order number (or your code) to download files.'],gateB:['Freischalten','Unlock'],gateBad:['Nummer oder Code ungültig.','Invalid number or code.'],gateRate:['Zu viele Versuche. Bitte später erneut versuchen.','Too many attempts. Please try again later.'],gateNet:['Keine Verbindung zum Server.','Cannot reach the server.'],gateCfg:['Freischaltung ist nicht eingerichtet.','Unlock service is not configured.'],gateEmpty:['Keine Exporte mehr übrig für diese Bestellung.','No exports left for this order.'],demoMode:['Testmodus: Export ist frei.','Test mode: export is free.'],notUnlocked:['Noch nicht freigeschaltet (Vorschau ist frei).','Not unlocked yet (preview is free).'],creditLeft:['Freigeschaltet: {0} Export(e) übrig.','Unlocked: {0} export(s) left.'],cart:['Herunterladen','Download'],cartHint:['Jede Konfiguration kostet 1 Export. Das ZIP enthält je eine 3MF-Datei (Bambu Studio) und einzelne STL-Dateien. Mehrere Konfigurationen hier sammeln und zusammen herunterladen.','Each configuration uses 1 export. The ZIP contains one 3MF file (Bambu Studio) and separate STL files per configuration. Collect several configurations here and download them together.'],cartMods:['Plan, {0} Module','Plan, {0} modules'],cartOne:['Einzelbox','Single box'],cartName:['Name','Name'],cartDel:['Entfernen','Remove'],cartExpN:['⬇ Warenkorb herunterladen ({0} Export(e))','⬇ Download cart ({0} export(s))'],cartExpOne:['⬇ Aktuelle Konfiguration herunterladen (1 Export)','⬇ Download current configuration (1 export)'],addCart:['+ Zum Warenkorb hinzufügen','+ Add to cart'],cartExp:['Warenkorb herunterladen (ZIP)','Download cart (ZIP)'],cartEmpty:['Warenkorb ist leer.','Cart is empty.'],cartLoad:['Laden','Load']
 };
 let lang=(navigator.language||'de').toLowerCase().startsWith('de')?0:1;
 const tr=k=>(L[k]||[k,k])[lang];
@@ -638,7 +637,7 @@ function ui(){
  buildPlanUI();
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
  ['cBox','cLid','cTray','cKey'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
- c=card('cart');para(c,'cartHint');const ci=document.createElement('p');ci.id='creditinfo';ci.className='note';c.append(ci);btn(c,'addCart',addCart);const cl=document.createElement('div');cl.id='cartlist';c.append(cl);btn(c,'cartExp',exportCart);renderCart();creditInfo();
+ c=card('cart');c.id='cartcard';para(c,'cartHint');const ci=document.createElement('p');ci.id='creditinfo';c.append(ci);const cl=document.createElement('div');cl.id='cartlist';c.append(cl);btn(c,'addCart',addCart);const cx=document.createElement('button');cx.id='cartexp';cx.className='btn pri';cx.onclick=exportCart;c.append(cx);renderCart();creditInfo();
  c=card('vis');const vv=document.createElement('div');vv.className='colors';S.hide=S.hide||{};
  ['cBox','cLid','cTray','cKey'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='checkbox';i.checked=!S.hide[k];i.onchange=()=>{S.hide[k]=!i.checked;present(false);save()};l.append(i,s);vv.append(l)});c.append(vv);
  c=card('fit');para(c,'fitText');btn(c,'fitDl',downloadFit);seg(c,'fit','fitPick',[[1,'1'],[2,'2'],[3,'3'],[4,'4'],[5,'5']])}
@@ -646,7 +645,7 @@ function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();a
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';
- document.getElementById('b3mf').textContent=tr('b3mf');document.getElementById('bstl').textContent=tr('bstl');
+ renderCart();
  document.getElementById('gt').textContent=tr('gateT');document.getElementById('gd').textContent=tr('gateD');document.getElementById('gok').textContent=tr('gateB');
  document.querySelectorAll('.vt button').forEach(b=>b.textContent=tr(b.dataset.v))}
 document.getElementById('langbtn').onclick=()=>{lang=lang?0:1;try{localStorage.setItem('mn-lang',lang)}catch(e){}applyLang();present(false)};
@@ -664,15 +663,7 @@ function present(reframe){if(!built)return;if(true){presentPlan(reframe);return}
  let w='';if(span[0]>256||span[1]>256||S.H>256)w+=tr('warnBed')+' ';if(Math.min(i.cw,i.ch)<15)w+=tr('warnCell')+' ';if(S.tray)w+=tr('warnTray');
  status.innerHTML=`${S.W} × ${S.D} × ${S.H} mm`+(w?`<br><b>${w}</b>`:'')}
 async function refresh(){const my=++seq;const r=await buildPlan(5,.05);if(my!==seq)return;r.mode=S.mode;const first=!built||built.mode!==S.mode;built=r;present(first)}
-async function doExport(kind){if(!unlockedNow())return;const b3=document.getElementById('b3mf'),bs=document.getElementById('bstl');b3.disabled=bs.disabled=true;status.innerHTML='<b>'+tr('exporting')+'</b>';
- await new Promise(r=>setTimeout(r,30));
- try{const plan=S.mode==='plan',r=await buildPlan(9,.02),base=plan?`ModuNest-Plan-${PL.W}x${PL.D}x${PL.H}`:`ModuNest-${PL.W}x${PL.D}x${PL.H}`;
-  if(!(await charge(1)))return;
-  if(kind==='3mf'){const arr=arrange(r.parts,'print');download(threeMF(arr.map(p=>({...p,color:S[p.key]}))),base+'.3mf')}
-  else download(zip(r.parts.map((p,i)=>({name:`${i+1}-${p.name}${p.qty>1?'_x'+p.qty:''}.stl`,data:stlOf(p.pf?xf(p.tris,p.pf):p.tris)}))),base+'-stl.zip')}
- finally{b3.disabled=bs.disabled=false;present(false)}}
 async function downloadFit(){const t=await fitTestTris(9,.02);const all=Float32Array.from([...t[0],...t[1]]);download(new Blob([stlOf(all)],{type:'model/stl'}),'ModuNest-Passungstest.stl')}
-document.getElementById('b3mf').onclick=()=>doExport('3mf');document.getElementById('bstl').onclick=()=>doExport('stl');
 function threeMF(parts){const hex=h=>h.replace('#','').toUpperCase(),f=v=>v.toFixed(4);let objs='',mats='',items='';
  parts.forEach((p,i)=>{const{V,I}=weld(p.tris),id=i+2;mats+=`<base name="${p.name}" displaycolor="#${hex(p.color)}"/>`;
   let vs='',ts='';for(let k=0;k<V.length;k+=3)vs+=`<vertex x="${f(V[k])}" y="${f(V[k+1])}" z="${f(V[k+2])}"/>`;for(let k=0;k<I.length;k+=3)ts+=`<triangle v1="${I[k]}" v2="${I[k+1]}" v3="${I[k+2]}"/>`;
@@ -692,7 +683,7 @@ function presentPlan(reframe){const sol=built.sol,arr0=sol.ok?arrange(built.part
  let wmsg='';if(sol.ok){let big=false,fa=0;built.parts.forEach(p=>{const q=bbox(p.tris);const w=q.b[0]-q.a[0],d=q.b[1]-q.a[1];if(Math.min(w,d)>250||Math.max(w,d)>256&&Math.min(w,d)>256||q.b[2]>256)big=true;fa+=(w+8)*(d+8)*(p.qty||1)});
   if(big)wmsg=tr('warnBed');else if(fa>.75*246*246)wmsg=trf('iPlates',Math.ceil(fa/(.75*246*246)))}
  status.innerHTML=`${PL.W} × ${PL.D} × ${PL.H} mm`+(wmsg?`<br><b>${wmsg}</b>`:'');
- document.getElementById('b3mf').disabled=document.getElementById('bstl').disabled=!sol.ok}
+ planOk=sol.ok;renderCart()}
 function numIn(m,k,mn,mx){const i=document.createElement('input');i.type='number';i.min=mn;i.max=mx;i.step=5;i.value=m[k];i.onchange=()=>{m[k]=Math.max(mn,Math.min(mx,+i.value||mn));i.value=m[k];changed()};return i}
 function mkSel(m,key,lk,vals,lab){const l=document.createElement('label'),s=document.createElement('span'),sel=document.createElement('select');s.textContent=tr(lk);vals.forEach(v=>{const op=document.createElement('option');op.value=v;op.textContent=lab?tr(lab+v):v;sel.append(op)});sel.value=m[key]??vals[0];sel.onchange=()=>{m[key]=typeof vals[0]==='number'?+sel.value:sel.value;changed()};l.append(s,sel);return l}
 function renderMods(){const list=document.getElementById('modlist');list.innerHTML='';const single=S.mode==='single',ms=single?[PL.one]:PL.mods;
@@ -736,22 +727,29 @@ const SKEYS=['wall','r','stack','conn','sharpSeam','filler','tex','fit','mode','
 const snap=()=>{const o={};SKEYS.forEach(k=>o[k]=S[k]);return{S:o,PL:JSON.parse(JSON.stringify(PL))}};
 function applySnap(s){Object.assign(S,s.S);for(const k in PL)delete PL[k];Object.assign(PL,JSON.parse(JSON.stringify(s.PL)))}
 const snapName=s=>(s.S.mode==='plan'?'Plan':'Box')+' '+s.PL.W+'x'+s.PL.D+'x'+s.PL.H;
+var planOk=true;
 function addCart(){const s=snap();s.name=snapName(s);CART.push(s);saveCart();renderCart()}
-function renderCart(){const e=gEl('cartlist');if(!e)return;e.innerHTML='';
- if(!CART.length){e.textContent=tr('cartEmpty');return}
- CART.forEach((it,i)=>{const r=document.createElement('div');r.className='crow';const n=document.createElement('input');n.value=it.name;n.onchange=()=>{it.name=n.value.replace(/[^\w\- ]+/g,'').trim()||'Konfig';saveCart()};
-  const l=document.createElement('button');l.textContent='↺';l.title=tr('cartLoad');l.onclick=()=>{applySnap(it);buildUI();changed()};
-  const d=document.createElement('button');d.textContent='×';d.onclick=()=>{CART.splice(i,1);saveCart();renderCart()};r.append(n,l,d);e.append(r)})}
-async function exportCart(){if(!CART.length||!unlockedNow())return;if(CONFIG.requireCode&&SES.left<CART.length){gate(tr('gateEmpty'));return}const st=document.getElementById('status'),keep=snap();const files=[];
- try{for(let i=0;i<CART.length;i++){st.innerHTML='<b>'+tr('exporting')+' '+(i+1)+'/'+CART.length+'</b>';await new Promise(r=>setTimeout(r,30));
-   applySnap(CART[i]);const r=await buildPlan(9,.02);if(!r.sol.ok)throw new Error(CART[i].name+': '+r.sol.msgs.map(x=>x.join(' ')).join('; '));
-   const dir=(i+1)+'-'+CART[i].name+'/',arr=arrange(r.parts,'print');
-   files.push({name:dir+CART[i].name+'.3mf',data:new Uint8Array(await threeMF(arr.map(p=>({...p,color:S[p.key]}))).arrayBuffer())});
+const snapInfo=s=>s.S.mode==='plan'?trf('cartMods',(s.PL.mods||[]).length):tr('cartOne');
+function renderCart(){const e=gEl('cartlist'),x=gEl('cartexp');if(!e)return;e.innerHTML='';
+ CART.forEach((it,i)=>{const r=document.createElement('div');r.className='crow';
+  const no=document.createElement('span');no.className='cno';no.textContent=i+1;
+  const m=document.createElement('div');m.className='cmain';const n=document.createElement('input');n.type='text';n.size=1;n.value=it.name;n.setAttribute('aria-label',tr('cartName'));n.onchange=()=>{it.name=n.value.replace(/[^\w\- ]+/g,'').trim()||'Konfig';n.value=it.name;saveCart()};
+  const d=document.createElement('small');d.textContent=snapInfo(it)+' · '+it.PL.W+' × '+it.PL.D+' × '+it.PL.H+' mm';m.append(n,d);
+  const l=document.createElement('button');l.className='cic';l.textContent='↺';l.title=l.ariaLabel=tr('cartLoad');l.onclick=()=>{applySnap(it);buildUI();changed()};
+  const del=document.createElement('button');del.className='cic';del.textContent='✕';del.title=del.ariaLabel=tr('cartDel');del.onclick=()=>{CART.splice(i,1);saveCart();renderCart()};
+  r.append(no,m,l,del);e.append(r)});
+ if(x){x.textContent=CART.length?trf('cartExpN',CART.length):tr('cartExpOne');x.disabled=!CART.length&&!planOk}}
+async function exportCart(){if(!unlockedNow())return;const keep=snap();if(!keep.name)keep.name=snapName(keep);const list=CART.length?CART:[keep];
+ if(CONFIG.requireCode&&SES.left<list.length){gate(tr('gateEmpty'));return}const st=document.getElementById('status'),x=gEl('cartexp');const files=[];if(x)x.disabled=true;
+ try{for(let i=0;i<list.length;i++){st.innerHTML='<b>'+tr('exporting')+' '+(i+1)+'/'+list.length+'</b>';await new Promise(r=>setTimeout(r,30));
+   applySnap(list[i]);const r=await buildPlan(9,.02);if(!r.sol.ok)throw new Error(list[i].name+': '+r.sol.msgs.map(x=>x.join(' ')).join('; '));
+   const dir=(i+1)+'-'+list[i].name+'/',arr=arrange(r.parts,'print');
+   files.push({name:dir+list[i].name+'.3mf',data:new Uint8Array(await threeMF(arr.map(p=>({...p,color:S[p.key]}))).arrayBuffer())});
    r.parts.forEach((p,k)=>files.push({name:dir+'stl/'+(k+1)+'-'+p.name+(p.qty>1?'_x'+p.qty:'')+'.stl',data:stlOf(p.pf?xf(p.tris,p.pf):p.tris)}))}
   applySnap(keep);
-  if(await charge(CART.length))download(zip(files),'ModuNest-Warenkorb.zip')}
+  if(await charge(list.length))download(zip(files),CART.length?'ModuNest-Warenkorb.zip':'ModuNest-'+keep.name.replace(/ /g,'-')+'.zip')}
  catch(e){st.textContent=e.message}
- finally{applySnap(keep);buildUI();present(false)}}
+ finally{applySnap(keep);buildUI();present(false);renderCart()}}
 
 panel.dataset.mode=S.mode;buildUI();refresh();
 window.__mn={slotsFor,S,PL,buildPlan,planSolve,renderMods,buildAll,openEdges,volume,fitTestTris,arrange,get built(){return built}};
