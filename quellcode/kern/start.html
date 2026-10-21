@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fdfaf2">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-180.png">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ModuNest">
+<title>ModuNest Studio – Art vom Hof</title>
+<script>
+/* Produktauswahl. Bei nur einem Produkt direkt weiter (alte Links bleiben gueltig). */
+const PRODUCTS=PRODUCTS_JSON;
+if(PRODUCTS.length===1)location.replace(PRODUCTS[0].id+'/'+location.search+location.hash);
+</script>
+<style>
+@font-face{font-family:"Script";src:url(FONT_DATA) format("woff2");font-weight:700;font-display:swap}
+:root{--bg:#f6f0e4;--card:#fdfaf2;--ink:#1e1a17;--mut:#6f6458;--line:#e2d6c4;--acc:#1e1a17;--on:#fdfaf2;--warm:#c46546}
+@media(prefers-color-scheme:dark){:root{--bg:#151412;--card:#1f1d1a;--ink:#f2ede3;--mut:#a59d8f;--line:#38332c;--acc:#f2ede3;--on:#151412;--warm:#d98462}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--card);border-bottom:3px solid var(--ink);box-shadow:0 3px 0 var(--card),0 5px 0 var(--warm);margin-bottom:5px}
+header .logo{width:56px;height:56px;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+h1{font-family:Script,cursive;font-size:29px;margin:0;line-height:1.05}
+header p{margin:2px 0 0;font-size:12px;color:var(--mut)}
+#lang{margin-left:auto;border:1px solid var(--ink);border-radius:999px;background:none;color:var(--ink);font:inherit;font-weight:600;padding:5px 12px;cursor:pointer}
+main{max-width:900px;margin:0 auto;padding:16px;display:grid;gap:14px}
+.intro{font-family:Script,cursive;font-size:26px;margin:4px 0 0;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+a.p{display:grid;gap:8px;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 1px 2px rgba(30,26,23,.05)}
+a.p img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;background:var(--bg)}
+a.p img.lg{object-fit:contain;padding:18px}
+a.p h2{font-family:Script,cursive;font-size:25px;margin:0}
+a.p p{margin:0;color:var(--mut);font-size:14px}
+a.p span{justify-self:start;margin-top:4px;padding:9px 16px;border-radius:999px;background:var(--acc);color:var(--on);font-weight:600}
+</style>
+</head>
+<body>
+<header><img class="logo" src="LOGO_DATA" alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div><button id="lang"></button></header>
+<main><p class="intro" id="intro"></p><div class="grid" id="grid"></div></main>
+<script>
+const T={tag:['Konfiguratoren von Art vom Hof','Configurators by Art vom Hof'],intro:['Was möchtest du gestalten?','What would you like to design?'],open:['Öffnen','Open']};
+let lang=(navigator.language||'de').toLowerCase().startsWith('de')?0:1;try{const l=localStorage.getItem('mn-lang');if(l!==null)lang=+l}catch(e){}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function show(){const k=lang?'en':'de';document.documentElement.lang=k;document.getElementById('tag').textContent=T.tag[lang];document.getElementById('intro').textContent=T.intro[lang];document.getElementById('lang').textContent=lang?'DE':'EN';
+ document.getElementById('grid').innerHTML=PRODUCTS.map(p=>`<a class="p" href="${esc(p.id)}/"><img ${p.bild?'':'class="lg"'} src="${p.bild||document.querySelector('header .logo').src}" alt=""><h2>${esc(p.name[k])}</h2><p>${esc(p.text[k])}</p><span>${T.open[lang]}</span></a>`).join('')}
+document.getElementById('lang').onclick=()=>{lang=lang?0:1;try{localStorage.setItem('mn-lang',lang)}catch(e){}show()};
+show();
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

@@ -7,25 +7,27 @@ Offline-fähige **Einzeldatei-HTML-App** (kein Framework, keine Abhängigkeiten)
 
 ## Repo & Build
 - Live: **https://mikesch15.github.io/ModuNest-Studio/** (GitHub Pages, Branch `main`, Ordner `/`). Mike will, dass Änderungen direkt auf `main` gehen.
-- `index.html` = fertige App (gebaut), `config.js` = Server-Einstellung (`window.MN_CONFIG`, requireCode + API-URL). Ohne config.js: Testmodus.
-- Quellcode in `quellcode/`. `quellcode/backend/admin.html` und `dist/` sind absichtlich nicht im Repo (.gitignore).
+- Erzeugte Dateien (nie von Hand ändern): `index.html` (Produktauswahl; bei nur 1 Produkt Weiterleitung), `<produkt>/index.html` (z. B. `modunest/`), `admin/index.html`, `manifest.webmanifest`, `admin/manifest.webmanifest`, `sw.js`, `icons/*`.
+- `config.js` (von Hand): Server-Einstellung `window.MN_CONFIG` (requireCode + API-URL), wird von Produktseiten und Admin als `../config.js` geladen. Ohne config.js: Testmodus.
 ```
-cd quellcode && python3 assemble.py   # baut dist/modunest-studio.html UND ../index.html
+cd quellcode && python3 assemble.py   # baut alles (braucht Pillow für die Icons); dist/<produkt>.html für Tests
 ```
-Version 2.9 + Änderungen vom 20.10.2026 (Kisten-Abrechnung, Design «Art vom Hof», Anleitung/ⓘ-Erklärungen).
-`src_sign.html` ist nur noch Quelle für Kern-Slices (Marching Squares, extrude/cap/walls, zip, Renderer, `mk`, `weld`); nicht direkt ändern, ausser Kern.
+- **Installierbar (PWA):** Konfigurator (Manifest im Wurzelordner, Scope `./`) und Admin (eigenes Manifest in `admin/`, dunkles Icon) teilen sich `sw.js` (immer zuerst Netz, offline aus Zwischenspeicher; Version = Hash aller Ausgaben; fremde Domains wie Supabase nie gecacht).
+- Admin liegt öffentlich unter `admin/` (noindex). Unbedenklich: keine Geheimnisse, ohne ADMIN_KEY nutzlos. Server erlaubt für admin/* jede Origin, für Kunden-Aufrufe nur ALLOWED_ORIGIN. admin/add setzt die Kisten-Gesamtzahl (upsert), nur Ziffern ≥6.
 
-## Dateien
+## Struktur für mehrere Produkte (`quellcode/`)
+- `kern/` – gemeinsam: `src_sign.html` (Kern-Slices: Marching Squares, extrude, zip, Renderer, `mk`, `weld`; nur bei Kernänderungen anfassen), `head.html` (HTML/CSS, Look «Art vom Hof»), `texte.js` (allg. Texte `L`, `lang`, `tr`/`trf`; Platzhalter `{U}`/`{UP}`/`{U1}` = Einheit des Produkts), `shell.js` (App-Rahmen: Karten, ⓘ, Sprache, Vorschau-Steuerung, `arrangePrint`, 3MF, Anleitung, SW-Registrierung), `gate.js` (Freischaltung, Warenkorb, Abrechnung), `start.html`, `admin.html`, `sw.js`, `fonts/`, `logo.webp` (klein, eingebettet), `logo-gross.webp` (Quelle für Icons).
+- `produkte/<id>/` – `produkt.json` (id, name/text DE+EN, `dateien` = Reihenfolge der JS-Dateien), die JS-Dateien, optional `bild.webp` (Kachel auf der Startseite), `tests/`.
+- **Vertrag Produkt → Kern** (in der letzten Produktdatei): globale `S` (Zustand mit view/hide/mode), `PRODUCT={id,name,file,store,unit:{one,n,many},build(res,tol)->{ok,err,parts,units},snap,applySnap,snapName,snapCount,snapInfo,onChange?,color?}`, Funktionen `ui()` (Karten bauen, `cartCard()` aufrufen), `present(reframe)`, `arrange(parts,mode)` (für 'print' → `arrangePrint`). `units` = je abgerechneter Einheit die Masse (Gratis-Korrektur ±5 mm). `store` = localStorage-Präfix (modunest: `mn` → `mn-state`, `mn-cart`). Texte mit `Object.assign(L,{...})`.
+- **Neues Produkt:** Ordner `produkte/<id>/` nach Vorbild modunest anlegen, `produkt.json` + Dateien, bauen. Startseite zeigt dann automatisch die Auswahl, jede Produktseite einen ⌂-Knopf. Server: `consume` bekommt `product`; Guthaben (orders) gilt für alle Produkte, Gratis-Korrekturen nur innerhalb des Produkts (`exports.product`).
+
+## ModuNest-Dateien (`produkte/modunest/`)
 - `planner.js` – Planer: `planSolve` (Reihenpackung, Validierung, Kontaktflächen `ti` mit Nachbarhöhe, Schlüsselpositionen), `slotsFor`, `effPlan` (Einzelbox = Planer mit 1 Modul).
 - `geo2.js` – Geometrie: `buildMod` (Box/Hoch/Schublade, Deckel plug/slide/hinge, Trennwände, Einsatz, Hohlkehle FR, Texturen, höhenabhängig scharfe Ecken `cornerHc`), `fillerParts` (Füllstücke), `buildPlan`.
 - `geo.js` – Konstanten (FOOT, POCK, RK…), `keyShape` (Schmetterlings-Schlüssel), `lidTris`, `cellRects`, Passungstest. `buildAll` ist Legacy.
-- `ui.js` – Texte `L` (DE/EN), Zustand `S`, Planer-Standard `PL`.
-- `app.js` – Anordnung (`arrange`), Vorschau, UI-Karten, Export (STL/3MF), Ansicht-Schalter (`S.hide`).
-- `gate.js` – Freischaltung gegen Server (`CONFIG.requireCode/api`), Warenkorb (`CART`, ZIP-Export).
-- `head.html` – HTML/CSS (Look «Art vom Hof»: Tinte auf Papier, Schreibschrift `Script` = Dancing Script/OFL, runde Formen; Logo `logo.webp` (farbig, rund freigestellt) wird von assemble.py einmal als `LOGO` eingebettet) und `CONFIG` (aus config.js/`window.MN_CONFIG`, sonst Testmodus).
-- `admin.html` (nur bei Mike, nicht im Repo): eigenständige Admin-Seite im App-Design (Logo/Schrift eingebettet), lokal geöffnet; ruft admin/list, admin/create, admin/add. Server erlaubt für admin/* jede Origin (Schutz = ADMIN_KEY), für Kunden-Aufrufe nur ALLOWED_ORIGIN. admin/add setzt die Kisten-Gesamtzahl (upsert), nur Ziffern ≥6.
-- `backend/` – Supabase: `schema.sql`, Edge Functions `modunest` (redeem/consume/admin) und `etsy-webhook`, `admin.html`, `ANLEITUNG.md`.
-- `tests/` – Playwright-Skripte (p*.mjs, t*.mjs); nutzen Chromium unter /opt/pw-browsers; Pfade anpassen: /home/claude/mn/ → quellcode/, playwright z. B. aus /opt/node22/lib/node_modules. p21 simuliert noch die alte Abrechnung (n statt cfgs). Wichtige: `p18.mjs` (Geometrie-Bau/Teileliste/Volumen/offene Kanten), `p19.mjs` (Screenshots), `p21.mjs` (Gate/Warenkorb mit simuliertem Server), `p11.mjs` (Planer-Konfigurationen, Verbinder-Eckencheck).
+- `produkt.js` – Texte, Zustand `S`/`PL`, Oberfläche (`ui`, `buildPlanUI`, `renderMods`), `presentPlan`, `arrange`, `PRODUCT`.
+- `tests/` – Playwright-Skripte; Chromium unter /opt/pw-browsers; Pfade anpassen: /home/claude/mn/dist/modunest-studio.html → quellcode/dist/modunest.html, playwright z. B. aus /opt/node22/lib/node_modules. p21 simuliert noch die alte Abrechnung. Wichtig: `p18.mjs` (Geometrie; Ausgabe beim Umbau 21.10. identisch), `p19.mjs` (Screenshots), `p11.mjs` (Planer, Verbinder-Ecken).
+- `quellcode/backend/` – Supabase: `schema.sql`, Edge Functions `modunest` (redeem/consume/admin) und `etsy-webhook`, `ANLEITUNG.md`.
 
 ## Geometrie-Konventionen (wichtig)
 - Eigenes Raster: Canvas → Marching Squares → Douglas-Peucker → Polygon-Triangulation. Aussenringe CCW, Löcher CW. Übereinandergestapelte Bänder (`extrude(ring,z0,z1)`) erzeugen mehrere Hüllen → `openEdges` zählt viel (bekannt, Bambu-Verhalten ungeprüft).
@@ -37,10 +39,10 @@ Version 2.9 + Änderungen vom 20.10.2026 (Kisten-Abrechnung, Design «Art vom Ho
 - Teile haben `asm` (Funktionen für Montageansicht), optional `qty`, `pf` (Druckausrichtung).
 
 ## Bedienhilfe
-Erstbesuch: Anleitung «So funktioniert's» (`#help`, localStorage `mn-help`), wieder öffnen mit «?» im Kopf. Jede Karte mit Text `L['i_'+Titelschlüssel]` bekommt automatisch einen ⓘ-Knopf (`addInfo` in app.js). Neue Karte → `i_<key>` in ui.js ergänzen. Hinweis in der 3D-Ansicht (`.vhint`) verschwindet nach erster Berührung.
+Erstbesuch: Anleitung «So funktioniert's» (`#help`, localStorage `mn-help`), wieder öffnen mit «?» im Kopf. Jede Karte mit Text `L['i_'+Titelschlüssel]` bekommt automatisch einen ⓘ-Knopf (`addInfo` in kern/shell.js). Neue Karte → `i_<key>` in den Produkttexten ergänzen. Hinweis in der 3D-Ansicht (`.vhint`) verschwindet nach erster Berührung.
 
 ## Freischaltung / Etsy
-Käufer gibt Etsy-**Bestellnummer** (oder Admin-Code) ein → Server prüft → Sitzungstoken → Abbuchung pro **Kiste** (Modul) beim Download. Korrekturen innerhalb 24 h gratis, wenn jede Kiste zu einer bezahlten passt (je Mass ±5 mm, Vergleich mit bezahlter Fassung; Tabelle `exports`). Webhook: Kisten = Menge × (LISTING_CREDITS[listing] oder DEFAULT_CREDITS). IP-Versuche werden per pg_cron nach 7 Tagen gelöscht. Live: https://mikesch15.github.io/ModuNest-Studio/ (Repo Mikesch15/ModuNest-Studio: index.html + config.js). Etsy-App ist freigegeben; Webhook `order.paid` → `etsy-webhook`. Supabase-Projekt «ModuNest Studio» (ref `sfoscpgsumukhihkdutw`, eu-west-1): Tabellen `orders`, `attempts`, `exports`; Funktionen `modunest` und `etsy-webhook` (beide **verify_jwt=false**). Secrets setzt Mike selbst im Dashboard (TOKEN_SECRET, ADMIN_KEY, ALLOWED_ORIGIN=https://mikesch15.github.io, DEFAULT_CREDITS=6, ETSY_WEBHOOK_SECRET). Andere Supabase-Projekte von Mike (Spengler-Digital, Tulpenweg-Sanierung) nie anfassen. **Offen:** Etsy-Testkauf (Payload-Format von Etsy unverifiziert, Funktion liest tolerant; danach Logs prüfen).
+Käufer gibt Etsy-**Bestellnummer** (oder Admin-Code) ein → Server prüft → Sitzungstoken → Abbuchung pro **Kiste** (Modul) beim Download. Korrekturen innerhalb 24 h gratis, wenn jede Kiste zu einer bezahlten passt (je Mass ±5 mm, Vergleich mit bezahlter Fassung; Tabelle `exports`). Webhook: Kisten = Menge × (LISTING_CREDITS[listing] oder DEFAULT_CREDITS). IP-Versuche werden per pg_cron nach 7 Tagen gelöscht. Etsy-App ist freigegeben; Webhook `order.paid` → `etsy-webhook`. Supabase-Projekt «ModuNest Studio» (ref `sfoscpgsumukhihkdutw`, eu-west-1): Tabellen `orders`, `attempts`, `exports`; Funktionen `modunest` und `etsy-webhook` (beide **verify_jwt=false**). Secrets setzt Mike selbst im Dashboard (TOKEN_SECRET, ADMIN_KEY, ALLOWED_ORIGIN=https://mikesch15.github.io, DEFAULT_CREDITS=6, ETSY_WEBHOOK_SECRET). Andere Supabase-Projekte von Mike (Spengler-Digital, Tulpenweg-Sanierung) nie anfassen. **Offen:** Etsy-Testkauf (Payload-Format von Etsy unverifiziert, Funktion liest tolerant; danach Logs prüfen).
 
 ## Offene Punkte / Ideen
 - Realer Druck- und Bambu-Studio-Test (3MF mit mehreren Hüllen, „offene Kanten“), Passung Verbinder/Schubladen/Deckel/Einsatz.

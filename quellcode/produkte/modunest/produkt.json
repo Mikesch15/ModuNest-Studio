@@ -1,0 +1,17 @@
+{
+ "id": "modunest",
+ "name": {
+  "de": "ModuNest Kisten",
+  "en": "ModuNest boxes"
+ },
+ "text": {
+  "de": "Modulare Aufbewahrungsboxen nach Mass – einzeln oder als Set für Schubladen und Regale.",
+  "en": "Modular storage boxes made to measure – single or as a set for drawers and shelves."
+ },
+ "dateien": [
+  "geo.js",
+  "planner.js",
+  "geo2.js",
+  "produkt.js"
+ ]
+}

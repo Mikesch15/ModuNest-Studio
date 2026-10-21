@@ -46,3 +46,7 @@ create table if not exists public.exports (
 create index if not exists exports_order_at on public.exports (order_id, at);
 alter table public.exports enable row level security;
 select cron.schedule('modunest-exports-cleanup', '23 3 * * *', $$delete from public.exports where at < now() - interval '2 days'$$);
+
+-- Mehrere Produkte: Gratis-Korrekturen je Produkt
+alter table public.exports add column if not exists product text not null default 'modunest';
+create index if not exists exports_order_product_at on public.exports (order_id, product, at);

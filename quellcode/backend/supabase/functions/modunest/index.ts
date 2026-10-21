@@ -61,7 +61,9 @@ Deno.serve(async (req) => {
     if (Array.isArray(b.cfgs)) {
       const cfgs: number[][][] = b.cfgs.slice(0, 50).map((c: any) => (Array.isArray(c) ? c.slice(0, 100) : []).map((m: any) => [0, 1, 2].map((k) => Number(m?.[k]) || 0))).filter((c: number[][]) => c.length);
       if (!cfgs.length) return json({ error: "bad" }, 400);
-      const { data: prev } = await sb.from("exports").select("dims").eq("order_id", p.id).gte("at", new Date(Date.now() - FREE_MS).toISOString());
+      // Produkt (z.B. "modunest"): Gratis-Korrekturen nur innerhalb desselben Produkts; Guthaben gilt fuer alle Produkte
+      const product = String(b.product ?? "modunest").replace(/[^a-z0-9-]/g, "").slice(0, 40) || "modunest";
+      const { data: prev } = await sb.from("exports").select("dims").eq("order_id", p.id).eq("product", product).gte("at", new Date(Date.now() - FREE_MS).toISOString());
       const free: number[] = [], rec: number[][][] = [];
       let n = 0;
       cfgs.forEach((c, i) => {
@@ -76,7 +78,7 @@ Deno.serve(async (req) => {
         const { data: o } = await sb.from("orders").select("credits,used").eq("id", p.id).single();
         return json({ error: "credits", left: o ? o.credits - o.used : 0, need: n }, 402);
       }
-      await sb.from("exports").insert(rec.map((dims) => ({ order_id: p.id, dims })));
+      await sb.from("exports").insert(rec.map((dims) => ({ order_id: p.id, product, dims })));
       return json({ left: data, n, free });
     }
     // alt (Version <= 2.9): n Exporte
