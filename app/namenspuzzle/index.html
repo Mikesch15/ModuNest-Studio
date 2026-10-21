@@ -417,39 +417,94 @@ function pzLetter(ch,fs,capH,res,tol){
  const R=pzRings(W+8,Hm,res,tol,(x,k)=>{x.save();x.scale(1,-1);x.font=fs+'px '+PZ_FONT;x.textBaseline='alphabetic';x.fillText(ch,(wl-wr)/2,capH/2);x.restore();pzJoin(k)});
  let y0=1e9,y1=-1e9;for(const r of R)for(const p of r){y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1])}
  return{ch,R,w:W,y0,y1}}
-// Punkt am weitesten vom Rand (fuer den Greifknopf)
-function pzDeep(R){const pin=p=>R.reduce((n,r)=>n+(pip(p,r)?1:0),0)%2===1;let bx=1e9,by=1e9,Bx=-1e9,By=-1e9;
- for(const r of R)for(const p of r){bx=Math.min(bx,p[0]);by=Math.min(by,p[1]);Bx=Math.max(Bx,p[0]);By=Math.max(By,p[1])}
- let best=[0,0],bd=0;for(let x=bx;x<=Bx;x+=.8)for(let y=by;y<=By;y+=.8){const p=[x,y];if(!pin(p))continue;let d=1e9;
-  for(const r of R)for(let i=0,n=r.length;i<n;i++){const a=r[i],b=r[(i+1)%n],vx=b[0]-a[0],vy=b[1]-a[1],l=vx*vx+vy*vy||1,u=Math.max(0,Math.min(1,((x-a[0])*vx+(y-a[1])*vy)/l));d=Math.min(d,Math.hypot(x-a[0]-u*vx,y-a[1]-u*vy))}
-  if(d>bd){bd=d;best=p}}
- return{p:best,d:bd}}
+// Stelle fuer den Greifknopf: moeglichst nahe am Schwerpunkt (Teil hebt gerade ab), aber mit genug Abstand
+// zum Rand und zu gravierten Linien D. Rueckgabe Punkt p und Randabstand d.
+function pzDeep(R,D=[]){const inR=p=>R.reduce((n,r)=>n+(pip(p,r)?1:0),0)%2===1,inD=p=>D.some(r=>pip(p,r));
+ let bx=1e9,by=1e9,Bx=-1e9,By=-1e9,A=0,cx=0,cy=0;
+ for(const r of R)for(let i=0,n=r.length;i<n;i++){const a=r[i],b=r[(i+1)%n],c=a[0]*b[1]-b[0]*a[1];A+=c;cx+=(a[0]+b[0])*c;cy+=(a[1]+b[1])*c;
+  bx=Math.min(bx,a[0]);by=Math.min(by,a[1]);Bx=Math.max(Bx,a[0]);By=Math.max(By,a[1])}
+ cx/=3*A||1;cy/=3*A||1;const E=R.concat(D),pts=[];let bd=0;
+ for(let x=bx;x<=Bx;x+=.5)for(let y=by;y<=By;y+=.5){const p=[x,y];if(!inR(p)||inD(p))continue;let d=1e9;
+  for(const r of E)for(let i=0,n=r.length;i<n;i++){const a=r[i],b=r[(i+1)%n],vx=b[0]-a[0],vy=b[1]-a[1],l=vx*vx+vy*vy||1,u=Math.max(0,Math.min(1,((x-a[0])*vx+(y-a[1])*vy)/l));d=Math.min(d,Math.hypot(x-a[0]-u*vx,y-a[1]-u*vy))}
+  pts.push([x,y,d]);bd=Math.max(bd,d)}
+ // 1. naechster Punkt zum Schwerpunkt, an dem ein kleiner Knopf (r 2.5) Platz hat; 2. in dessen Umkreis (4 mm) die Strichmitte
+ let best=null,bc=1e18;for(const q of pts)if(q[2]>=Math.min(3.7,bd)){const c=(q[0]-cx)**2+(q[1]-cy)**2;if(c<bc){bc=c;best=q}}
+ if(best){const b0=best;for(const q of pts)if(q[2]>best[2]&&(q[0]-b0[0])**2+(q[1]-b0[1])**2<=16)best=q}
+ return best?{p:[best[0],best[1]],d:best[2]}:{p:[0,0],d:0}}
 
-/* Figuren: einfache, kompakte Formen (Einheit = Hoehe, y nach oben), ohne duenne Stellen */
+/* Figuren: Zeichnung in 0..100 (y nach unten, Tiere schauen nach links). Flaechen: C Kreis, E Ellipse (Winkel in Grad),
+   S SVG-Pfad (optional mit Rundung rd). Gravur (0.6 mm tief, Linienbreite 1.4 mm): L SVG-Linie, O Punkt (Radius mm).
+   Regeln: Beine/Spalten mind. ~6 Einheiten breit (bei 50 mm = 3 mm), Gravur mind. 4 Einheiten vom Rand. */
 const PZ_SHAPES={
- kuh:d=>{d.R(-.28,-.2,.72,.38,.14);d.R(-.2,-.46,.12,.3,.03);d.R(.26,-.46,.12,.3,.03);d.R(.4,-.06,.07,.2,.03);d.E(-.44,0,.17,.19);d.E(-.5,-.13,.13,.09);d.E(-.44,.13,.19,.08);d.P([[-.56,.1],[-.8,.18],[-.84,.3],[-.56,.2]],.06);d.P([[-.32,.1],[-.08,.18],[-.04,.3],[-.32,.2]],.06)},
- schaf:d=>{d.C(-.2,.08,.2);d.C(.05,.15,.22);d.C(.27,.06,.19);d.C(-.08,-.08,.2);d.C(.18,-.08,.19);d.E(-.42,.08,.13,.16);d.R(-.22,-.5,.1,.3,.03);d.R(.12,-.5,.1,.3,.03)},
- schwein:d=>{d.E(.05,-.02,.4,.27);d.C(-.33,.08,.19);d.E(-.5,.04,.08,.1);d.P([[-.42,.2],[-.3,.38],[-.24,.2]],.05);d.R(-.22,-.45,.12,.22,.03);d.R(.18,-.45,.12,.22,.03)},
- huhn:d=>{d.E(.08,-.08,.34,.28);d.C(-.24,.22,.16);d.C(-.3,.4,.06);d.C(-.2,.42,.07);d.P([[-.38,.27],[-.52,.2],[-.38,.14]],.05);d.P([[.3,0],[.52,.32],[.44,-.06]],.06);d.R(-.04,-.5,.09,.2,.02);d.R(.14,-.5,.09,.2,.02)},
- hase:d=>{d.E(.08,-.2,.32,.28);d.C(-.16,.14,.19);d.E(-.24,.42,.07,.19);d.E(-.08,.44,.07,.19);d.C(.4,-.12,.08)},
- herz:d=>{d.C(-.23,.17,.27);d.C(.23,.17,.27);d.P([[-.48,.08],[.48,.08],[0,-.5]],.08)},
- stern:d=>{const p=[];for(let k=0;k<10;k++){const a=Math.PI/2+k*Math.PI/5,r=k%2?.24:.5;p.push([r*Math.cos(a),r*Math.sin(a)-.03])}d.P(p,.1)},
- sonne:d=>{d.C(0,0,.3);for(let k=0;k<8;k++){const a=k*Math.PI/4,c=Math.cos(a),s=Math.sin(a);d.P([[.24*c-.11*s,.24*s+.11*c],[.5*c,.5*s],[.24*c+.11*s,.24*s-.11*c]],.08)}},
- blume:d=>{for(let k=0;k<5;k++){const a=Math.PI/2+k*2*Math.PI/5;d.C(.27*Math.cos(a),.27*Math.sin(a),.2)}d.C(0,0,.18)},
- wolke:d=>{d.C(-.24,-.02,.22);d.C(.02,.12,.28);d.C(.28,0,.2);d.R(-.46,-.24,.92,.24,.12)},
- baum:d=>{d.C(0,.2,.3);d.C(-.22,.02,.2);d.C(.22,.02,.2);d.R(-.08,-.5,.16,.42,.03)},
- fisch:d=>{d.E(-.08,0,.36,.26);d.P([[.18,0],[.5,.26],[.5,-.26]],.07)},
- haus:d=>{d.R(-.38,-.5,.76,.55,.03);d.P([[-.5,.02],[.5,.02],[0,.48]],.05);d.R(.18,.12,.12,.28,.02)}};
+ kuh:d=>{ // Hochlandrind: zottiges Fell, Stirnfransen, lange Hoerner
+  d.S('M34 30 C34 22 42 20 50 20 L82 20 C90 20 95 26 95 34 L95 60 Q92 66 89 62 Q86 67 83 62 Q80 67 77 62 Q74 67 71 62 Q68 67 65 62 Q62 67 59 62 Q56 67 53 62 Q50 67 47 62 Q44 67 41 62 Q38 66 35 60 Z');
+  for(const x of [36,52,70,85])d.S(`M${x} 56 L${x+10} 56 L${x+10} 88 Q${x+10} 92 ${x+7} 92 L${x+3} 92 Q${x} 92 ${x} 88 Z`);
+  d.S('M93 26 C99 32 99 48 97 58 C101 60 101 68 96 68 C91 68 90 62 92 58 C93 48 93 36 90 30 Z');
+  d.S('M14 30 C18 25 30 25 34 30 L38 46 C38 56 33 63 26 64 C18 65 10 62 9 55 C8 47 10 37 14 30 Z');
+  d.C(14,31,6);d.C(21,28,6);d.C(28,28,6);d.C(34,32,5.5);
+  d.S('M16 32 C6 32 0 26 2 12 C3 9 8 9 8 13 C8 20 11 24 17 24 Z',4);
+  d.S('M30 28 C37 27 41 22 41 13 C41 9 46 9 47 13 C48 25 42 33 32 34 Z',4);
+  d.E(9,40,7,4,-20);
+  d.O(18,44,1.6);d.O(15,56,1.1);d.O(23,57,1.1);
+  d.L('M84 28 Q88 32 84 36');d.L('M86 44 Q90 48 86 52');d.L('M44 52 Q48 56 44 60')},
+ schaf:d=>{
+  for(const[a,b,r]of[[42,36,12],[55,30,13],[69,32,12],[81,40,11],[83,52,10],[72,58,11],[58,59,11],[45,57,11],[37,47,10]])d.C(a,b,r);d.S('M40 36 L82 36 L82 56 L40 56 Z');
+  for(const x of [40,52,66,78])d.S(`M${x} 58 L${x+8} 58 L${x+8} 88 Q${x+8} 91 ${x+5} 91 L${x+3} 91 Q${x} 91 ${x} 88 Z`);
+  d.E(22,42,11,14,25);d.E(31,31,9,4.5,-25);
+  d.O(19,40,1.6);d.O(14,52,1);
+  d.L('M48 40 q3 -4 6 0 q3 -4 6 0');d.L('M66 44 q3 -4 6 0 q3 -4 6 0');d.L('M52 50 q3 -4 6 0 q3 -4 6 0')},
+ schwein:d=>{
+  d.E(58,50,34,22);d.C(28,46,17);d.S('M6 40 Q6 37 9 37 L16 37 L16 57 L9 57 Q6 57 6 54 Z');d.S('M14 40 L20 36 L20 58 L14 54 Z');
+  d.S('M24 33 L32 13 Q34 10 37 13 L42 30 Z',3);
+  for(const x of [30,44,66,80])d.S(`M${x} 62 L${x+10} 62 L${x+10} 84 Q${x+10} 87 ${x+7} 87 L${x+3} 87 Q${x} 87 ${x} 84 Z`);
+  d.S('M90 42 C97 38 100 44 96 48 C93 50 91 46 94 44',3.5);
+  d.O(27,40,1.6);d.O(10,44,1.1);d.O(10,50,1.1);d.L('M28 22 L34 31');d.L('M58 34 Q66 40 62 50')},
+ huhn:d=>{
+  d.S('M28 52 C28 34 46 28 62 36 L82 14 C88 10 94 14 91 22 L88 46 C88 68 70 78 54 78 C40 78 28 68 28 52 Z');
+  d.C(32,32,12);d.S('M26 36 L44 36 L44 52 L28 52 Z');
+  d.C(25,19,5);d.C(32,17,5.5);d.C(39,20,5);
+  d.S('M22 28 L9 33 L22 38 Z',3);d.E(23,45,4,6);
+  for(const x of [41,65])d.S(`M${x} 74 L${x+7} 74 L${x+7} 86 L${x+8} 86 Q${x+11} 86 ${x+11} 89 Q${x+11} 92 ${x+8} 92 L${x-6} 92 Q${x-9} 92 ${x-9} 89 Q${x-9} 86 ${x-6} 86 L${x} 86 Z`);
+  d.O(30,30,1.6);d.L('M46 54 C54 44 70 46 74 56 C66 64 54 64 46 54');d.L('M54 56 Q62 54 68 57');d.L('M74 34 L84 24')},
+ hase:d=>{
+  d.E(60,64,28,24);d.E(32,44,16,13.5,-10);
+  d.E(33,20,6.5,17,-12);d.E(46,21,6.5,17,18);
+  d.C(87,60,8);d.E(36,84,9,5.5);d.E(66,86,20,6);
+  d.O(27,41,1.6);d.O(17,46,1.4);d.L('M33 10 L36 26');d.L('M47 11 L44 27');d.L('M60 58 C70 52 80 60 78 74')},
+ herz:d=>{d.S('M50 90 C22 70 6 54 6 34 C6 19 17 9 30 9 C39 9 46 14 50 22 C54 14 61 9 70 9 C83 9 94 19 94 34 C94 54 78 70 50 90 Z');
+  d.L('M24 26 C20 30 19 36 21 42')},
+ stern:d=>{const p=[];for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,r=k%2?21:48;p.push((k?'L':'M')+(50+r*Math.cos(a)).toFixed(1)+' '+(54+r*Math.sin(a)).toFixed(1))}
+  d.S(p.join(' ')+'Z',8);d.O(43,52,1.5);d.O(57,52,1.5);d.L('M43 62 Q50 67 57 62')},
+ sonne:d=>{d.C(50,50,27);for(let k=0;k<12;k++){const a=k*Math.PI/6,c=Math.cos(a),s=Math.sin(a),t=Math.PI/12;
+   d.S(`M${50+24*Math.cos(a-t)} ${50+24*Math.sin(a-t)} L${50+46*c} ${50+46*s} L${50+24*Math.cos(a+t)} ${50+24*Math.sin(a+t)} Z`,5)}
+  d.O(38,44,1.8);d.O(62,44,1.8);d.L('M36 62 Q50 72 64 62')},
+ blume:d=>{for(let k=0;k<6;k++){const a=k*Math.PI/3;d.E(50+17*Math.cos(a),32+17*Math.sin(a),13,10,k*60)}d.C(50,32,12);
+  d.S('M45 44 L55 44 L55 94 L45 94 Z');d.E(37,74,13,7,-30);d.E(63,66,13,7,30);
+  d.L('M29 79 L42 71');d.L('M71 71 L58 63')},
+ wolke:d=>{d.C(28,56,15);d.C(46,42,20);d.C(67,46,17);d.C(82,58,12);d.S('M16 58 Q14 74 28 74 L80 74 Q94 74 92 60 Z');
+  d.L('M30 50 Q40 40 52 42')},
+ baum:d=>{for(const[a,b,r]of[[50,26,20],[31,38,15],[69,38,15],[36,55,15],[64,55,15],[50,50,18]])d.C(a,b,r);
+  d.S('M44 62 L56 62 L57 80 C58 85 63 87 69 89 Q72 92 68 92 L32 92 Q28 92 31 89 C37 87 42 85 43 80 Z');
+  for(const[a,b]of[[34,40],[62,24],[68,48],[40,58]])d.L(`M${a-3} ${b} a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0`)},
+ fisch:d=>{d.S('M5 50 C16 30 42 25 60 33 C67 37 71 41 74 45 L90 30 C95 27 99 30 96 35 L88 50 L96 65 C99 70 95 73 90 70 L74 55 C71 59 67 63 60 67 C42 75 16 70 5 50 Z');
+  d.S('M30 33 C36 18 52 16 62 34 Z',3);d.S('M40 66 C44 76 52 76 56 66 Z',3);
+  d.O(18,46,1.8);d.L('M30 38 C35 45 35 55 30 62');d.L('M42 44 q4 4 0 8');d.L('M52 42 q4 4 0 8');d.L('M47 52 q4 4 0 8');d.L('M57 50 q4 4 0 8')},
+ haus:d=>{d.S('M18 46 L82 46 L82 92 L18 92 Z');d.S('M5 52 L50 10 L95 52 Z',6);d.S('M64 14 L76 14 L76 36 L64 36 Z');
+  d.L('M30 92 L30 66 Q30 60 36 60 L40 60 Q46 60 46 66 L46 92');d.L('M56 62 L72 62 L72 78 L56 78 Z M64 62 L64 78 M56 70 L72 70')}};
 const PZ_SHAPE_IDS=Object.keys(PZ_SHAPES);
-// Figur als Ringe (mm), Begrenzung zentriert
-function pzShape(id,H,res,tol){
- let R=pzRings(H*1.4,H*1.4,res,tol,(x,k)=>{x.save();x.scale(H,H);x.lineJoin='round';
-  const d={C:(a,b,r)=>{x.beginPath();x.arc(a,b,r,0,6.2832);x.fill()},E:(a,b,rx,ry)=>{x.beginPath();x.ellipse(a,b,rx,ry,0,0,6.2832);x.fill()},
-   R:(a,b,w,h,r)=>{x.beginPath();x.roundRect(a,b,w,h,r||0);x.fill()},P:(pts,rd)=>{x.beginPath();pts.forEach((q,n)=>n?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.closePath();x.fill();if(rd){x.lineWidth=rd;x.stroke()}}};
-  PZ_SHAPES[id](d);x.restore();pzJoin(k)});
+// Figur als Ringe (mm), Begrenzung zentriert; D = gravierte Linien (innerhalb des Teils)
+function pzShape(id,H,res,tol){const f=H/100;
+ const draw=fill=>(x,k)=>{x.save();x.scale(f,-f);x.translate(-50,-50);x.lineJoin=x.lineCap='round';
+  const d={C:(a,b,r)=>{if(fill){x.beginPath();x.arc(a,b,r,0,6.2832);x.fill()}},
+   E:(a,b,rx,ry,t=0)=>{if(fill){x.beginPath();x.ellipse(a,b,rx,ry,t*Math.PI/180,0,6.2832);x.fill()}},
+   S:(p,rd)=>{if(fill){const q=new Path2D(p);x.fill(q);if(rd){x.lineWidth=rd;x.stroke(q)}}},
+   L:p=>{if(!fill){x.lineWidth=1.4/f;x.stroke(new Path2D(p))}},
+   O:(a,b,r)=>{if(!fill){x.beginPath();x.arc(a,b,r/f,0,6.2832);x.fill()}}};
+  PZ_SHAPES[id](d);x.restore();if(fill)pzJoin(k)};
+ let R=pzRings(H*1.4,H*1.4,res,tol,draw(1)),D=pzRings(H*1.4,H*1.4,res,tol,draw(0));
  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const r of R)for(const p of r){x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1])}
- const mx=(x0+x1)/2,my=(y0+y1)/2;R=R.map(r=>r.map(p=>[p[0]-mx,p[1]-my]));
- return{ch:id,R,w:x1-x0,y0:y0-my,y1:y1-my}}
+ const mx=(x0+x1)/2,my=(y0+y1)/2,sh=r=>r.map(p=>[p[0]-mx,p[1]-my]);R=R.map(sh);D=D.map(sh);
+ return{ch:id,R,D,w:x1-x0,y0:y0-my,y1:y1-my}}
 // Reihe nebeneinander legen und zentrieren; Rueckgabe Breite
 function pzRow(items,gap){let x=0;for(const g of items){g.cx=x+g.w/2;x+=g.w+gap}const W=Math.max(0,x-gap);items.forEach(g=>g.cx-=W/2);return W}
 
@@ -492,8 +547,8 @@ async function buildPuzzle(res,tol,opt={}){
  const bt=[];cap(A,0,false,bt);walls(A,0,T,bt);cap(A.concat(rev(P),rev(E)),T,true,bt);walls(rev(P),T-Pd,T,bt);cap(P,T-Pd,true,bt);
  if(E.length){walls(rev(E),T-1,T,bt);cap(E,T-1,true,bt)}
  const parts=[{key:'cBoard',name:'Brett',tris:Float32Array.from(bt),asm:[(X,Y,Z)=>[X,Y,Z]]}];
- pieces.forEach((g,i)=>{const t=extrude(g.R,0,LT);
-  if(S.knob){const k=pzDeep(g.R),r=Math.min(5,k.d-1.2);if(r>=2.5)t.push(...extrude(pzCircle(k.p[0],k.p[1],r),LT,LT+PZ_KNOB_H))}
+ pieces.forEach((g,i)=>{const t=g.D&&g.D.length?plateWithPocket(g.R,g.D,LT,.6):extrude(g.R,0,LT);
+  if(S.knob){const k=pzDeep(g.R,g.D),r=Math.min(5,k.d-1.2);if(r>=2.5)t.push(...extrude(pzCircle(k.p[0],k.p[1],r),LT,LT+PZ_KNOB_H))}
   parts.push({key:'cL'+(i%6),name:(PZ_SHAPES[g.ch]?'Figur '+(i+1)+' '+g.ch:'Buchstabe '+(i+1)+' '+g.ch),tris:Float32Array.from(t),asm:[(X,Y,Z)=>[X+g.cx,Y+g.oy,Z+T-Pd+.05]]})});
  return{ok:true,err:'',parts,units:[[Math.round(Wb),Math.round(Db),pzHash(name+'|'+shapes.join(','))]],info:{name:name+(shapes.length?(name?' + ':'')+shapes.map(id=>tr('sh_'+id)).join(', '):''),Wb,Db,T,H,scaled,n:pieces.length,cut:[...String(S.name||'').trim()].length>12}}}
 
