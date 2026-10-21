@@ -73,3 +73,6 @@ create table if not exists public.etsy_auth (
   state text, verifier text, ret text, started_at timestamptz
 );
 alter table public.etsy_auth enable row level security;
+
+-- Bestellungen nach 2 Jahren loeschen (exports per Fremdschluessel mit)
+select cron.schedule('modunest-orders-cleanup', '41 3 * * *', $$delete from public.orders where created_at < now() - interval '2 years'$$);

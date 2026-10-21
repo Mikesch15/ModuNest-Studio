@@ -33,18 +33,18 @@ a.p img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;backgrou
 a.p img.lg{object-fit:contain;padding:18px}
 a.p h2{font-family:Script,cursive;font-size:25px;margin:0}
 a.p p{margin:0;color:var(--mut);font-size:14px}
-p.legal{margin:8px 0 0;text-align:center;font-size:11px;color:var(--mut)}
+p.legal{margin:8px 0 0;text-align:center;font-size:11px;color:var(--mut)}p.legal a{color:var(--warm);font-size:13px;font-weight:600}
 a.p span{justify-self:start;margin-top:4px;padding:9px 16px;border-radius:999px;background:var(--acc);color:var(--on);font-weight:600}
 </style>
 </head>
 <body>
 <header><img class="logo" src="LOGO_DATA" alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div><button id="lang"></button></header>
-<main><p class="intro" id="intro"></p><div class="grid" id="grid"></div><p class="legal" id="legal"></p></main>
+<main><p class="intro" id="intro"></p><div class="grid" id="grid"></div><p class="legal"><a id="priv" href="datenschutz/"></a></p><p class="legal" id="legal"></p></main>
 <script>
-const T={tag:['Konfiguratoren von Art vom Hof','Configurators by Art vom Hof'],intro:['Was möchtest du gestalten?','What would you like to design?'],open:['Öffnen','Open'],legal:['Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.','The term “Etsy” is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.']};
+const T={tag:['Konfiguratoren von Art vom Hof','Configurators by Art vom Hof'],intro:['Was möchtest du gestalten?','What would you like to design?'],open:['Öffnen','Open'],privacy:['Datenschutz','Privacy policy'],legal:['Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.','The term “Etsy” is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.']};
 let lang=(navigator.language||'de').toLowerCase().startsWith('de')?0:1;try{const l=localStorage.getItem('mn-lang');if(l!==null)lang=+l}catch(e){}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function show(){const k=lang?'en':'de';document.documentElement.lang=k;document.getElementById('tag').textContent=T.tag[lang];document.getElementById('intro').textContent=T.intro[lang];document.getElementById('legal').textContent=T.legal[lang];document.getElementById('lang').textContent=lang?'DE':'EN';
+function show(){const k=lang?'en':'de';document.documentElement.lang=k;document.getElementById('tag').textContent=T.tag[lang];document.getElementById('intro').textContent=T.intro[lang];document.getElementById('legal').textContent=T.legal[lang];document.getElementById('priv').textContent=T.privacy[lang];document.getElementById('lang').textContent=lang?'DE':'EN';
  document.getElementById('grid').innerHTML=PRODUCTS.map(p=>`<a class="p" href="${esc(p.id)}/"><img ${p.bild?'':'class="lg"'} src="${p.bild||document.querySelector('header .logo').src}" alt=""><h2>${esc(p.name[k])}</h2><p>${esc(p.text[k])}</p><span>${T.open[lang]}</span></a>`).join('')}
 document.getElementById('lang').onclick=()=>{lang=lang?0:1;try{localStorage.setItem('mn-lang',lang)}catch(e){}show()};
 show();

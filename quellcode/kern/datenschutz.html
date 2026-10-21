@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fdfaf2">
+<link rel="icon" href="../../icons/icon-192.png">
+<title>Datenschutz – ModuNest Studio</title>
+<style>
+@font-face{font-family:"Script";src:url(FONT_DATA) format("woff2");font-weight:700;font-display:swap}
+:root{--bg:#f6f0e4;--card:#fdfaf2;--ink:#1e1a17;--mut:#6f6458;--line:#e2d6c4;--warm:#c46546}
+@media(prefers-color-scheme:dark){:root{--bg:#151412;--card:#1f1d1a;--ink:#f2ede3;--mut:#a59d8f;--line:#38332c;--warm:#d98462}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--card);border-bottom:3px solid var(--ink);box-shadow:0 3px 0 var(--card),0 5px 0 var(--warm);margin-bottom:5px}
+header img{width:48px;height:48px;border-radius:50%}
+header a{margin-left:auto;border:1px solid var(--ink);border-radius:999px;color:var(--ink);text-decoration:none;font-weight:600;padding:5px 12px}
+h1{font-family:Script,cursive;font-size:30px;margin:0}
+main{max-width:760px;margin:0 auto;padding:16px}
+section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 16px;margin-bottom:12px}
+h2{font-family:Script,cursive;font-size:23px;margin:4px 0 6px}
+p,li{margin:6px 0}ul{padding-left:20px;margin:6px 0}
+a{color:var(--warm)}small{color:var(--mut)}
+</style>
+</head>
+<body>
+<header><img src="LOGO_DATA" alt="Art vom Hof"><h1>Datenschutz</h1><a href="../" onclick="if(history.length>1){history.back();return false}">‹ Zurück</a></header>
+<main>
+<section><h2>Verantwortlich</h2>
+<p>Mike Ledermann, Art vom Hof<br>E-Mail: <a href="mailto:artvomhof@gmail.com">artvomhof@gmail.com</a></p>
+<p>Diese Erklärung gilt für die Konfiguratoren von Art vom Hof (ModuNest Studio) unter mikesch15.github.io/ModuNest-Studio. Sie richtet sich nach dem Schweizer Datenschutzgesetz (DSG) und, soweit anwendbar, der EU-Datenschutz-Grundverordnung (DSGVO).</p></section>
+
+<section><h2>Was der Konfigurator tut</h2>
+<p>Der Konfigurator läuft in deinem Browser. Deine Einstellungen und die 3D-Vorschau werden auf deinem Gerät berechnet und nicht an uns übertragen. Es gibt keine Cookies, keine Analyse- oder Werbedienste und keine externen Schriften oder Skripte.</p></section>
+
+<section><h2>Speicherung auf deinem Gerät</h2>
+<p>Im Speicher deines Browsers (localStorage) werden deine letzte Konfiguration, die Sprache, der Warenkorb und nach der Freischaltung ein Sitzungs-Schlüssel gespeichert. Diese Daten verlassen dein Gerät nicht; du kannst sie über die Browser-Einstellungen jederzeit löschen. Damit die App offline startet, legt der Browser zudem eine Kopie der Seiten an.</p></section>
+
+<section><h2>Freischaltung und Download</h2>
+<p>Zum Herunterladen gibst du deine Etsy-Bestellnummer oder einen Code ein. Dabei werden an unseren Server übertragen bzw. dort gespeichert:</p>
+<ul>
+<li>die Bestellnummer bzw. der Code und wie viele Kisten verfügbar und verbraucht sind;</li>
+<li>die gekauften Artikel der Bestellung (Angebotsnummer, Angebotstitel, Menge). Diese fragt der Server bei Etsy ab, sobald Etsy die bezahlte Bestellung meldet. <b>Namen, Adressen und Zahlungsdaten werden nicht gespeichert;</b></li>
+<li>beim Herunterladen die Masse der heruntergeladenen Kisten, damit kleine Korrekturen innerhalb von 24 Stunden gratis sind;</li>
+<li>bei der Eingabe einer Nummer deine IP-Adresse, um Missbrauch zu verhindern (Begrenzung der Fehlversuche).</li>
+</ul>
+<p>Zweck: Prüfen, ob eine bezahlte Bestellung vorliegt, und Zählen der Downloads. Rechtsgrundlage (DSGVO): Vertragserfüllung (Art. 6 Abs. 1 lit. b) und berechtigtes Interesse am Schutz vor Missbrauch (lit. f).</p></section>
+
+<section><h2>Wie lange wir speichern</h2>
+<ul>
+<li>IP-Adressen von Freischalt-Versuchen: 7 Tage</li>
+<li>Masse der Downloads (für die Gratis-Korrektur): 2 Tage</li>
+<li>Bestellungen, Codes und gekaufte Artikel: 2 Jahre</li>
+</ul>
+<p>Danach werden die Daten automatisch gelöscht.</p></section>
+
+<section><h2>Dienstleister</h2>
+<ul>
+<li><b>GitHub Pages</b> (GitHub Inc., USA) stellt die Webseite bereit und kann dabei Zugriffsdaten wie die IP-Adresse protokollieren. <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">Datenschutz von GitHub</a></li>
+<li><b>Supabase</b> (Supabase Inc., USA; unsere Datenbank liegt auf Servern in der EU, Irland) betreibt Datenbank und Server-Funktionen.</li>
+<li><b>Etsy</b> (Kauf und Zahlung). Es gilt die Datenschutzerklärung von Etsy. Unser Server liest über die Etsy-Schnittstelle nur die Artikel deiner Bestellung.</li>
+</ul>
+<p>Bei einer Übermittlung in die USA stützen sich diese Anbieter auf anerkannte Garantien (z. B. Swiss-U.S. bzw. EU-U.S. Data Privacy Framework oder Standardvertragsklauseln).</p></section>
+
+<section><h2>Deine Rechte</h2>
+<p>Du hast das Recht auf Auskunft, Berichtigung und Löschung deiner Daten sowie – nach DSGVO – auf Einschränkung, Datenübertragbarkeit und Widerspruch. Schreib dafür an <a href="mailto:artvomhof@gmail.com">artvomhof@gmail.com</a>. Du kannst dich auch bei einer Aufsichtsbehörde beschweren (Schweiz: Eidgenössischer Datenschutz- und Öffentlichkeitsbeauftragter, EDÖB; EU: die Behörde deines Landes).</p>
+<p><small>Stand: 21. Oktober 2026</small></p></section>
+</main>
+</body>
+</html>
