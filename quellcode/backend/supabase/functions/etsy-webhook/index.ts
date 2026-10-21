@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
   if (!(await verify(req, raw))) return new Response("bad signature", { status: 401 });
   const body = JSON.parse(raw);
   const type = body.type ?? body.event_type ?? body.event;
-  if (type !== "order.paid") return new Response("ignored");
+  if (type !== "order.paid") { console.log("ignoriert: event", type, "felder", Object.keys(body).join(",")); return new Response("ignored"); }
   // Die genaue Payload-Struktur ist bei Etsy nicht ueberall dokumentiert -> tolerant lesen.
   const d = body.data ?? body;
   const receipt = String(d.receipt_id ?? d.order_id ?? d.id ?? (d.resource_url ?? "").split("/").pop() ?? "");
