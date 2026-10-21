@@ -22,6 +22,7 @@ const L={
  gateT:['Freischalten','Unlock'],
  gateD:['Gib deine Etsy-Bestellnummer (oder deinen Code) ein, um Dateien herunterzuladen.','Enter your Etsy order number (or your code) to download files.'],
  gateB:['Freischalten','Unlock'],
+ gatePending:['Deine Bestellung ist angekommen und wird noch kurz geprüft. Bitte versuche es später nochmal oder schreib mir über Etsy.','Your order has arrived and is still being checked. Please try again later or message me on Etsy.'],
  gateBad:['Nummer oder Code ungültig.','Invalid number or code.'],
  gateRate:['Zu viele Versuche. Bitte später erneut versuchen.','Too many attempts. Please try again later.'],
  gateNet:['Keine Verbindung zum Server.','Cannot reach the server.'],

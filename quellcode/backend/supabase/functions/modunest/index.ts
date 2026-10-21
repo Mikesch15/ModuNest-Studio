@@ -1,4 +1,5 @@
-// API fuer den Konfigurator: /redeem, /consume (Guthaben = Kisten), /admin/create, /admin/list, /admin/add
+// API fuer den Konfigurator: /redeem, /consume (Guthaben = Kisten), /admin/create, /admin/list, /admin/add,
+//   /admin/listings, /admin/listing (speichern), /admin/listing-del (Konfigurator-Angebote fuer den Etsy-Webhook)
 // Secrets: TOKEN_SECRET (lange Zufallszeichenfolge), ADMIN_KEY, ALLOWED_ORIGIN (z.B. https://deinname.github.io),
 //          SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (automatisch)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
@@ -49,6 +50,7 @@ Deno.serve(async (req) => {
     const q = /^\d+$/.test(c) ? sb.from("orders").select("*").eq("receipt_id", c) : sb.from("orders").select("*").eq("code", c);
     const { data } = await q.maybeSingle();
     if (!data) return json({ error: "bad" }, 404);
+    if (data.status === "pruefen") return json({ error: "pending" }, 409); // Etsy-Bestellung noch nicht von Mike geprueft
     const exp = Date.now() + TTL;
     return json({ token: await sign({ id: data.id, exp }), left: data.credits - data.used, exp });
   }
@@ -98,12 +100,26 @@ Deno.serve(async (req) => {
       return error ? json({ error: error.message }, 500) : json({ code });
     }
     if (path === "admin/list") {
-      const { data } = await sb.from("orders").select("source,receipt_id,code,credits,used,note,created_at").order("created_at", { ascending: false }).limit(200);
+      const { data } = await sb.from("orders").select("source,receipt_id,code,credits,used,note,items,status,created_at").order("created_at", { ascending: false }).limit(200);
       return json({ orders: data });
     }
     if (path === "admin/add") { // Etsy-Bestellung von Hand nachtragen oder Kisten-Gesamtzahl aendern: { receipt_id, credits }
       const rid = norm(b.receipt_id); if (!/^\d{6,}$/.test(rid)) return json({ error: "receipt" }, 400);
-      const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: rid, credits: Math.max(1, Number(b.credits) | 0 || 6), note: "manuell" }, { onConflict: "receipt_id" });
+      const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: rid, credits: Math.max(1, Number(b.credits) | 0 || 6), note: "manuell", status: "ok" }, { onConflict: "receipt_id" });
+      return error ? json({ error: error.message }, 500) : json({ ok: true });
+    }
+    if (path === "admin/listings") {
+      const { data } = await sb.from("listings").select("listing_id,title,product,credits,active,created_at").order("created_at");
+      return json({ listings: data ?? [] });
+    }
+    if (path === "admin/listing") { // { listing_id, title, product, credits, active }
+      const lid = String(b.listing_id ?? "").replace(/\D/g, ""); if (lid.length < 6) return json({ error: "listing" }, 400);
+      const row = { listing_id: lid, title: String(b.title ?? "").slice(0, 120), product: String(b.product ?? "modunest").replace(/[^a-z0-9-]/g, "").slice(0, 40) || "modunest", credits: Math.max(0, Math.min(500, Number(b.credits) | 0)), active: b.active !== false };
+      const { error } = await sb.from("listings").upsert(row, { onConflict: "listing_id" });
+      return error ? json({ error: error.message }, 500) : json({ ok: true });
+    }
+    if (path === "admin/listing-del") {
+      const { error } = await sb.from("listings").delete().eq("listing_id", String(b.listing_id ?? ""));
       return error ? json({ error: error.message }, 500) : json({ ok: true });
     }
   }

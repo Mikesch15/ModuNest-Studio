@@ -50,7 +50,13 @@ button:disabled{opacity:.5;cursor:default}
 .it .sub{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--mut)}
 .mini{padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
 .empty{color:var(--mut);font-size:14px;text-align:center;padding:8px}
-.lock .needkey{opacity:.45;pointer-events:none}#res{display:grid;gap:8px}#res[hidden]{display:none}
+.lock .needkey{opacity:.45;pointer-events:none}
+.tag.w{background:#d9a21b;color:#1e1a17}.it.pend{border-color:#d9a21b;border-width:2px}
+.lines{margin:0;padding-left:18px;font-size:12px;color:var(--mut)}.lines .z{opacity:.6}
+.warn{margin:0;padding:9px 12px;border-radius:12px;background:#d9a21b22;border:1px solid #d9a21b;font-size:13px}
+.fix{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px}.fix input{width:76px;padding:6px 8px}
+.ls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);border-radius:14px;padding:8px 10px;background:var(--bg)}.ls.off{opacity:.55}.ls b{flex:1 1 150px;min-width:0}.ls small{color:var(--mut)}
+select{width:100%;padding:10px 12px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px}#res{display:grid;gap:8px}#res[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -61,9 +67,11 @@ button:disabled{opacity:.5;cursor:default}
 <ol style="margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px">
 <li>Admin-Schlüssel eingeben und <b>Verbinden</b> tippen.</li>
 <li>In der <b>Übersicht</b> siehst du alle Bestellungen und wie viele Kisten verbraucht sind.</li>
+<li>Unter <b>Konfigurator-Angebote</b> trägst du einmal deine Etsy-Angebote ein, die zum Konfigurator gehören, mit Kisten pro Stück.</li>
+<li>Gelb markierte Bestellungen (<b>prüfen</b>) gibst du mit der richtigen Kistenzahl frei.</li>
 <li>Hat ein Käufer ein Problem, trägst du seine <b>Etsy-Bestellnummer</b> ein oder schenkst ihm einen <b>Code</b>.</li>
 </ol>
-<p class="info">Etsy-Bestellungen kommen nach der Zahlung automatisch hierher. Normalerweise musst du nichts tun. Das <b>ⓘ</b> bei jedem Abschnitt erklärt mehr.</p>
+<p class="info">Etsy-Bestellungen kommen nach der Zahlung automatisch hierher. Gezählt werden nur deine Konfigurator-Angebote, andere Shop-Artikel nicht. Normalerweise musst du nichts tun. Das <b>ⓘ</b> bei jedem Abschnitt erklärt mehr.</p>
 </section>
 
 <section class="card"><div class="ch"><h2>Verbindung</h2><button class="ib" data-i="i1">i</button></div>
@@ -75,10 +83,20 @@ button:disabled{opacity:.5;cursor:default}
 </section>
 
 <section class="card needkey"><div class="ch"><h2>Übersicht</h2><button class="ib" data-i="i2">i</button></div>
-<p class="info" id="i2" hidden><b>Etsy</b> = Bestellung (kommt automatisch nach der Zahlung), <b>Code</b> = von dir erstellter Code. Der Balken zeigt, wie viele Kisten schon heruntergeladen wurden. Fehlt eine bezahlte Bestellung, war Etsy evtl. langsam (ein paar Minuten warten) – sonst unten von Hand eintragen.</p>
+<p class="info" id="i2" hidden><b>Etsy</b> = Bestellung (kommt automatisch nach der Zahlung), <b>Code</b> = von dir erstellter Code. Darunter stehen die gekauften Artikel (grau = kein Konfigurator-Angebot, gibt 0 Kisten). Der Balken zeigt, wie viele Kisten schon heruntergeladen wurden. <b>Gelb «prüfen»</b>: Etsy hat nicht mitgeteilt, was gekauft wurde, oder es waren noch keine Angebote eingetragen. Schau die Bestellung in Etsy an (Shop-Manager → Bestellungen) und gib sie mit der richtigen Kistenzahl frei – vorher kann der Käufer nichts herunterladen. Fehlt eine bezahlte Bestellung, war Etsy evtl. langsam (ein paar Minuten warten) – sonst unten von Hand eintragen.</p>
+<p class="warn" id="pendw" hidden></p>
 <div class="stats"><div class="stat"><span>Bestellungen</span><strong id="sN">–</strong></div><div class="stat"><span>Kisten gekauft</span><strong id="sC">–</strong></div><div class="stat"><span>Kisten verbraucht</span><strong id="sU">–</strong></div></div>
 <div class="row"><input id="q" type="search" placeholder="Suchen: Nummer, Code oder Notiz"><button class="b narrow" id="reload">Neu laden</button></div>
 <div class="list" id="list"><div class="empty">Noch nicht verbunden.</div></div>
+</section>
+
+<section class="card needkey"><div class="ch"><h2>Konfigurator-Angebote</h2><button class="ib" data-i="i5">i</button></div>
+<p class="info" id="i5" hidden>Nur diese Etsy-Angebote geben Kisten. Pro Angebot: wie viele Kisten ein Stück enthält und für welches Produkt es ist. Kauft jemand 2 Stück, gibt es doppelt so viele Kisten; andere Artikel derselben Bestellung zählen nicht. Die <b>Angebotsnummer</b> steht in der Adresse deines Angebots: etsy.com/listing/<b>1234567890</b>/… (oder Shop-Manager → Angebote → Angebot öffnen). «Pausieren» lässt ein altes Angebot keine Kisten mehr geben, ohne es zu löschen. Änderungen gelten für neue Bestellungen.</p>
+<p class="warn" id="lw" hidden>Noch keine Angebote eingetragen. Bis dahin landen alle Etsy-Bestellungen unter «prüfen».</p>
+<div class="list" id="llist"></div>
+<div class="row"><label>Angebotsnummer<input id="lid" type="text" inputmode="numeric" placeholder="z. B. 1234567890"></label><label>Bezeichnung<input id="lti" type="text" maxlength="120" placeholder="z. B. Kisten-Set 6"></label></div>
+<div class="row"><label>Produkt<select id="lpr"></select></label><label class="narrow">Kisten pro Stück<input id="lcr" type="number" min="0" max="500" value="6"></label></div>
+<button class="b p" id="lsave">Angebot speichern</button><div class="msg" id="lmsg"></div>
 </section>
 
 <section class="card needkey"><div class="ch"><h2>Code erstellen</h2><button class="ib" data-i="i3">i</button></div>
@@ -100,24 +118,38 @@ button:disabled{opacity:.5;cursor:default}
 const $=i=>document.getElementById(i),WEB=location.protocol.startsWith('http'),SHOP=WEB?new URL('../',location.href).href:'https://mikesch15.github.io/ModuNest-Studio/',DEF_API=(window.MN_CONFIG&&window.MN_CONFIG.api)||'https://sfoscpgsumukhihkdutw.supabase.co/functions/v1/modunest';
 const st={get:k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)}catch(e){return null}},set:(k,v,keep)=>{try{(keep?localStorage:sessionStorage).setItem(k,v);(keep?sessionStorage:localStorage).removeItem(k)}catch(e){}}};
 $('api').value=st.get('mna-api')||DEF_API;$('key').value=st.get('mna-key')||'';try{$('rem').checked=!!localStorage.getItem('mna-key')}catch(e){}
-const ERR={auth:'Admin-Schlüssel falsch.',net:'Keine Verbindung. Internet und Server-Adresse prüfen.',receipt:'Bestellnummer: nur Ziffern, mindestens 6.',notfound:'Server kennt diese Funktion nicht – ist die neueste Version veröffentlicht?'};
+const ERR={auth:'Admin-Schlüssel falsch.',net:'Keine Verbindung. Internet und Server-Adresse prüfen.',receipt:'Bestellnummer: nur Ziffern, mindestens 6.',listing:'Angebotsnummer: nur Ziffern, mindestens 6.',notfound:'Server kennt diese Funktion nicht – ist die neueste Version veröffentlicht?'};
 const say=(id,t,ok)=>{const e=$(id);e.textContent=t;e.className='msg '+(ok?'ok':'err')};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function call(p,b){try{const r=await fetch($('api').value.trim().replace(/\/$/,'')+'/'+p,{method:'POST',headers:{'content-type':'application/json','x-admin-key':$('key').value.trim()},body:JSON.stringify(b||{})});const j=await r.json().catch(()=>({}));return r.ok?j:{error:j.error||('http'+r.status)}}catch(e){return{error:'net'}}}
 const fmt=c=>String(c).replace(/(.{4})(?=.)/g,'$1-');
 document.querySelectorAll('.ib').forEach(b=>b.onclick=()=>{const p=$(b.dataset.i);p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden)});
 $('eye').onclick=()=>{$('key').type=$('key').type==='password'?'text':'password'};
-let ORD=[];
+let ORD=[],LST=[];const PRODUCTS=PRODUCTS_JSON,pname=id=>{const p=PRODUCTS.find(p=>p.id===id);return p?p.name.de:id};
+$('lpr').innerHTML=PRODUCTS.map(p=>`<option value="${esc(p.id)}">${esc(p.name.de)}</option>`).join('');
 function render(){const q=$('q').value.trim().toLowerCase(),l=$('list');
- const f=ORD.filter(o=>!q||[o.receipt_id,o.code,o.note].some(v=>String(v||'').toLowerCase().includes(q)));
+ const f=ORD.filter(o=>!q||[o.receipt_id,o.code,o.note,...(o.items||[]).map(i=>i.title)].some(v=>String(v||'').toLowerCase().includes(q))).sort((a,b)=>(b.status==='pruefen')-(a.status==='pruefen'));
+ const np=ORD.filter(o=>o.status==='pruefen').length;$('pendw').hidden=!np;$('pendw').textContent=np+' Bestellung(en) warten auf deine Prüfung (gelb markiert).';
  $('sN').textContent=ORD.length;$('sC').textContent=ORD.reduce((a,o)=>a+o.credits,0);$('sU').textContent=ORD.reduce((a,o)=>a+o.used,0);
  if(!f.length){l.innerHTML='<div class="empty">'+(ORD.length?'Nichts gefunden.':'Noch keine Bestellungen.')+'</div>';return}
  l.innerHTML=f.map((o,i)=>{const nr=o.source==='etsy'?o.receipt_id:fmt(o.code),pc=o.credits?Math.min(100,Math.round(o.used/o.credits*100)):0;
-  return `<div class="it"><div class="top"><span class="tag ${o.source==='etsy'?'':'m'}">${o.source==='etsy'?'Etsy':'Code'}</span><span class="nr">${esc(nr)}</span>${o.source!=='etsy'?`<button class="mini" data-cp="${esc(nr)}">kopieren</button>`:''}<span class="date">${esc(new Date(o.created_at).toLocaleDateString('de-CH'))}</span></div>
-  <div class="bar"><i style="width:${pc}%"></i></div><div class="sub"><span>${o.used} von ${o.credits} Kisten verbraucht</span><span>${esc(o.note||'')}</span></div></div>`}).join('');
+  const pend=o.status==='pruefen',lines=(o.items||[]).map(i=>`<li class="${i.credits?'':'z'}">${i.qty}× ${esc(i.title||'Angebot '+i.listing_id)} <small>(${esc(i.listing_id)})</small> → ${i.credits} Kisten</li>`).join('');
+  return `<div class="it${pend?' pend':''}"><div class="top">${pend?'<span class="tag w">prüfen</span>':''}<span class="tag ${o.source==='etsy'?'':'m'}">${o.source==='etsy'?'Etsy':'Code'}</span><span class="nr">${esc(nr)}</span>${o.source!=='etsy'?`<button class="mini" data-cp="${esc(nr)}">kopieren</button>`:''}<span class="date">${esc(new Date(o.created_at).toLocaleDateString('de-CH'))}</span></div>
+  <div class="bar"><i style="width:${pc}%"></i></div><div class="sub"><span>${o.used} von ${o.credits} Kisten verbraucht</span><span>${esc(o.note||'')}</span></div>${lines?`<ul class="lines">${lines}</ul>`:(pend?'<div class="sub">Etsy hat keine Artikel mitgeschickt.</div>':'')}
+  ${pend?`<div class="fix">Freigeben mit <input type="number" min="1" max="500" value="${o.credits||6}" data-rid="${esc(o.receipt_id)}"> Kisten <button class="mini" data-ok="${esc(o.receipt_id)}">Freigeben</button></div>`:''}</div>`}).join('');
+ l.querySelectorAll('[data-ok]').forEach(b=>b.onclick=async()=>{const rid=b.dataset.ok,n=+l.querySelector(`input[data-rid="${rid}"]`).value;if(!(n>=1))return;b.disabled=true;const r=await call('admin/add',{receipt_id:rid,credits:n});if(r.ok)load();else{b.disabled=false;alert(ERR[r.error]||('Fehler: '+r.error))}});
  l.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>copy(b.dataset.cp,b))}
 async function load(){const r=await call('admin/list');if(r.error){say('cmsg',ERR[r.error]||('Fehler: '+r.error));$('m').classList.add('lock');return false}
- ORD=r.orders||[];render();$('m').classList.remove('lock');return true}
+ ORD=r.orders||[];render();$('m').classList.remove('lock');loadL();return true}
+async function loadL(){const r=await call('admin/listings');if(r.error)return;LST=r.listings||[];$('lw').hidden=!!LST.length;
+ $('llist').innerHTML=LST.map(x=>`<div class="ls${x.active?'':' off'}"><b>${esc(x.title||'Angebot')}<br><small>Nr. ${esc(x.listing_id)} · ${esc(pname(x.product))}${x.active?'':' · pausiert'}</small></b><span>${x.credits} Kisten/Stück</span><button class="mini" data-ed="${esc(x.listing_id)}">ändern</button><button class="mini" data-pa="${esc(x.listing_id)}">${x.active?'pausieren':'aktivieren'}</button><button class="mini" data-rm="${esc(x.listing_id)}">löschen</button></div>`).join('');
+ const g=id=>LST.find(x=>x.listing_id===id);
+ $('llist').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{const x=g(b.dataset.ed);$('lid').value=x.listing_id;$('lti').value=x.title;$('lpr').value=x.product;$('lcr').value=x.credits;$('lid').focus()});
+ $('llist').querySelectorAll('[data-pa]').forEach(b=>b.onclick=async()=>{const x=g(b.dataset.pa);await call('admin/listing',{...x,active:!x.active});loadL()});
+ $('llist').querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const x=g(b.dataset.rm);if(!confirm(`Angebot «${x.title||x.listing_id}» löschen? Es gibt dann keine Kisten mehr.`))return;await call('admin/listing-del',{listing_id:x.listing_id});loadL()})}
+$('lsave').onclick=async()=>{const lid=$('lid').value.replace(/\D/g,''),n=+$('lcr').value;if(lid.length<6){say('lmsg',ERR.listing);return}if(!(n>=0)){say('lmsg','Bitte Kisten pro Stück angeben.');return}
+ $('lsave').disabled=true;const ex=LST.find(x=>x.listing_id===lid);const r=await call('admin/listing',{listing_id:lid,title:$('lti').value.trim(),product:$('lpr').value,credits:n,active:ex?ex.active:true});$('lsave').disabled=false;
+ if(r.ok){say('lmsg','✓ Angebot '+lid+(ex?' geändert.':' gespeichert.'),true);$('lid').value='';$('lti').value='';loadL()}else say('lmsg',ERR[r.error]||('Fehler: '+r.error))};
 async function copy(t,b){try{await navigator.clipboard.writeText(t);const o=b.textContent;b.textContent='✓ kopiert';setTimeout(()=>b.textContent=o,1500)}catch(e){prompt('Zum Kopieren:',t)}}
 $('conn').onclick=async()=>{if(!$('key').value.trim()){say('cmsg','Bitte Admin-Schlüssel eingeben.');return}$('conn').disabled=true;say('cmsg','Verbinde …',true);
  if(await load()){say('cmsg','✓ Verbunden.',true);st.set('mna-key',$('key').value.trim(),$('rem').checked);st.set('mna-api',$('api').value.trim(),true)}$('conn').disabled=false};

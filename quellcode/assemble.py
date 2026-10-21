@@ -56,7 +56,7 @@ st=open(K+'start.html').read().replace('PRODUCTS_JSON',json.dumps(lst,ensure_asc
 write('index.html',st)
 
 # ---- Admin ----
-write('admin/index.html',open(K+'admin.html').read().replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT))
+write('admin/index.html',open(K+'admin.html').read().replace('PRODUCTS_JSON',json.dumps([{'id':P['id'],'name':P['name']} for P in prods],ensure_ascii=False)).replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT))
 
 # ---- App-Symbole ----
 big=Image.open(K+'logo-gross.webp').convert('RGBA')

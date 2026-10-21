@@ -1,6 +1,7 @@
 // Empfaengt Etsy-Webhook "order.paid", prueft die Signatur und legt die Bestellung an.
-// Secrets: ETSY_WEBHOOK_SECRET (whsec_...), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (automatisch),
-//          DEFAULT_CREDITS (Kisten pro Kauf, z.B. 6), optional LISTING_CREDITS='{"123456":10}'
+// Secrets: ETSY_WEBHOOK_SECRET (whsec_...), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (automatisch).
+// Welche Angebote zum Konfigurator gehoeren und wie viele Kisten sie geben, steht in der Tabelle `listings`
+// (pflegt Mike im Admin). Andere Shop-Artikel geben 0 Kisten; Bestellungen nur mit solchen Artikeln werden ignoriert.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 const b64 = (u8: Uint8Array) => btoa(String.fromCharCode(...u8));
@@ -28,21 +29,27 @@ Deno.serve(async (req) => {
   // Die genaue Payload-Struktur ist bei Etsy nicht ueberall dokumentiert -> tolerant lesen.
   const d = body.data ?? body;
   const receipt = String(d.receipt_id ?? d.order_id ?? d.id ?? (d.resource_url ?? "").split("/").pop() ?? "");
-  if (!receipt) { console.error("no receipt id in payload", raw); return new Response("no receipt", { status: 400 }); }
-  const listing = String(d.listing_id ?? d.listing_ids?.[0] ?? d.transactions?.[0]?.listing_id ?? "");
-  // Guthaben = Kisten. Pro gekauftem Stueck DEFAULT_CREDITS bzw. LISTING_CREDITS[listing_id], mal Menge.
-  // Format der Etsy-Meldung unverifiziert: liest transactions[].quantity, sonst quantity, sonst 1.
-  const def = Number(Deno.env.get("DEFAULT_CREDITS") ?? 6) || 6;
-  let map: Record<string, number> = {};
-  try { map = JSON.parse(Deno.env.get("LISTING_CREDITS") ?? "{}"); } catch (_) {}
-  const per = (l: string) => Number(map[l]) || def;
-  const qty = (q: unknown) => Math.max(1, Math.min(100, Number(q) | 0 || 1));
-  const tx = Array.isArray(d.transactions) ? d.transactions : [];
-  let credits = tx.length ? tx.reduce((a: number, t: any) => a + per(String(t.listing_id ?? listing)) * qty(t.quantity), 0) : per(listing) * qty(d.quantity);
-  if (!(credits > 0)) credits = def;
-  console.log("order.paid", receipt, "listing", listing, "tx", tx.length, "credits", credits);
+  if (!receipt) { console.error("no receipt id, fields:", Object.keys(d).join(",")); return new Response("no receipt", { status: 400 }); }
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: receipt, listing_id: listing || null, credits }, { onConflict: "receipt_id", ignoreDuplicates: true });
+  const { data: lst } = await sb.from("listings").select("listing_id,title,product,credits").eq("active", true);
+  const known = new Map((lst ?? []).map((l: any) => [String(l.listing_id), l]));
+  const qty = (q: unknown) => Math.max(1, Math.min(100, Number(q) | 0 || 1));
+  const tx: any[] | null = Array.isArray(d.transactions) ? d.transactions : null;
+  const items = tx?.map((t) => {
+    const lid = String(t.listing_id ?? ""), l: any = known.get(lid), q = qty(t.quantity);
+    return { listing_id: lid, title: String(t.title ?? l?.title ?? "").slice(0, 120), qty: q, product: l?.product ?? null, credits: l ? l.credits * q : 0 };
+  }) ?? null;
+  let credits = 0, status = "ok";
+  if (items && items.length && known.size) {
+    credits = items.reduce((a, i) => a + i.credits, 0);
+    if (!credits) { console.log("order.paid", receipt, "ohne Konfigurator-Artikel -> ignoriert"); return new Response("ignored"); }
+  } else {
+    // Artikel nicht mitgeschickt oder noch keine Angebote eingetragen: nicht raten, im Admin pruefen lassen
+    status = "pruefen";
+    console.log("order.paid", receipt, "Artikel unbekannt -> pruefen; fields:", Object.keys(d).join(","), "tx:", tx ? tx.length : "keine");
+  }
+  console.log("order.paid", receipt, "items", items?.length ?? 0, "credits", credits, "status", status);
+  const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: receipt, listing_id: items?.[0]?.listing_id || null, credits, items, status }, { onConflict: "receipt_id", ignoreDuplicates: true });
   if (error) { console.error(error); return new Response("db error", { status: 500 }); }
   return new Response("ok");
 });

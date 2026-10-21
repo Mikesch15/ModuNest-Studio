@@ -50,3 +50,17 @@ select cron.schedule('modunest-exports-cleanup', '23 3 * * *', $$delete from pub
 -- Mehrere Produkte: Gratis-Korrekturen je Produkt
 alter table public.exports add column if not exists product text not null default 'modunest';
 create index if not exists exports_order_product_at on public.exports (order_id, product, at);
+
+-- Konfigurator-Angebote (pflegt Mike im Admin): nur diese Etsy-Angebote geben Kisten (credits pro Stueck)
+create table if not exists public.listings (
+  listing_id text primary key,
+  title text not null default '',
+  product text not null default 'modunest',
+  credits int not null default 6 check (credits >= 0),
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+alter table public.listings enable row level security;
+-- Bestellungen: gekaufte Artikel und Status ('ok' | 'pruefen' = Artikel unbekannt, Mike gibt im Admin frei)
+alter table public.orders add column if not exists items jsonb;
+alter table public.orders add column if not exists status text not null default 'ok';

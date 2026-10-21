@@ -5,7 +5,7 @@ const saveSes=()=>{try{SES?localStorage.setItem('mn-ses',JSON.stringify(SES)):lo
 const apiCall=async(p,b)=>{try{const r=await fetch(CONFIG.api.replace(/\/$/,'')+'/'+p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)});return{ok:r.ok,j:await r.json().catch(()=>({}))}}catch(e){return{ok:false,j:{error:'net'}}}};
 function creditInfo(){const e=gEl('creditinfo');if(!e)return;e.textContent=!CONFIG.requireCode?tr('demoMode'):(SES&&SES.exp>Date.now()?trf('creditLeft',SES.left):tr('notUnlocked'))}
 function gate(msg){gEl('gate').style.display='grid';gEl('gmsg').textContent=msg||''}
-async function redeem(code){const r=await apiCall('redeem',{code});if(!r.ok)return tr(r.j.error==='rate'?'gateRate':r.j.error==='net'?'gateNet':'gateBad');SES={token:r.j.token,left:r.j.left,exp:r.j.exp};saveSes();creditInfo();return''}
+async function redeem(code){const r=await apiCall('redeem',{code});if(!r.ok)return tr(r.j.error==='rate'?'gateRate':r.j.error==='net'?'gateNet':r.j.error==='pending'?'gatePending':'gateBad');SES={token:r.j.token,left:r.j.left,exp:r.j.exp};saveSes();creditInfo();return''}
 function unlockedNow(){if(!CONFIG.requireCode)return true;if(!CONFIG.api){gate(tr('gateCfg'));return false}if(!SES||SES.exp<Date.now()){gate();return false}return true}
 /* Abrechnung pro Kiste (Modul). cfgs = je Konfiguration die Kistenmasse [lang,kurz,hoch]; der Server bucht nur ab,
    was nicht innerhalb 24 h schon bezahlt wurde (gleiche Kistenzahl, je Mass max. 5 mm Abweichung). */
