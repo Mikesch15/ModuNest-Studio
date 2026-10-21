@@ -73,9 +73,12 @@ for n in (192,512):write('icons/admin-%d.png'%n,icon(n,INK,.74,RUST))
 write('icons/admin-maskable-512.png',icon(512,INK,.66,RUST));write('icons/admin-apple-180.png',icon(180,INK,.8,RUST))
 
 # ---- Manifeste ----
+# App-Kennung (id) wird vom Browser gegen die Domain aufgeloest, nicht gegen den Ordner: './' ergaebe fuer alle Apps
+# auf mikesch15.github.io dieselbe Kennung ('schon installiert'). Darum absoluter Pfad, je App verschieden.
+SITE='/ModuNest-Studio/'  # Pfad der GitHub-Pages-Seite (Repo-Name)
 icons=lambda pre,a:[{'src':pre+a+'-192.png','sizes':'192x192','type':'image/png'},{'src':pre+a+'-512.png','sizes':'512x512','type':'image/png'},{'src':pre+(a+'-maskable-512.png' if a=='admin' else 'maskable-512.png'),'sizes':'512x512','type':'image/png','purpose':'maskable'}]
-write('manifest.webmanifest',json.dumps({'name':'ModuNest Studio','short_name':'ModuNest','description':'Konfigurator von Art vom Hof','id':'./','start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#f6f0e4','theme_color':'#fdfaf2','icons':icons('icons/','icon')},ensure_ascii=False,indent=1))
-write('admin/manifest.webmanifest',json.dumps({'name':'ModuNest Admin','short_name':'MN Admin','id':'./','start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#151412','theme_color':'#1e1a17','icons':icons('../icons/','admin')},ensure_ascii=False,indent=1))
+write('manifest.webmanifest',json.dumps({'name':'ModuNest Studio','short_name':'ModuNest','description':'Konfigurator von Art vom Hof','id':SITE,'start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#f6f0e4','theme_color':'#fdfaf2','icons':icons('icons/','icon')},ensure_ascii=False,indent=1))
+write('admin/manifest.webmanifest',json.dumps({'name':'ModuNest Admin','short_name':'MN Admin','id':SITE+'admin/','start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#151412','theme_color':'#1e1a17','icons':icons('../icons/','admin')},ensure_ascii=False,indent=1))
 
 # ---- Service Worker (Version = Inhalt aller Dateien, damit Updates ankommen) ----
 pre=['./','config.js']+sorted(k.replace('index.html','') for k in out_files)

@@ -12,7 +12,7 @@ Offline-fähige **Einzeldatei-HTML-App** (kein Framework, keine Abhängigkeiten)
 ```
 cd quellcode && python3 assemble.py   # baut alles (braucht Pillow für die Icons); dist/<produkt>.html für Tests
 ```
-- **Installierbar (PWA):** Konfigurator (Manifest im Wurzelordner, Scope `./`) und Admin (eigenes Manifest in `admin/`, dunkles Icon) teilen sich `sw.js` (immer zuerst Netz, offline aus Zwischenspeicher; Version = Hash aller Ausgaben; fremde Domains wie Supabase nie gecacht).
+- **Installierbar (PWA):** App-Kennung `id` absolut (`/ModuNest-Studio/` bzw. `/ModuNest-Studio/admin/`, Konstante `SITE` in assemble.py) – `./` wird gegen die Domain aufgelöst und kollidiert mit anderen Apps auf mikesch15.github.io. Konfigurator (Manifest im Wurzelordner, Scope `./`) und Admin (eigenes Manifest in `admin/`, dunkles Icon) teilen sich `sw.js` (immer zuerst Netz, offline aus Zwischenspeicher; Version = Hash aller Ausgaben; fremde Domains wie Supabase nie gecacht).
 - Admin-Zugang im Konfigurator: Knopf «Admin» im Kopf nur, wenn auf dem Gerät `mna-key` gespeichert ist; sonst 5× schnell aufs Logo tippen.
 - Admin liegt öffentlich unter `admin/` (noindex). Unbedenklich: keine Geheimnisse, ohne ADMIN_KEY nutzlos. Server erlaubt für admin/* jede Origin, für Kunden-Aufrufe nur ALLOWED_ORIGIN. admin/add setzt die Kisten-Gesamtzahl (upsert), nur Ziffern ≥6.
 

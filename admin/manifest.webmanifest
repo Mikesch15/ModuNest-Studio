@@ -1,7 +1,7 @@
 {
  "name": "ModuNest Admin",
  "short_name": "MN Admin",
- "id": "./",
+ "id": "/ModuNest-Studio/admin/",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
