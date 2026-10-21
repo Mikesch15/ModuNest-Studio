@@ -170,13 +170,12 @@ async function buildPlan(res,tol){
  for(const it of sol.items){const q=await buildMod(it.mod,it,slotsFor(it,sol.keys),res,tol);parts.push(...q.parts);vol+=q.vol;cells+=q.cells;sol.msgs.push(...q.notes)}
  if(S.filler&&S.mode==='plan')parts.push(...fillerParts(sol,res,tol));
  const fl=S.stack?FOOT:0,groups=new Map();
- if(sol.keys.length){let w=0,h=0;const k=mk(WH+4,WH+4,res);keyShape(k.x,0,0,RK);w=k.c.width;h=k.c.height;
-  const RKr=marching(fieldOf(k),w,h,res).map(q=>simplify(q,tol));
+ if(sol.keys.length){
   for(const key of sol.keys){if(!key.zs.length)continue;const id=key.Lk.toFixed(1);
    if(!groups.has(id))groups.set(id,{Lk:key.Lk,fns:[]});
    const cx=(key.ax?key.s:key.seam)-PL.W/2,cy=(key.ax?key.seam:key.s)-PL.D/2;
    for(const z of key.zs)groups.get(id).fns.push(key.ax?(X,Y,Z)=>[-Y+cx,X+cy,Z]:(X,Y,Z)=>[X+cx,Y+cy,Z])}
-  for(const[id,g]of groups)parts.push({key:'cKey',name:'Key '+id,tris:extrude(RKr,0,g.Lk),qty:g.fns.length,asm:g.fns})}
+  for(const[id,g]of groups)parts.push({key:'cKey',name:'Key '+id,tris:keyTris(g.Lk,res,tol),qty:g.fns.length,asm:g.fns})}
  parts.forEach(p=>p.tris=Float32Array.from(p.tris));
  return{sol,parts,info:{vol,cells,keys:parts.filter(p=>p.key==='cKey').reduce((s,p)=>s+p.qty,0)}}}
 

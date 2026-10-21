@@ -76,3 +76,22 @@ alter table public.etsy_auth enable row level security;
 
 -- Bestellungen nach 2 Jahren loeschen (exports per Fremdschluessel mit)
 select cron.schedule('modunest-orders-cleanup', '41 3 * * *', $$delete from public.orders where created_at < now() - interval '2 years'$$);
+
+-- Guthaben je Produkt: per = { produkt: Kisten } aus den gekauften Angeboten (null = gilt fuer alle Produkte), pused = verbraucht
+alter table public.orders add column if not exists per jsonb;
+alter table public.orders add column if not exists pused jsonb not null default '{}';
+create or replace function public.consume_credits2(p_id uuid, p_n int, p_product text)
+returns int language plpgsql security definer set search_path = public as $$
+declare o orders%rowtype; cap int := null; usedp int;
+begin
+  select * into o from orders where id = p_id for update;
+  if not found or o.used + p_n > o.credits then return -1; end if;
+  usedp := coalesce((o.pused->>p_product)::int, 0);
+  if o.per is not null then
+    cap := coalesce((o.per->>p_product)::int, 0);
+    if usedp + p_n > cap then return -1; end if;
+  end if;
+  update orders set used = used + p_n, pused = jsonb_set(coalesce(pused, '{}'), array[p_product], to_jsonb(usedp + p_n)) where id = p_id;
+  return case when cap is null then o.credits - o.used - p_n else least(o.credits - o.used - p_n, cap - usedp - p_n) end;
+end $$;
+revoke all on function public.consume_credits2(uuid, int, text) from public, anon, authenticated;

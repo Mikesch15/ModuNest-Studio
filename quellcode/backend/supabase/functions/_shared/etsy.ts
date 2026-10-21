@@ -55,5 +55,8 @@ export async function evaluate(sb: any, tx: any[] | null) {
   }) ?? null;
   const known_ok = !!(items && items.length && known.size);
   const credits = known_ok ? items!.reduce((a, i) => a + i.credits, 0) : 0;
-  return { items, credits, status: known_ok ? "ok" : "pruefen", relevant: !known_ok || credits > 0 };
+  // Guthaben je Produkt (Kisten fuer ModuNest gelten nicht fuers Namenspuzzle und umgekehrt)
+  const per: Record<string, number> | null = known_ok ? {} : null;
+  if (per) for (const i of items!) if (i.credits && i.product) per[i.product] = (per[i.product] ?? 0) + i.credits;
+  return { items, credits, per, status: known_ok ? "ok" : "pruefen", relevant: !known_ok || credits > 0 };
 }

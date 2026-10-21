@@ -4,8 +4,10 @@ let SES=null;try{SES=JSON.parse(localStorage.getItem('mn-ses')||'null')}catch(e)
 const saveSes=()=>{try{SES?localStorage.setItem('mn-ses',JSON.stringify(SES)):localStorage.removeItem('mn-ses')}catch(e){}};
 const apiCall=async(p,b)=>{try{const r=await fetch(CONFIG.api.replace(/\/$/,'')+'/'+p,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)});return{ok:r.ok,j:await r.json().catch(()=>({}))}}catch(e){return{ok:false,j:{error:'net'}}}};
 function creditInfo(){const e=gEl('creditinfo');if(!e)return;e.textContent=!CONFIG.requireCode?tr('demoMode'):(SES&&SES.exp>Date.now()?trf('creditLeft',SES.left):tr('notUnlocked'))}
+// Restguthaben gilt je Produkt: beim Oeffnen einer Produktseite fuer dieses Produkt nachfragen
+async function refreshLeft(){if(!CONFIG.requireCode||!CONFIG.api||!SES||SES.exp<Date.now())return;const r=await apiCall('left',{token:SES.token,product:PRODUCT.id});if(r.ok){SES.left=r.j.left;saveSes();creditInfo()}}
 function gate(msg){gEl('gate').style.display='grid';gEl('gmsg').textContent=msg||''}
-async function redeem(code){const r=await apiCall('redeem',{code});if(!r.ok)return tr(r.j.error==='rate'?'gateRate':r.j.error==='net'?'gateNet':r.j.error==='pending'?'gatePending':'gateBad');SES={token:r.j.token,left:r.j.left,exp:r.j.exp};saveSes();creditInfo();return''}
+async function redeem(code){const r=await apiCall('redeem',{code,product:PRODUCT.id});if(!r.ok)return tr(r.j.error==='rate'?'gateRate':r.j.error==='net'?'gateNet':r.j.error==='pending'?'gatePending':'gateBad');SES={token:r.j.token,left:r.j.left,exp:r.j.exp};saveSes();creditInfo();return''}
 function unlockedNow(){if(!CONFIG.requireCode)return true;if(!CONFIG.api){gate(tr('gateCfg'));return false}if(!SES||SES.exp<Date.now()){gate();return false}return true}
 /* Abrechnung pro Kiste (Modul). cfgs = je Konfiguration die Kistenmasse [lang,kurz,hoch]; der Server bucht nur ab,
    was nicht innerhalb 24 h schon bezahlt wurde (gleiche Kistenzahl, je Mass max. 5 mm Abweichung). */
@@ -18,7 +20,7 @@ gEl('gx').onclick=()=>{gEl('gate').style.display='none'};
 let CART=[];try{CART=JSON.parse(localStorage.getItem(PRODUCT.store+'-cart')||'[]')}catch(e){}
 const saveCart=()=>{try{localStorage.setItem(PRODUCT.store+'-cart',JSON.stringify(CART))}catch(e){}};
 function addCart(){const s=PRODUCT.snap();s.name=PRODUCT.snapName(s);CART.push(s);saveCart();renderCart()}
-function cartCard(){const c=card('cart');c.id='cartcard';para(c,'cartHint');const ci=document.createElement('p');ci.id='creditinfo';c.append(ci);const cl=document.createElement('div');cl.id='cartlist';c.append(cl);btn(c,'addCart',addCart);const cx=document.createElement('button');cx.id='cartexp';cx.className='btn pri';cx.onclick=exportCart;c.append(cx);renderCart();creditInfo();return c}
+function cartCard(){const c=card('cart');c.id='cartcard';para(c,'cartHint');const ci=document.createElement('p');ci.id='creditinfo';c.append(ci);const cl=document.createElement('div');cl.id='cartlist';c.append(cl);btn(c,'addCart',addCart);const cx=document.createElement('button');cx.id='cartexp';cx.className='btn pri';cx.onclick=exportCart;c.append(cx);renderCart();creditInfo();refreshLeft();return c}
 function renderCart(){const e=gEl('cartlist'),x=gEl('cartexp');if(!e)return;e.innerHTML='';
  CART.forEach((it,i)=>{const r=document.createElement('div');r.className='crow';
   const no=document.createElement('span');no.className='cno';no.textContent=i+1;

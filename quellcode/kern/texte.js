@@ -29,7 +29,7 @@ const L={
  gateRate:['Zu viele Versuche. Bitte später erneut versuchen.','Too many attempts. Please try again later.'],
  gateNet:['Keine Verbindung zum Server.','Cannot reach the server.'],
  gateCfg:['Freischaltung ist nicht eingerichtet.','Unlock service is not configured.'],
- gateEmpty:['Nicht genug {UP} übrig für diese Bestellung.','Not enough {UP} left for this order.'],
+ gateEmpty:['Nicht genug {UP} übrig für diese Bestellung. Das Guthaben gilt nur für das gekaufte Produkt.','Not enough {UP} left for this order. Credit only applies to the product you bought.'],
  demoMode:['Testmodus: Export ist frei.','Test mode: export is free.'],
  notUnlocked:['Noch nicht freigeschaltet (Vorschau ist frei).','Not unlocked yet (preview is free).'],
  creditLeft:['Freigeschaltet: noch {0} {U}.','Unlocked: {0} {U} left.'],

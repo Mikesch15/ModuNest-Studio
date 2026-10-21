@@ -6,6 +6,12 @@ const rr=(x,x0,y0,x1,y1,r)=>{x.beginPath();x.roundRect(x0,y0,x1-x0,y1-y0,Math.ma
 // Schmetterlings-Verbinder: Fliege mit schmaler Taille, abgerundet. e = Aufweitung (Spiel).
 const keyShape=(x,cx,cy,e,v)=>{x.beginPath();[[-DS,-WH/2],[0,-WN/2],[DS,-WH/2],[DS,WH/2],[0,WN/2],[-DS,WH/2]].forEach((q,i)=>{const a=v?q[1]:q[0],b=v?q[0]:q[1];i?x.lineTo(cx+a,cy+b):x.moveTo(cx+a,cy+b)});x.closePath();x.fill();x.lineJoin='round';x.lineWidth=2*e;x.stroke()};
 const dvY=D=>D>130?[-D/6,D/6]:[0];
+// Verbinder mit Klemmband: die unteren KB mm sind um Spiel + KGRIP breiter als der Rest. Der Schluessel gleitet leicht
+// in die Tasche (von unten, Kisten umgedreht) und klemmt erst am Ende -> faellt beim Umdrehen nicht heraus.
+// Druck stehend, Band unten auf dem Bett: keine Ueberhaenge.
+const KB=2.5,KGRIP=.1;
+function keyTris(Lk,res,tol){const R=e=>{const m=mk(WH+4,WH+4,res);keyShape(m.x,0,0,e);return marching(fieldOf(m),m.c.width,m.c.height,res).map(q=>simplify(q,tol))};
+ const a=R(RK),b=R(RK+cl2()+KGRIP),o=[];cap(b,0,false,o);walls(b,0,KB,o);cap(b.concat(rev(a)),KB,true,o);walls(a,KB,Lk,o);cap(a,Lk,true,o);return o}
 function singleKeyZ(){const Lk=Math.min(16,S.H-(S.stack?POCK:0)-S.wall-FOOT-4);if(Lk<6)return{Lk:0,zs:[]};const L=Math.round(Lk*10)/10;return{Lk:L,zs:[[-1e3,L+.3]]}}
 function cellRects(x0,y0,x1,y1,cols,rows,td){const cw=(x1-x0-(cols-1)*td)/cols,ch=(y1-y0-(rows-1)*td)/rows,o=[];
  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++)o.push([x0+i*(cw+td),y0+j*(ch+td),x0+i*(cw+td)+cw,y0+j*(ch+td)+ch]);return{o,cw,ch}}
@@ -41,8 +47,8 @@ async function buildAll(S,res,tol){
   if(stack)bt=bt.concat(extrude(O.concat(rev(RP)),pz,H))}
  parts.push({key:'cBox',name:'Box',tris:bt});
  info.cells=bc.o.length;info.cw=bc.cw;info.ch=bc.ch;info.depth=depth;info.vol=bc.o.length*bc.cw*bc.ch*depth/1e6;
- if(conn){const RKr=ring(x=>keyShape(x,0,0,RK)),Lk=kz.Lk||8;info.keyN=kz.zs.length*ys.length;info.keyL=Lk;info.kz=kz;
-  parts.push({key:'cKey',name:'Verbinder',tris:extrude(RKr,0,Lk),qty:info.keyN})}
+ if(conn){const Lk=kz.Lk||8;info.keyN=kz.zs.length*ys.length;info.keyL=Lk;info.kz=kz;
+  parts.push({key:'cKey',name:'Verbinder',tris:keyTris(Lk,res,tol),qty:info.keyN})}
  if(S.lid){const txt=(S.label||'').trim();
   const RT=txt?ring(x=>{x.save();x.scale(1,-1);x.font='100px KFModern';x.textAlign='center';x.textBaseline='middle';const wd=x.measureText(txt).width/100;
    x.font=Math.min(16,(W-24)/wd,D*.5)+'px KFModern';x.fillText(txt,0,0);x.restore()}):[];

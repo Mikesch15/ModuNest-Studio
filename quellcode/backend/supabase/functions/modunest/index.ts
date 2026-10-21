@@ -1,4 +1,4 @@
-// API fuer den Konfigurator: /redeem, /consume (Guthaben = Kisten), /admin/create, /admin/list, /admin/add,
+// API fuer den Konfigurator: /redeem, /left, /consume (Guthaben = Kisten, je Produkt), /admin/create, /admin/list, /admin/add,
 //   /admin/listings, /admin/listing (speichern), /admin/listing-del (Konfigurator-Angebote fuer den Etsy-Webhook),
 //   /admin/etsy-start, /etsy-callback, /admin/etsy-status, /admin/etsy-fetch, /admin/etsy-lookup (Etsy-Verbindung, siehe ../_shared/etsy.ts)
 // Secrets: TOKEN_SECRET (lange Zufallszeichenfolge), ADMIN_KEY, ALLOWED_ORIGIN (z.B. https://deinname.github.io),
@@ -48,6 +48,10 @@ async function etsyCallback(u: URL) {
     return back("ok");
   } catch (e) { console.error("etsy-callback", (e as Error).message); return back("fehler"); }
 }
+// Guthaben fuer ein Produkt: orders.per = { produkt: Kisten } aus den gekauften Etsy-Angeboten (null = gilt fuer alle
+// Produkte, z.B. Codes und von Hand freigegebene Bestellungen); pused = davon verbraucht. Gesamtzahl credits/used gilt immer.
+const prodOf = (v: unknown) => String(v ?? "modunest").replace(/[^a-z0-9-]/g, "").slice(0, 40) || "modunest";
+const leftFor = (o: any, product: string) => { const t = o.credits - o.used; if (!o.per) return t; return Math.max(0, Math.min(t, (Number(o.per[product]) || 0) - (Number(o.pused?.[product]) || 0))); };
 const newCode = () => { const a = crypto.getRandomValues(new Uint8Array(12)); return Array.from(a, (x) => ALPHA[x % 32]).join(""); };
 
 Deno.serve(async (req) => {
@@ -71,7 +75,12 @@ Deno.serve(async (req) => {
     if (!data) return json({ error: "bad" }, 404);
     if (data.status === "pruefen") return json({ error: "pending" }, 409); // Etsy-Bestellung noch nicht von Mike geprueft
     const exp = Date.now() + TTL;
-    return json({ token: await sign({ id: data.id, exp }), left: data.credits - data.used, exp });
+    return json({ token: await sign({ id: data.id, exp }), left: leftFor(data, prodOf(b.product)), exp });
+  }
+  if (path === "left") { // { token, product }: Restguthaben fuer dieses Produkt (Anzeige beim Oeffnen einer Produktseite)
+    const p = await check(b.token); if (!p) return json({ error: "token" }, 401);
+    const { data: o } = await sb.from("orders").select("credits,used,per,pused").eq("id", p.id).single();
+    return json({ left: o ? leftFor(o, prodOf(b.product)) : 0 });
   }
   if (path === "consume") {
     const p = await check(b.token); if (!p) return json({ error: "token" }, 401);
@@ -82,8 +91,8 @@ Deno.serve(async (req) => {
     if (Array.isArray(b.cfgs)) {
       const cfgs: number[][][] = b.cfgs.slice(0, 50).map((c: any) => (Array.isArray(c) ? c.slice(0, 100) : []).map((m: any) => [0, 1, 2].map((k) => Number(m?.[k]) || 0))).filter((c: number[][]) => c.length);
       if (!cfgs.length) return json({ error: "bad" }, 400);
-      // Produkt (z.B. "modunest"): Gratis-Korrekturen nur innerhalb desselben Produkts; Guthaben gilt fuer alle Produkte
-      const product = String(b.product ?? "modunest").replace(/[^a-z0-9-]/g, "").slice(0, 40) || "modunest";
+      // Produkt (z.B. "modunest"): Gratis-Korrekturen und Guthaben (orders.per) je Produkt
+      const product = prodOf(b.product);
       const { data: prev } = await sb.from("exports").select("dims").eq("order_id", p.id).eq("product", product).gte("at", new Date(Date.now() - FREE_MS).toISOString());
       const free: number[] = [], rec: number[][][] = [];
       let n = 0;
@@ -93,18 +102,18 @@ Deno.serve(async (req) => {
         const k = best.filter((x) => !x).length;
         if (!k) free.push(i); else { n += k; rec.push(c.map((m, j) => best[j] ?? m)); }
       });
-      if (!n) { const { data: o } = await sb.from("orders").select("credits,used").eq("id", p.id).single(); return json({ left: o ? o.credits - o.used : 0, n: 0, free }); }
-      const { data } = await sb.rpc("consume_credits", { p_id: p.id, p_n: n });
+      if (!n) { const { data: o } = await sb.from("orders").select("credits,used,per,pused").eq("id", p.id).single(); return json({ left: o ? leftFor(o, product) : 0, n: 0, free }); }
+      const { data } = await sb.rpc("consume_credits2", { p_id: p.id, p_n: n, p_product: product });
       if (data === -1 || data == null) {
-        const { data: o } = await sb.from("orders").select("credits,used").eq("id", p.id).single();
-        return json({ error: "credits", left: o ? o.credits - o.used : 0, need: n }, 402);
+        const { data: o } = await sb.from("orders").select("credits,used,per,pused").eq("id", p.id).single();
+        return json({ error: "credits", left: o ? leftFor(o, product) : 0, need: n }, 402);
       }
       await sb.from("exports").insert(rec.map((dims) => ({ order_id: p.id, product, dims })));
       return json({ left: data, n, free });
     }
     // alt (Version <= 2.9): n Exporte
     const n = Math.max(1, Math.min(50, Number(b.n) | 0));
-    const { data } = await sb.rpc("consume_credits", { p_id: p.id, p_n: n });
+    const { data } = await sb.rpc("consume_credits2", { p_id: p.id, p_n: n, p_product: "modunest" });
     if (data === -1 || data == null) {
       const { data: o } = await sb.from("orders").select("credits,used").eq("id", p.id).single();
       return json({ error: "credits", left: o ? o.credits - o.used : 0 }, 402);
@@ -119,12 +128,12 @@ Deno.serve(async (req) => {
       return error ? json({ error: error.message }, 500) : json({ code });
     }
     if (path === "admin/list") {
-      const { data } = await sb.from("orders").select("source,receipt_id,code,credits,used,note,items,status,created_at").order("created_at", { ascending: false }).limit(200);
+      const { data } = await sb.from("orders").select("source,receipt_id,code,credits,used,note,items,status,per,pused,created_at").order("created_at", { ascending: false }).limit(200);
       return json({ orders: data });
     }
     if (path === "admin/add") { // Etsy-Bestellung von Hand nachtragen oder Kisten-Gesamtzahl aendern: { receipt_id, credits }
       const rid = norm(b.receipt_id); if (!/^\d{6,}$/.test(rid)) return json({ error: "receipt" }, 400);
-      const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: rid, credits: Math.max(1, Number(b.credits) | 0 || 6), note: "manuell", status: "ok" }, { onConflict: "receipt_id" });
+      const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: rid, credits: Math.max(1, Number(b.credits) | 0 || 6), note: "manuell", status: "ok", per: null }, { onConflict: "receipt_id" });
       return error ? json({ error: error.message }, 500) : json({ ok: true });
     }
     if (path === "admin/listings") {
@@ -163,7 +172,7 @@ Deno.serve(async (req) => {
     }
     if (path === "admin/etsy-lookup") { // { receipt_id }: nur nachschlagen (Test der Etsy-Verbindung), speichert nichts
       const rid = norm(b.receipt_id); if (!/^\d{6,}$/.test(rid)) return json({ error: "receipt" }, 400);
-      try { const tx = await receiptTransactions(sb, rid); const r = await evaluate(sb, tx); return json({ ok: true, items: r.items, credits: r.credits, status: r.status }); }
+      try { const tx = await receiptTransactions(sb, rid); const r = await evaluate(sb, tx); return json({ ok: true, items: r.items, credits: r.credits, per: r.per, status: r.status }); }
       catch (e) { return json({ error: "etsy", detail: (e as Error).message }, 502); }
     }
     if (path === "admin/etsy-fetch") { // { receipt_id }: Artikel einer Bestellung bei Etsy holen und neu berechnen
@@ -172,7 +181,7 @@ Deno.serve(async (req) => {
       try { tx = await receiptTransactions(sb, rid); } catch (e) { return json({ error: "etsy", detail: (e as Error).message }, 502); }
       const r = await evaluate(sb, tx);
       const status = r.status === "ok" && r.credits > 0 ? "ok" : "pruefen";
-      const { error } = await sb.from("orders").update({ items: r.items, credits: r.credits, status, note: status === "ok" ? null : "keine Konfigurator-Artikel gefunden" }).eq("receipt_id", rid);
+      const { error } = await sb.from("orders").update({ items: r.items, credits: r.credits, per: r.per, status, note: status === "ok" ? null : "keine Konfigurator-Artikel gefunden" }).eq("receipt_id", rid);
       return error ? json({ error: error.message }, 500) : json({ ok: true, credits: r.credits, status, items: r.items });
     }
   }

@@ -38,11 +38,11 @@ Deno.serve(async (req) => {
     try { tx = await receiptTransactions(sb, receipt, d.shop_id ? String(d.shop_id) : undefined); }
     catch (e) { note = "Etsy-Abfrage: " + String((e as Error).message ?? e).slice(0, 150); console.log("order.paid", receipt, note); }
   }
-  const { items, credits, status, relevant } = await evaluate(sb, tx);
+  const { items, credits, per, status, relevant } = await evaluate(sb, tx);
   if (!relevant) { console.log("order.paid", receipt, "ohne Konfigurator-Artikel -> ignoriert"); return new Response("ignored"); }
   if (status === "pruefen") console.log("order.paid", receipt, "Artikel unbekannt -> pruefen; fields:", Object.keys(d).join(","), "tx:", tx ? tx.length : "keine");
   console.log("order.paid", receipt, "items", items?.length ?? 0, "credits", credits, "status", status);
-  const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: receipt, listing_id: items?.[0]?.listing_id || null, credits, items, status, note }, { onConflict: "receipt_id", ignoreDuplicates: true });
+  const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: receipt, listing_id: items?.[0]?.listing_id || null, credits, per, items, status, note }, { onConflict: "receipt_id", ignoreDuplicates: true });
   if (error) { console.error(error); return new Response("db error", { status: 500 }); }
   return new Response("ok");
 });
