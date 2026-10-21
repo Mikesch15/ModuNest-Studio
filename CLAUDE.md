@@ -7,12 +7,12 @@ Offline-fähige **Einzeldatei-HTML-App** (kein Framework, keine Abhängigkeiten)
 
 ## Repo & Build
 - Live: **https://mikesch15.github.io/ModuNest-Studio/** (GitHub Pages, Branch `main`, Ordner `/`). Mike will, dass Änderungen direkt auf `main` gehen.
-- Erzeugte Dateien (nie von Hand ändern): `index.html` (Produktauswahl; bei nur 1 Produkt Weiterleitung), `<produkt>/index.html` (z. B. `modunest/`), `admin/index.html`, `manifest.webmanifest`, `admin/manifest.webmanifest`, `sw.js`, `icons/*`.
-- `config.js` (von Hand): Server-Einstellung `window.MN_CONFIG` (requireCode + API-URL), wird von Produktseiten und Admin als `../config.js` geladen. Ohne config.js: Testmodus.
+- Erzeugte Dateien (nie von Hand ändern): `app/index.html` (Produktauswahl; bei nur 1 Produkt Weiterleitung), `app/<produkt>/index.html` (z. B. `app/modunest/`), `admin/index.html`, `app/manifest.webmanifest`, `admin/manifest.webmanifest`, `sw.js`, `icons/*`; `index.html` und `<produkt>/index.html` sind nur Weiterleitungen (alte Links).
+- `config.js` (von Hand): Server-Einstellung `window.MN_CONFIG` (requireCode + API-URL), wird von Produktseiten (`../../config.js`) und Admin (`../config.js`) geladen. Ohne config.js: Testmodus.
 ```
 cd quellcode && python3 assemble.py   # baut alles (braucht Pillow für die Icons); dist/<produkt>.html für Tests
 ```
-- **Installierbar (PWA):** App-Kennung `id` absolut (`/ModuNest-Studio/` bzw. `/ModuNest-Studio/admin/`, Konstante `SITE` in assemble.py) – `./` wird gegen die Domain aufgelöst und kollidiert mit anderen Apps auf mikesch15.github.io. Konfigurator (Manifest im Wurzelordner, Scope `./`) und Admin (eigenes Manifest in `admin/`, dunkles Icon) teilen sich `sw.js` (immer zuerst Netz, offline aus Zwischenspeicher; Version = Hash aller Ausgaben; fremde Domains wie Supabase nie gecacht).
+- **Installierbar (PWA):** App-Kennung `id` absolut (`/ModuNest-Studio/app/` bzw. `/ModuNest-Studio/admin/`, Konstante `SITE` in assemble.py) – `./` wird gegen die Domain aufgelöst und kollidiert mit anderen Apps auf mikesch15.github.io. App-Bereiche (scope) dürfen sich nicht verschachteln (Android: «App konnte nicht geöffnet werden») → Konfigurator unter `app/`, Admin unter `admin/`. Konfigurator (Manifest `app/manifest.webmanifest`, Scope `app/`) und Admin (eigenes Manifest in `admin/`, dunkles Icon) teilen sich `sw.js` (immer zuerst Netz, offline aus Zwischenspeicher; Version = Hash aller Ausgaben; fremde Domains wie Supabase nie gecacht).
 - Admin-Zugang im Konfigurator: Knopf «Admin» im Kopf nur, wenn auf dem Gerät `mna-key` gespeichert ist; sonst 5× schnell aufs Logo tippen.
 - Admin liegt öffentlich unter `admin/` (noindex). Unbedenklich: keine Geheimnisse, ohne ADMIN_KEY nutzlos. Server erlaubt für admin/* jede Origin, für Kunden-Aufrufe nur ALLOWED_ORIGIN. admin/add setzt die Kisten-Gesamtzahl (upsert), nur Ziffern ≥6.
 

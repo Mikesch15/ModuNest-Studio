@@ -1,7 +1,10 @@
 # Baut die Webseite aus kern/ + produkte/<id>/ (Aufruf im Ordner quellcode):  python3 assemble.py
 # Ergebnis (eine Ebene hoeher, im Repo-Wurzelordner):
-#   <id>/index.html je Produkt, index.html (Produktauswahl; bei nur einem Produkt Weiterleitung),
-#   admin/index.html, manifest.webmanifest + admin/manifest.webmanifest, sw.js, icons/*
+#   app/<id>/index.html je Produkt, app/index.html (Produktauswahl; bei nur einem Produkt Weiterleitung),
+#   admin/index.html, app/manifest.webmanifest + admin/manifest.webmanifest, sw.js, icons/*,
+#   index.html und <id>/index.html als Weiterleitungen (alte Links).
+# Konfigurator (app/) und Admin (admin/) haben getrennte, nicht verschachtelte App-Bereiche – Android kann
+# ineinander liegende App-Bereiche nicht sauber oeffnen.
 # Zusaetzlich dist/<id>.html (fuer Tests). Braucht Python 3 mit Pillow (Icons).
 import re,base64,json,os,glob,hashlib
 from PIL import Image,ImageDraw
@@ -43,11 +46,14 @@ def write(rel,data):
 # auf mikesch15.github.io dieselbe Kennung ('schon installiert'). Darum absoluter Pfad, je App verschieden.
 SITE='/ModuNest-Studio/'  # Pfad der GitHub-Pages-Seite (Repo-Name)
 icons=lambda pre,a:[{'src':pre+a+'-192.png','sizes':'192x192','type':'image/png'},{'src':pre+a+'-512.png','sizes':'512x512','type':'image/png'},{'src':pre+(a+'-maskable-512.png' if a=='admin' else 'maskable-512.png'),'sizes':'512x512','type':'image/png','purpose':'maskable'}]
-MAN_ROOT=(json.dumps({'name':'ModuNest Studio','short_name':'ModuNest','description':'Konfigurator von Art vom Hof','id':SITE,'start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#f6f0e4','theme_color':'#fdfaf2','icons':icons('icons/','icon')},ensure_ascii=False,indent=1))
+MAN_ROOT=(json.dumps({'name':'ModuNest Studio','short_name':'ModuNest','description':'Konfigurator von Art vom Hof','id':SITE+'app/','start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#f6f0e4','theme_color':'#fdfaf2','icons':icons('../icons/','icon')},ensure_ascii=False,indent=1))
 MAN_ADMIN=(json.dumps({'name':'ModuNest Admin','short_name':'MN Admin','id':SITE+'admin/','start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#151412','theme_color':'#1e1a17','icons':icons('../icons/','admin')},ensure_ascii=False,indent=1))
 
 MV=hashlib.sha1((MAN_ROOT+MAN_ADMIN).encode()).hexdigest()[:8]  # ?v= an den Manifest-Links: Handy holt neue Fassung sofort
 man_link=lambda h:h.replace('manifest.webmanifest"','manifest.webmanifest?v=%s"'%MV)
+
+# Weiterleitung fuer alte Adressen (Etsy-Links, Lesezeichen)
+redirect=lambda to:'<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>ModuNest Studio</title><meta http-equiv="refresh" content="0;url=%s"><script>location.replace(%s+location.search+location.hash)</script><a href="%s">Weiter</a>\n'%(to,json.dumps(to),to)
 
 # ---- Produktseiten ----
 for P in prods:
@@ -58,18 +64,20 @@ for P in prods:
     out=head+core+mk+exp+dl+rend+open(K+'texte.js').read()+src+'const PRODUCT_COUNT=%d;\n'%len(prods)+shell
     out=man_link(out.replace("/*FONTFACES*/",faces).replace("LOGO_DATA",LOGO))
     open('dist/%s.html'%P['id'],'w').write(out)
-    write(P['id']+'/index.html',out)
+    write('app/'+P['id']+'/index.html',out)
+    write(P['id']+'/index.html',redirect('../app/%s/'%P['id']))
     print(P['id'],len(out)//1024,'KB')
 
 # ---- Startseite (Produktauswahl) ----
 lst=[{'id':P['id'],'name':P['name'],'text':P['text'],'bild':('data:image/webp;base64,'+b64('produkte/%s/bild.webp'%P['id'])) if os.path.exists('produkte/%s/bild.webp'%P['id']) else ''} for P in prods]
 st=open(K+'start.html').read().replace('PRODUCTS_JSON',json.dumps(lst,ensure_ascii=False)).replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT)
-write('index.html',man_link(st))
+write('app/index.html',man_link(st))
+write('index.html',redirect('app/'))
 
 # ---- Admin ----
 write('admin/index.html',man_link(open(K+'admin.html').read().replace('PRODUCTS_JSON',json.dumps([{'id':P['id'],'name':P['name']} for P in prods],ensure_ascii=False))
   .replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT)))
-write('manifest.webmanifest',MAN_ROOT);write('admin/manifest.webmanifest',MAN_ADMIN)
+write('app/manifest.webmanifest',MAN_ROOT);write('admin/manifest.webmanifest',MAN_ADMIN)
 
 # ---- App-Symbole ----
 big=Image.open(K+'logo-gross.webp').convert('RGBA')

@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#fdfaf2">
-<link rel="icon" href="icons/icon-192.png">
+<link rel="icon" href="../icons/icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/apple-180.png">
+<link rel="apple-touch-icon" href="../icons/apple-180.png">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ModuNest">
 <title>ModuNest Studio – Art vom Hof</title>
 <script>
@@ -47,7 +47,7 @@ function show(){const k=lang?'en':'de';document.documentElement.lang=k;document.
  document.getElementById('grid').innerHTML=PRODUCTS.map(p=>`<a class="p" href="${esc(p.id)}/"><img ${p.bild?'':'class="lg"'} src="${p.bild||document.querySelector('header .logo').src}" alt=""><h2>${esc(p.name[k])}</h2><p>${esc(p.text[k])}</p><span>${T.open[lang]}</span></a>`).join('')}
 document.getElementById('lang').onclick=()=>{lang=lang?0:1;try{localStorage.setItem('mn-lang',lang)}catch(e){}show()};
 show();
-if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('../sw.js',{scope:'../'}).catch(()=>{});
 </script>
 </body>
 </html>

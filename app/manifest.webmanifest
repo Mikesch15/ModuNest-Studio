@@ -2,7 +2,7 @@
  "name": "ModuNest Studio",
  "short_name": "ModuNest",
  "description": "Konfigurator von Art vom Hof",
- "id": "/ModuNest-Studio/",
+ "id": "/ModuNest-Studio/app/",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
@@ -11,17 +11,17 @@
  "theme_color": "#fdfaf2",
  "icons": [
   {
-   "src": "icons/icon-192.png",
+   "src": "../icons/icon-192.png",
    "sizes": "192x192",
    "type": "image/png"
   },
   {
-   "src": "icons/icon-512.png",
+   "src": "../icons/icon-512.png",
    "sizes": "512x512",
    "type": "image/png"
   },
   {
-   "src": "icons/maskable-512.png",
+   "src": "../icons/maskable-512.png",
    "sizes": "512x512",
    "type": "image/png",
    "purpose": "maskable"

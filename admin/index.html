@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>ModuNest Admin</title>
 <link rel="icon" href="../icons/admin-192.png">
-<link rel="manifest" href="manifest.webmanifest?v=10b3d939">
+<link rel="manifest" href="manifest.webmanifest?v=1e99c918">
 <link rel="apple-touch-icon" href="../icons/admin-apple-180.png">
 <meta name="theme-color" content="#1e1a17">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MN Admin">
@@ -121,7 +121,7 @@ select{width:100%;padding:10px 12px;font:inherit;color:var(--ink);background:var
 <script>
 'use strict';
 /* Online (GitHub Pages): Shop-Link und Server-Adresse aus der eigenen Adresse bzw. ../config.js; als lokale Datei: feste Werte */
-const $=i=>document.getElementById(i),WEB=location.protocol.startsWith('http'),SHOP=WEB?new URL('../',location.href).href:'https://mikesch15.github.io/ModuNest-Studio/',DEF_API=(window.MN_CONFIG&&window.MN_CONFIG.api)||'https://sfoscpgsumukhihkdutw.supabase.co/functions/v1/modunest';
+const $=i=>document.getElementById(i),WEB=location.protocol.startsWith('http'),SHOP=WEB?new URL('../app/',location.href).href:'https://mikesch15.github.io/ModuNest-Studio/app/',DEF_API=(window.MN_CONFIG&&window.MN_CONFIG.api)||'https://sfoscpgsumukhihkdutw.supabase.co/functions/v1/modunest';
 const st={get:k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)}catch(e){return null}},set:(k,v,keep)=>{try{(keep?localStorage:sessionStorage).setItem(k,v);(keep?sessionStorage:localStorage).removeItem(k)}catch(e){}}};
 $('api').value=st.get('mna-api')||DEF_API;$('key').value=st.get('mna-key')||'';try{$('rem').checked=!!localStorage.getItem('mna-key')}catch(e){}
 const ERR={auth:'Admin-Schlüssel falsch.',net:'Keine Verbindung. Internet und Server-Adresse prüfen.',receipt:'Bestellnummer: nur Ziffern, mindestens 6.',listing:'Angebotsnummer: nur Ziffern, mindestens 6.','etsy-secrets':'In Supabase fehlen noch die Secrets ETSY_KEYSTRING und ETSY_SHARED_SECRET (siehe Anleitung).',etsy:'Etsy-Abfrage fehlgeschlagen – ist die Verbindung aktiv?',notfound:'Server kennt diese Funktion nicht – ist die neueste Version veröffentlicht?'};
