@@ -7,12 +7,12 @@ Object.assign(L,{
  help4:['Drucke Brett und Buchstaben ohne Stützen – am schönsten mit verschiedenen Farben.','Print board and letters without supports – nicest in different colours.'],
  helpTip:['Tipp: Lade zuerst die kostenlose Passungsprobe herunter (ganz unten) und prüfe die Passung. Bei jedem Abschnitt erklärt dir das ⓘ, was die Einstellungen bewirken.','Tip: download the free fit test first (at the bottom) and check the fit. In every section, the ⓘ explains what the settings do.'],
  pzText:['Name & Text','Name & text'],pzName:['Name (nur Buchstaben)','Name (letters only)'],pzSub:['Zweite Zeile (optional, z. B. Geburtsdatum)','Second line (optional, e.g. date of birth)'],
- pzSize:['Grösse','Size'],pzH:['Buchstabenhöhe','Letter height'],pzT:['Brettdicke','Board thickness'],pzKnob:['Greifknöpfe (für kleine Hände)','Grip knobs (for small hands)'],
+ pzSize:['Grösse','Size'],pzLines:['Zeilen','Lines'],lnAuto:['Automatisch','Automatic'],ln1:['1 Zeile','1 line'],ln2:['2 Zeilen','2 lines'],pzH:['Buchstabenhöhe','Letter height'],pzT:['Brettdicke','Board thickness'],pzKnob:['Greifknöpfe (für kleine Hände)','Grip knobs (for small hands)'],
  pzFit:['Passung','Fit'],pzFitPick:['Spiel (1 stramm … 5 locker)','Clearance (1 tight … 5 loose)'],
  pzFitText:['Lade die Passungsprobe herunter: ein kleines Herz und ein Brettchen mit 5 Vertiefungen (1 stramm … 5 locker, zusammen ca. 15 g). Drucke sie mit demselben Filament wie später das Puzzle und probiere das Herz in jeder Vertiefung. Wähle die Nummer, bei der es leicht hinein- und herausgeht. Durch das Loch im Boden lässt es sich herausdrücken.','Download the fit test: a small heart and a little board with 5 pockets (1 tight … 5 loose, about 15 g in total). Print it with the same filament you will use for the puzzle and try the heart in each pocket. Choose the number where it goes in and out easily. Push it out through the hole in the bottom.'],
  pzFitDl:['Passungsprobe herunterladen (gratis)','Download fit test (free)'],
  cBoard:['Brett','Board'],cL0:['Buchstabe 1, 7 …','Letter 1, 7 …'],cL1:['Buchstabe 2, 8 …','Letter 2, 8 …'],cL2:['Buchstabe 3, 9 …','Letter 3, 9 …'],cL3:['Buchstabe 4, 10 …','Letter 4, 10 …'],cL4:['Buchstabe 5, 11 …','Letter 5, 11 …'],cL5:['Buchstabe 6, 12 …','Letter 6, 12 …'],
- i_pzText:['Erlaubt sind Buchstaben (auch Ä, Ö, Ü), Zahlen und Leerzeichen, höchstens 12 Zeichen. Die Pünktchen von Ä/Ö/Ü werden mit dem Buchstaben verbunden, damit keine losen Kleinteile entstehen. Die zweite Zeile wird ins Brett graviert.','Letters (incl. Ä, Ö, Ü), digits and spaces are allowed, up to 12 characters. The dots of Ä/Ö/Ü are joined to the letter so there are no loose small parts. The second line is engraved into the board.'],
+ i_pzText:['Erlaubt sind Buchstaben (auch Ä, Ö, Ü), Zahlen und Leerzeichen, höchstens 16 Zeichen. Lange Namen kommen automatisch auf 2 Zeilen (bei mehreren Wörtern am Leerzeichen), damit die Buchstaben gross bleiben; unter «Zeilen» kannst du das festlegen. Die Pünktchen von Ä/Ö/Ü werden mit dem Buchstaben verbunden, damit keine losen Kleinteile entstehen. Die zweite Zeile wird ins Brett graviert.','Letters (incl. Ä, Ö, Ü), digits and spaces are allowed, up to 16 characters. Long names automatically go onto 2 lines (split at a space if there are several words) so the letters stay large; you can fix this under «Lines». The dots of Ä/Ö/Ü are joined to the letter so there are no loose small parts. The second line is engraved into the board.'],
  i_pzSize:['Buchstabenhöhe: Grösse der Puzzleteile. Ist der Name zu lang für das Druckbett, verkleinert die App die Buchstaben automatisch. Brettdicke: dickeres Brett = tiefere Vertiefungen. Greifknöpfe: kleine Knöpfe oben auf den Buchstaben, damit Kinder sie leicht herausnehmen können.','Letter height: size of the pieces. If the name is too long for the print bed, the app shrinks the letters automatically. Board thickness: thicker board = deeper recesses. Grip knobs: small knobs on top of the letters so children can lift them out easily.'],
  i_pzFit:['Jeder Drucker druckt etwas anders. Die Passungsprobe zeigt, welches Spiel bei dir passt. Für Kinderhände lieber etwas lockerer wählen.','Every printer prints slightly differently. The fit test shows which clearance suits yours. For small hands, rather choose a bit looser.'],
  pzSafety:['Sicherheit: Kleinteile – für Kinder unter 3 Jahren nur unter Aufsicht. Teile vor dem Spielen auf scharfe Kanten prüfen.','Safety: small parts – children under 3 only under supervision. Check parts for sharp edges before play.'],
@@ -24,19 +24,22 @@ Object.assign(L,{
  sh_kuh:['Hochlandrind','Highland cow'],sh_schaf:['Schaf','Sheep'],sh_schwein:['Schwein','Pig'],sh_huhn:['Huhn','Chicken'],sh_hase:['Hase','Bunny'],
  sh_herz:['Herz','Heart'],sh_stern:['Stern','Star'],sh_sonne:['Sonne','Sun'],sh_blume:['Blume','Flower'],sh_wolke:['Wolke','Cloud'],sh_baum:['Baum','Tree'],sh_fisch:['Fisch','Fish'],sh_haus:['Haus','House'],
  eLong:['Der Name ist zu lang für ein Brett (Buchstaben wären kleiner als 30 mm). Bitte kürzeren Namen oder Spitznamen wählen.','The name is too long for one board (letters would be smaller than 30 mm). Please choose a shorter name or nickname.'],
- wCut:['Höchstens 12 Zeichen – der Name wurde gekürzt.','At most 12 characters – the name was shortened.'],
+ wCut:['Höchstens 16 Zeichen – der Name wurde gekürzt.','At most 16 characters – the name was shortened.'],
  wScaled:['Der Name ist zu lang für das Druckbett – die Buchstaben wurden auf {0} mm verkleinert.','The name is too long for the print bed – letters were reduced to {0} mm.'],
  cartOne:['Namenspuzzle','Name puzzle'],
  i_colors:['Die Farben sind für die Vorschau und werden in der 3MF-Datei als Vorschlag für Bambu Studio mitgegeben. Die Buchstaben wechseln reihum durch sechs Farben.','Colours are for the preview and are passed to Bambu Studio in the 3MF file as a suggestion. Letters cycle through six colours.']
 });
-const S={name:'LINA',sub:'',shapes:[],H:50,T:10,knob:true,fit:3,view:'asm',hide:{},cBoard:'#ead9bd',cL0:'#c46546',cL1:'#5f9b8c',cL2:'#e2ad3f',cL3:'#5b7db1',cL4:'#9a6fae',cL5:'#7aa35a'};
+const S={name:'LINA',sub:'',lines:0,shapes:[],H:50,T:10,knob:true,fit:3,view:'asm',hide:{},cBoard:'#ead9bd',cL0:'#c46546',cL1:'#5f9b8c',cL2:'#e2ad3f',cL3:'#5b7db1',cL4:'#9a6fae',cL5:'#7aa35a'};
 try{Object.assign(S,JSON.parse(localStorage.getItem('np-state')||'{}'))}catch(e){}
 if(!Array.isArray(S.shapes))S.shapes=[];
 
 /* ================= Namenspuzzle: Geometrie ================= */
 const PZ_FONT='KFModern',PZ_MARGIN=12,PZ_WALL=5,PZ_KNOB_H=7;
 const pzClr=()=>[.2,.3,.4,.5,.6][(S.fit|0)-1]??.4;          // Spiel je Seite (mm)
-const pzName=s=>[...String(s||'').toUpperCase()].filter(c=>/[A-Z0-9ÄÖÜ ]/.test(c)).join('').replace(/\s+/g,' ').trim().slice(0,12);
+const pzName=s=>[...String(s||'').toUpperCase()].filter(c=>/[A-Z0-9ÄÖÜ ]/.test(c)).join('').replace(/\s+/g,' ').trim().slice(0,16);
+// Name in 2 Zeilen teilen: am Leerzeichen, das die Zeilen am gleichmaessigsten macht; ein einzelnes Wort ab 6 Zeichen (bei «2 Zeilen» immer) in der Mitte
+function pzSplit(n,force){const w=n.split(' ');if(w.length>1){let best=null,bv=1e9;for(let k=1;k<w.length;k++){const a=w.slice(0,k).join(' '),b=w.slice(k).join(' '),v=Math.max(a.length,b.length);if(v<bv){bv=v;best=[a,b]}}return best}
+ return n.length>=(force?2:6)?[n.slice(0,Math.ceil(n.length/2)),n.slice(Math.ceil(n.length/2))]:null}
 const pzHash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0}return h%100000000};
 const pzCircle=(cx,cy,r,n=40)=>[Array.from({length:n},(_,i)=>[cx+r*Math.cos(i/n*2*Math.PI),cy+r*Math.sin(i/n*2*Math.PI)])];
 // Ringe aus einer Zeichnung; winzige Artefakt-Ringe (Kantenrauschen, < 0.5 mm²) werden verworfen
@@ -171,25 +174,29 @@ async function buildPuzzle(res,tol,opt={}){
  const clr=pzClr(),T=+S.T||12,Pd=Math.round(T*.5),LT=Pd+3,GAP=2*clr+PZ_WALL;
  const m=document.createElement('canvas').getContext('2d');m.font='100px '+PZ_FONT;const capR=m.measureText('H').actualBoundingBoxAscent/100;
  const maxW=250-2*PZ_MARGIN;
- // Reihe 1: Buchstaben. Groesse so waehlen, dass das Brett aufs Druckbett passt; mind. 30 mm (Kleinteile)
- let H=+S.H||50,scaled=false,letters=[],RW=0;
- if(name.replace(/ /g,'')){
-  const rowW=H=>[...name].reduce((s,ch)=>s+(ch===' '?.4*H:m.measureText(ch).width*H/capR/100),0)+(name.length-1)*GAP;
-  if(rowW(H)>maxW){H=Math.floor(H*maxW/rowW(H));scaled=true}
-  for(let pass=0;pass<4;pass++){
+ // Name auf 1 oder 2 Zeilen (Auto: 2 Zeilen, sobald die Buchstaben auf einer Zeile verkleinert werden muessten).
+ // Alle Buchstaben gleich gross; Groesse so waehlen, dass das Brett aufs Druckbett passt (Breite und Tiefe); mind. 30 mm (Kleinteile)
+ const H0=+S.H||50,lineW=(t,H)=>[...t].reduce((s,ch)=>s+(ch===' '?.4*H:m.measureText(ch).width*H/capR/100),0)+(t.length-1)*GAP;
+ const mode=opt.lines??(S.lines|0),two=pzSplit(name,mode===2);
+ const lines=!name.replace(/ /g,'')?[]:two&&(mode===2||(mode===0&&lineW(name,H0)>maxW))?two:[name];
+ let H=H0,Hs=H0,scaled=false,lrows=[],figs=[],RW=0,FW=0;
+ for(let pass=0;pass<6;pass++){
+  if(lines.length){const lw=Math.max(...lines.map(t=>lineW(t,H)));if(lw>maxW){H=Math.floor(H*maxW/lw);scaled=true}
    if(H<30)return{ok:false,err:tr('eLong'),parts:[],units:[],info:{}};
-   const fs=H/capR;letters=[];let x=0;
-   for(const ch of name){if(ch===' '){x+=.4*H+GAP;continue}
-    const g=pzLetter(ch,fs,H,res,tol);letters.push({...g,cx:x+g.w/2});x+=g.w+GAP}
-   RW=x-GAP;if(RW<=maxW)break;H=Math.floor(H*maxW/RW-1);scaled=true}
-  letters.forEach(g=>g.cx-=RW/2)}
- // Reihe 2: Figuren (gleiche Groesse, falls noetig kleiner)
- let figs=[],FW=0,Hs=+S.H||50;
- for(let pass=0;shapes.length&&pass<4;pass++){
-  if(Hs<30)return{ok:false,err:tr('eShapes'),parts:[],units:[],info:{}};
-  figs=shapes.map(id=>pzShape(id,Hs,res,tol));FW=pzRow(figs,GAP);if(FW<=maxW)break;Hs=Math.floor(Hs*maxW/FW-1)}
+   const fs=H/capR;lrows=lines.map(t=>{const row=[];let x=0;
+    for(const ch of t){if(ch===' '){x+=.4*H+GAP;continue}const g=pzLetter(ch,fs,H,res,tol);row.push({...g,cx:x+g.w/2});x+=g.w+GAP}
+    const w=x-GAP;row.forEach(g=>g.cx-=w/2);row.W=w;return row});RW=Math.max(...lrows.map(r=>r.W))}
+  // Figuren-Reihe (gleiche Groesse wie die Buchstaben, falls noetig kleiner)
+  if(shapes.length){if(Hs<30)return{ok:false,err:tr('eShapes'),parts:[],units:[],info:{}};figs=shapes.map(id=>pzShape(id,Hs,res,tol));FW=pzRow(figs,GAP)}
+  if(RW>maxW){H=Math.floor(H*maxW/RW-1);scaled=true;continue}
+  if(FW>maxW){Hs=Math.floor(Hs*maxW/FW-1);continue}
+  // Tiefe pruefen (Druckbett 250 mm): alles gemeinsam verkleinern
+  const dep=lrows.concat([figs]).filter(r=>r.length).reduce((t,r)=>t+Math.max(...r.map(g=>g.y1))-Math.min(...r.map(g=>g.y0))+2*clr+PZ_WALL+5,0)-PZ_WALL-5+2*PZ_MARGIN+(sub?Math.min(9,H*.22)+6:0);
+  if(dep>250){const f=250/dep;H=Math.floor(H*f-1);Hs=Math.floor(Hs*f-1);scaled=scaled||lines.length>0;continue}
+  break}
+ const letters=lrows.flat();
  // Reihen uebereinander, darunter optional die gravierte Zeile
- const rows=[letters,figs].filter(r=>r.length),ext=r=>[Math.min(...r.map(g=>g.y0))-clr,Math.max(...r.map(g=>g.y1))+clr],RGAP=PZ_WALL+5;
+ const rows=lrows.concat([figs]).filter(r=>r.length),ext=r=>[Math.min(...r.map(g=>g.y0))-clr,Math.max(...r.map(g=>g.y1))+clr],RGAP=PZ_WALL+5;
  const SUBH=sub?Math.min(9,(letters.length?H:Hs)*.22):0,contentH=rows.reduce((t,r)=>{const e=ext(r);return t+e[1]-e[0]},0)+RGAP*(rows.length-1);
  const Wb=Math.max(RW,FW,(letters.length?H:Hs))+2*PZ_MARGIN,Db=contentH+2*PZ_MARGIN+(sub?SUBH+6:0);
  let yt=Db/2-PZ_MARGIN;for(const r of rows){const e=ext(r),oy=yt-e[1];r.forEach(g=>g.oy=oy);yt-=(e[1]-e[0])+RGAP}
@@ -211,12 +218,12 @@ async function buildPuzzle(res,tol,opt={}){
  pieces.forEach((g,i)=>{const t=g.D&&g.D.length?plateWithPocket(g.R,g.D,LT,.6):extrude(g.R,0,LT);
   if(S.knob){const k=kn[i],r=PZ_SHAPES[g.ch]?Math.min(5,k.d-1.2):Math.min(rL,k.d-1.19);if(r>=2.5)t.push(...extrude(pzCircle(k.p[0],k.p[1],r),LT,LT+PZ_KNOB_H))}
   parts.push({key:'cL'+(i%6),name:(PZ_SHAPES[g.ch]?'Figur '+(i+1)+' '+g.ch:'Buchstabe '+(i+1)+' '+g.ch),tris:Float32Array.from(t),asm:[(X,Y,Z)=>[X+g.cx,Y+g.oy,Z+T-Pd+.05]]})});
- return{ok:true,err:'',parts,units:[[Math.round(Wb),Math.round(Db),pzHash(name+'|'+shapes.join(','))]],info:{name:name+(shapes.length?(name?' + ':'')+shapes.map(id=>tr('sh_'+id)).join(', '):''),Wb,Db,T,H,scaled,n:pieces.length,cut:[...String(S.name||'').trim()].length>12}}}
+ return{ok:true,err:'',parts,units:[[Math.round(Wb),Math.round(Db),pzHash(name+'|'+shapes.join(','))]],info:{name:name+(shapes.length?(name?' + ':'')+shapes.map(id=>tr('sh_'+id)).join(', '):''),Wb,Db,T,H,scaled,n:pieces.length,cut:[...String(S.name||'').trim()].length>16}}}
 
 /* ================= Namenspuzzle: Oberflaeche, Vorschau ================= */
 function arrange(parts,mode){return mode==='asm'?parts.flatMap(p=>p.asm.map(f=>({...p,tris:xf(p.tris,f)}))):arrangePrint(parts)}
 function ui(){
- let c=card('pzText');tInput(c,'name','pzName');tInput(c,'sub','pzSub');
+ let c=card('pzText');tInput(c,'name','pzName');seg(c,'lines','pzLines',[[0,'lnAuto'],[1,'ln1'],[2,'ln2']]);tInput(c,'sub','pzSub');
  c=card('pzShapes');const sg=document.createElement('div');sg.className='seg shp';
  PZ_SHAPE_IDS.forEach(id=>{const b=document.createElement('button');b.dataset.k='sh_'+id;const upd=()=>{const n=S.shapes.indexOf(id);b.classList.toggle('on',n>=0);b.dataset.n=n>=0?n+1:''};upd();
   b.onclick=()=>{const n=S.shapes.indexOf(id);if(n>=0)S.shapes.splice(n,1);else if(S.shapes.length<6)S.shapes.push(id);sg.querySelectorAll('button').forEach(x=>x._u());changed()};b._u=upd;sg.append(b)});c.append(sg);
@@ -249,7 +256,7 @@ async function downloadPzTest(){const r=await buildPzTest(9,.02);
  download(zip(r.map((p,i)=>({name:`${i+1}-${p.name}.stl`,data:stlOf(p.tris)}))),'Namenspuzzle-Passungsprobe.zip')}
 
 /* ================= Namenspuzzle: Produktbeschreibung fuer den Kern ================= */
-const PZ_KEYS=['name','sub','shapes','H','T','knob','fit','cBoard','cL0','cL1','cL2','cL3','cL4','cL5'];
+const PZ_KEYS=['name','lines','sub','shapes','H','T','knob','fit','cBoard','cL0','cL1','cL2','cL3','cL4','cL5'];
 const PRODUCT={id:'namenspuzzle',name:'Namenspuzzle',file:'Namenspuzzle',store:'np',
  unit:{one:['Puzzle','puzzle'],n:['Puzzle','puzzle(s)'],many:['Puzzles','puzzles']},
  // units: Brettmasse + Kennzahl des Namens -> Gratis-Korrektur nur fuer denselben Namen (Groesse/Farben)
