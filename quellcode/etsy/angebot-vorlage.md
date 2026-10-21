@@ -123,7 +123,7 @@ Hochladen: **ModuNest-Anleitung.pdf** (die Version ohne Adresse).
 ## 9. Nach dem Veröffentlichen
 1. Angebotsnummer aus der Adresse kopieren: etsy.com/listing/**1234567890**/…
 2. Admin → «Konfigurator-Angebote» → Nummer, Bezeichnung (z. B. «Kisten-Set 6»), Produkt «ModuNest Kisten», Kisten pro Stück → **Speichern**
-3. Testkauf mit 100-%-Gutschein → im Admin prüfen, ob die Bestellung mit den richtigen Kisten erscheint
+3. Ohne Kauf testen: Admin → Etsy-Verbindung → «Verbindung testen (ohne Kauf)» mit einer alten Bestellnummer. Den Webhook prüft der erste echte Verkauf (im Admin schauen, ob die Bestellung mit den richtigen Kisten erscheint; sonst steht sie auf «prüfen» und du gibst sie frei).
 
 ---
 *Erstellt von Claude, nicht von Etsy geprüft. Etsy-Regeln zu digitalen Produkten und externen Links bitte selbst lesen. Feldnamen können je nach Etsy-Version leicht abweichen.*

@@ -95,6 +95,9 @@ select{width:100%;padding:10px 12px;font:inherit;color:var(--ink);background:var
 <p class="info" id="i6" hidden>Etsy meldet bei einer Bestellung nur die Bestellnummer. Damit der Server nachschauen kann, <b>was</b> gekauft wurde, braucht er einmalig deine Erlaubnis (nur Lesen von Bestellungen). Ohne Verbindung landen alle Bestellungen unter «prüfen». Die Verbindung erneuert sich jedes Mal, wenn du den Admin öffnest; nach 90 Tagen ohne Öffnen musst du neu verbinden.</p>
 <div id="estat" class="sub" style="font-size:14px">–</div>
 <button class="b p" id="econn">Mit Etsy verbinden</button><div class="msg" id="emsg"></div>
+<details><summary style="font-size:13px;color:var(--mut);cursor:pointer">Verbindung testen (ohne Kauf)</summary>
+<p class="info" style="margin-top:6px">Gib die Nummer einer beliebigen <b>alten Bestellung</b> aus deinem Shop ein (Shop-Manager → Bestellungen). Der Server fragt Etsy, was darin gekauft wurde, und zeigt, wie viele Kisten das geben würde. Es wird nichts gespeichert.</p>
+<div class="row"><input id="tlid" type="text" inputmode="numeric" placeholder="Bestellnummer"><button class="b narrow" id="tlbtn">Nachschlagen</button></div><div class="msg" id="tlmsg"></div><ul class="lines" id="tlout"></ul></details>
 </section>
 
 <section class="card needkey"><div class="ch"><h2>Konfigurator-Angebote</h2><button class="ib" data-i="i5">i</button></div>
@@ -157,6 +160,11 @@ async function loadE(){const r=await call('admin/etsy-status'),e=$('estat');if(r
  $('econn').disabled=false;
  if(!r.connected){e.innerHTML='⚠️ Nicht verbunden – Bestellungen landen unter «prüfen».';$('econn').textContent='Mit Etsy verbinden';return}
  e.innerHTML=(r.ok===false?'⚠️ Verbindung gestört: '+esc(r.problem||'')+' – bitte neu verbinden.':'✓ Verbunden mit Shop <b>'+esc(r.shop_name||r.shop_id)+'</b>')+'<br><small>gültig bis '+new Date(r.valid_until).toLocaleDateString('de-CH')+' (verlängert sich beim Öffnen des Admins)</small>';$('econn').textContent='Neu verbinden'}
+$('tlbtn').onclick=async()=>{const rid=$('tlid').value.replace(/\D/g,'');if(rid.length<6){say('tlmsg',ERR.receipt);return}$('tlbtn').disabled=true;say('tlmsg','frage Etsy …',true);$('tlout').innerHTML='';
+ const r=await call('admin/etsy-lookup',{receipt_id:rid});$('tlbtn').disabled=false;
+ if(!r.ok){say('tlmsg',(ERR[r.error]||('Fehler: '+r.error))+(r.detail?' ('+r.detail+')':''));return}
+ say('tlmsg','✓ Etsy hat geantwortet: '+(r.items||[]).length+' Artikel, ergibt '+r.credits+' Kisten'+(r.status==='pruefen'?' (noch keine passenden Konfigurator-Angebote eingetragen)':'')+'.',true);
+ $('tlout').innerHTML=(r.items||[]).map(i=>`<li class="${i.credits?'':'z'}">${i.qty}× ${esc(i.title||'Angebot')} <small>(${esc(i.listing_id)})</small> → ${i.credits} Kisten</li>`).join('')};
 $('econn').onclick=async()=>{if(!WEB){say('emsg','Bitte den Admin über die Internet-Adresse öffnen (nicht als Datei).');return}$('econn').disabled=true;const r=await call('admin/etsy-start',{ret:location.href.split('?')[0]});$('econn').disabled=false;
  if(r.url)location.href=r.url;else say('emsg',ERR[r.error]||('Fehler: '+r.error))};
 {const q=new URLSearchParams(location.search).get('etsy');if(q){const T={ok:['✓ Etsy ist verbunden.',1],abgebrochen:['Verbindung bei Etsy abgebrochen.'],ungueltig:['Verbindung abgelaufen – bitte nochmal «Mit Etsy verbinden».'],fehler:['Etsy hat die Verbindung abgelehnt. Prüfe die Callback-Adresse in deiner Etsy-App (siehe Anleitung).']}[q]||['Unbekannte Antwort von Etsy.'];say('emsg',T[0],T[1]);history.replaceState(null,'',location.pathname)}}

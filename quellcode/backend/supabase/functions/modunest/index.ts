@@ -1,6 +1,6 @@
 // API fuer den Konfigurator: /redeem, /consume (Guthaben = Kisten), /admin/create, /admin/list, /admin/add,
 //   /admin/listings, /admin/listing (speichern), /admin/listing-del (Konfigurator-Angebote fuer den Etsy-Webhook),
-//   /admin/etsy-start, /etsy-callback, /admin/etsy-status, /admin/etsy-fetch (Etsy-Verbindung, siehe ../_shared/etsy.ts)
+//   /admin/etsy-start, /etsy-callback, /admin/etsy-status, /admin/etsy-fetch, /admin/etsy-lookup (Etsy-Verbindung, siehe ../_shared/etsy.ts)
 // Secrets: TOKEN_SECRET (lange Zufallszeichenfolge), ADMIN_KEY, ALLOWED_ORIGIN (z.B. https://deinname.github.io),
 //          SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (automatisch)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
@@ -160,6 +160,11 @@ Deno.serve(async (req) => {
         st.valid_until = new Date(new Date(c?.refreshed_at).getTime() + 90 * 24 * 3600 * 1000).toISOString();
       }
       return json(st);
+    }
+    if (path === "admin/etsy-lookup") { // { receipt_id }: nur nachschlagen (Test der Etsy-Verbindung), speichert nichts
+      const rid = norm(b.receipt_id); if (!/^\d{6,}$/.test(rid)) return json({ error: "receipt" }, 400);
+      try { const tx = await receiptTransactions(sb, rid); const r = await evaluate(sb, tx); return json({ ok: true, items: r.items, credits: r.credits, status: r.status }); }
+      catch (e) { return json({ error: "etsy", detail: (e as Error).message }, 502); }
     }
     if (path === "admin/etsy-fetch") { // { receipt_id }: Artikel einer Bestellung bei Etsy holen und neu berechnen
       const rid = norm(b.receipt_id); if (!/^\d{6,}$/.test(rid)) return json({ error: "receipt" }, 400);
