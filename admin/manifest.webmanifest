@@ -1,8 +1,8 @@
 {
  "name": "ModuNest Admin",
  "short_name": "MN Admin",
- "id": "/ModuNest-Studio/admin/",
- "start_url": "./",
+ "id": "/ModuNest-Studio/admin/modunest-admin",
+ "start_url": "index.html",
  "scope": "./",
  "display": "standalone",
  "lang": "de",

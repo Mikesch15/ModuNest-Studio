@@ -46,8 +46,11 @@ def write(rel,data):
 # auf mikesch15.github.io dieselbe Kennung ('schon installiert'). Darum absoluter Pfad, je App verschieden.
 SITE='/ModuNest-Studio/'  # Pfad der GitHub-Pages-Seite (Repo-Name)
 icons=lambda pre,a:[{'src':pre+a+'-192.png','sizes':'192x192','type':'image/png'},{'src':pre+a+'-512.png','sizes':'512x512','type':'image/png'},{'src':pre+(a+'-maskable-512.png' if a=='admin' else 'maskable-512.png'),'sizes':'512x512','type':'image/png','purpose':'maskable'}]
-MAN_ROOT=(json.dumps({'name':'ModuNest Studio','short_name':'ModuNest','description':'Konfigurator von Art vom Hof','id':SITE+'app/','start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#f6f0e4','theme_color':'#fdfaf2','icons':icons('../icons/','icon')},ensure_ascii=False,indent=1))
-MAN_ADMIN=(json.dumps({'name':'ModuNest Admin','short_name':'MN Admin','id':SITE+'admin/','start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#151412','theme_color':'#1e1a17','icons':icons('../icons/','admin')},ensure_ascii=False,indent=1))
+# Start direkt auf der Produktseite (ohne Weiterleitung), solange es nur ein Produkt gibt. Kennungen mit Namen (am 21.10.
+# geaendert, weil ein haengender Installations-Eintrag zur alten Kennung das Installieren blockierte).
+START=prods[0]['id']+'/index.html' if len(prods)==1 else 'index.html'
+MAN_ROOT=(json.dumps({'name':'ModuNest Studio','short_name':'ModuNest','description':'Konfigurator von Art vom Hof','id':SITE+'app/modunest-studio','start_url':START,'scope':'./','display':'standalone','lang':'de','background_color':'#f6f0e4','theme_color':'#fdfaf2','icons':icons('../icons/','icon')},ensure_ascii=False,indent=1))
+MAN_ADMIN=(json.dumps({'name':'ModuNest Admin','short_name':'MN Admin','id':SITE+'admin/modunest-admin','start_url':'index.html','scope':'./','display':'standalone','lang':'de','background_color':'#151412','theme_color':'#1e1a17','icons':icons('../icons/','admin')},ensure_ascii=False,indent=1))
 
 MV=hashlib.sha1((MAN_ROOT+MAN_ADMIN).encode()).hexdigest()[:8]  # ?v= an den Manifest-Links: Handy holt neue Fassung sofort
 man_link=lambda h:h.replace('manifest.webmanifest"','manifest.webmanifest?v=%s"'%MV)
