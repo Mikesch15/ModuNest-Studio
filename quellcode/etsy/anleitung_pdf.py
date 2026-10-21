@@ -56,6 +56,6 @@ s.append(Spacer(1, 3))
 s.append(Paragraph('Files and printed parts are for <b>personal use only</b>. Not allowed: sharing or selling the files, selling printed parts, uploading to other platforms.', P))
 s.append(Paragraph('Hilfe / Help', H))
 s.append(Paragraph(f'Probleme mit der Bestellnummer? Schreib mir über Etsy-Nachrichten oder an {MAIL} – mit deiner Bestellnummer. / Problems with your order number? Message me on Etsy or at {MAIL} with your order number.', P))
-s += [Spacer(1, 12), Paragraph(f'Mike Ledermann · Art vom Hof · Papillonallee 7b, 3172 Niederwangen BE, Schweiz · {MAIL}<br/>Impressum: <link href="{IMP}">{IMP}</link> · Datenschutz: <link href="{PRIV}">{PRIV}</link>', S),
+s += [Spacer(1, 12), Paragraph(f'Mike Ledermann · Art vom Hof · {MAIL}<br/>Impressum: <link href="{IMP}">{IMP}</link> · Datenschutz: <link href="{PRIV}">{PRIV}</link>', S),
       Paragraph('Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.', S)]
 SimpleDocTemplate(sys.argv[1] if len(sys.argv) > 1 else 'dist/ModuNest-Anleitung.pdf', pagesize=A4, leftMargin=50, rightMargin=50, topMargin=42, bottomMargin=36, title='ModuNest Studio – Anleitung', author='Art vom Hof').build(s)
