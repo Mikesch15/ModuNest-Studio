@@ -45,7 +45,9 @@ def write(rel,data):
 # App-Kennung (id) wird vom Browser gegen die Domain aufgeloest, nicht gegen den Ordner: './' ergaebe fuer alle Apps
 # auf mikesch15.github.io dieselbe Kennung ('schon installiert'). Darum absoluter Pfad, je App verschieden.
 SITE='/ModuNest-Studio/'  # Pfad der GitHub-Pages-Seite (Repo-Name)
-icons=lambda pre,a:[{'src':pre+a+'-192.png','sizes':'192x192','type':'image/png'},{'src':pre+a+'-512.png','sizes':'512x512','type':'image/png'},{'src':pre+(a+'-maskable-512.png' if a=='admin' else 'maskable-512.png'),'sizes':'512x512','type':'image/png','purpose':'maskable'}]
+IV=hashlib.sha1(open(K+'logo-gross.webp','rb').read()+b'rgba').hexdigest()[:6]  # Symbol-Version (neu laden erzwingen)
+icons=lambda pre,a:[{**i,'src':i['src']+'?v='+IV} for i in _icons(pre,a)]
+_icons=lambda pre,a:[{'src':pre+a+'-192.png','sizes':'192x192','type':'image/png'},{'src':pre+a+'-512.png','sizes':'512x512','type':'image/png'},{'src':pre+(a+'-maskable-512.png' if a=='admin' else 'maskable-512.png'),'sizes':'512x512','type':'image/png','purpose':'maskable'}]
 # Start direkt auf der Produktseite (ohne Weiterleitung), solange es nur ein Produkt gibt. Kennungen mit Namen (am 21.10.
 # geaendert, weil ein haengender Installations-Eintrag zur alten Kennung das Installieren blockierte).
 START=prods[0]['id']+'/index.html' if len(prods)==1 else 'index.html'
@@ -89,7 +91,8 @@ def icon(n,bg,scale,ring=None):
     if ring:
         r=int(n*scale/2)+max(2,n//40);c=n//2;ImageDraw.Draw(im).ellipse((c-r,c-r,c+r,c+r),fill=ring)
     l=big.resize((int(n*scale),)*2,Image.LANCZOS);im.alpha_composite(l,((n-l.width)//2,)*2)
-    from io import BytesIO;b=BytesIO();im.quantize(256,method=Image.FASTOCTREE).save(b,'PNG',optimize=True);return b.getvalue()  # Palette: kleinere Dateien
+    # Vollfarben-PNG (RGBA): Paletten-PNG wurden beim Installieren auf Android abgelehnt (WebAPK)
+    from io import BytesIO;b=BytesIO();im.save(b,'PNG',optimize=True);return b.getvalue()
 CREAM=(253,250,242,255);INK=(30,26,23,255);RUST=(196,101,70,255)
 for n in (192,512):write('icons/icon-%d.png'%n,icon(n,None,1))
 write('icons/maskable-512.png',icon(512,CREAM,.78));write('icons/apple-180.png',icon(180,CREAM,.9))
