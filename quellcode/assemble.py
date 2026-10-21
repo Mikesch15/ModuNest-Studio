@@ -38,6 +38,17 @@ def write(rel,data):
         os.makedirs(os.path.dirname('../'+rel) or '..',exist_ok=True)
         open('../'+rel,'wb').write(out_files[rel])
 
+# ---- Manifeste ----
+# App-Kennung (id) wird vom Browser gegen die Domain aufgeloest, nicht gegen den Ordner: './' ergaebe fuer alle Apps
+# auf mikesch15.github.io dieselbe Kennung ('schon installiert'). Darum absoluter Pfad, je App verschieden.
+SITE='/ModuNest-Studio/'  # Pfad der GitHub-Pages-Seite (Repo-Name)
+icons=lambda pre,a:[{'src':pre+a+'-192.png','sizes':'192x192','type':'image/png'},{'src':pre+a+'-512.png','sizes':'512x512','type':'image/png'},{'src':pre+(a+'-maskable-512.png' if a=='admin' else 'maskable-512.png'),'sizes':'512x512','type':'image/png','purpose':'maskable'}]
+MAN_ROOT=(json.dumps({'name':'ModuNest Studio','short_name':'ModuNest','description':'Konfigurator von Art vom Hof','id':SITE,'start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#f6f0e4','theme_color':'#fdfaf2','icons':icons('icons/','icon')},ensure_ascii=False,indent=1))
+MAN_ADMIN=(json.dumps({'name':'ModuNest Admin','short_name':'MN Admin','id':SITE+'admin/','start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#151412','theme_color':'#1e1a17','icons':icons('../icons/','admin')},ensure_ascii=False,indent=1))
+
+MV=hashlib.sha1((MAN_ROOT+MAN_ADMIN).encode()).hexdigest()[:8]  # ?v= an den Manifest-Links: Handy holt neue Fassung sofort
+man_link=lambda h:h.replace('manifest.webmanifest"','manifest.webmanifest?v=%s"'%MV)
+
 # ---- Produktseiten ----
 for P in prods:
     d='produkte/%s/'%P['id']
@@ -45,7 +56,7 @@ for P in prods:
     shell=open(K+'shell.js').read().replace("/*UIBUILDERS*/",ub).replace("/*GATE*/",open(K+'gate.js').read())
     src=''.join(open(d+f).read() for f in P['dateien'])
     out=head+core+mk+exp+dl+rend+open(K+'texte.js').read()+src+'const PRODUCT_COUNT=%d;\n'%len(prods)+shell
-    out=out.replace("/*FONTFACES*/",faces).replace("LOGO_DATA",LOGO)
+    out=man_link(out.replace("/*FONTFACES*/",faces).replace("LOGO_DATA",LOGO))
     open('dist/%s.html'%P['id'],'w').write(out)
     write(P['id']+'/index.html',out)
     print(P['id'],len(out)//1024,'KB')
@@ -53,10 +64,12 @@ for P in prods:
 # ---- Startseite (Produktauswahl) ----
 lst=[{'id':P['id'],'name':P['name'],'text':P['text'],'bild':('data:image/webp;base64,'+b64('produkte/%s/bild.webp'%P['id'])) if os.path.exists('produkte/%s/bild.webp'%P['id']) else ''} for P in prods]
 st=open(K+'start.html').read().replace('PRODUCTS_JSON',json.dumps(lst,ensure_ascii=False)).replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT)
-write('index.html',st)
+write('index.html',man_link(st))
 
 # ---- Admin ----
-write('admin/index.html',open(K+'admin.html').read().replace('PRODUCTS_JSON',json.dumps([{'id':P['id'],'name':P['name']} for P in prods],ensure_ascii=False)).replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT))
+write('admin/index.html',man_link(open(K+'admin.html').read().replace('PRODUCTS_JSON',json.dumps([{'id':P['id'],'name':P['name']} for P in prods],ensure_ascii=False))
+  .replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT)))
+write('manifest.webmanifest',MAN_ROOT);write('admin/manifest.webmanifest',MAN_ADMIN)
 
 # ---- App-Symbole ----
 big=Image.open(K+'logo-gross.webp').convert('RGBA')
@@ -71,14 +84,6 @@ for n in (192,512):write('icons/icon-%d.png'%n,icon(n,None,1))
 write('icons/maskable-512.png',icon(512,CREAM,.78));write('icons/apple-180.png',icon(180,CREAM,.9))
 for n in (192,512):write('icons/admin-%d.png'%n,icon(n,INK,.74,RUST))
 write('icons/admin-maskable-512.png',icon(512,INK,.66,RUST));write('icons/admin-apple-180.png',icon(180,INK,.8,RUST))
-
-# ---- Manifeste ----
-# App-Kennung (id) wird vom Browser gegen die Domain aufgeloest, nicht gegen den Ordner: './' ergaebe fuer alle Apps
-# auf mikesch15.github.io dieselbe Kennung ('schon installiert'). Darum absoluter Pfad, je App verschieden.
-SITE='/ModuNest-Studio/'  # Pfad der GitHub-Pages-Seite (Repo-Name)
-icons=lambda pre,a:[{'src':pre+a+'-192.png','sizes':'192x192','type':'image/png'},{'src':pre+a+'-512.png','sizes':'512x512','type':'image/png'},{'src':pre+(a+'-maskable-512.png' if a=='admin' else 'maskable-512.png'),'sizes':'512x512','type':'image/png','purpose':'maskable'}]
-write('manifest.webmanifest',json.dumps({'name':'ModuNest Studio','short_name':'ModuNest','description':'Konfigurator von Art vom Hof','id':SITE,'start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#f6f0e4','theme_color':'#fdfaf2','icons':icons('icons/','icon')},ensure_ascii=False,indent=1))
-write('admin/manifest.webmanifest',json.dumps({'name':'ModuNest Admin','short_name':'MN Admin','id':SITE+'admin/','start_url':'./','scope':'./','display':'standalone','lang':'de','background_color':'#151412','theme_color':'#1e1a17','icons':icons('../icons/','admin')},ensure_ascii=False,indent=1))
 
 # ---- Service Worker (Version = Inhalt aller Dateien, damit Updates ankommen) ----
 pre=['./','config.js']+sorted(k.replace('index.html','') for k in out_files)
