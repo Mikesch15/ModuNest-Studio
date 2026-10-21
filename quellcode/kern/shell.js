@@ -23,7 +23,8 @@ function para(c,lk){const p=document.createElement('p');p.dataset.k=lk;c.append(
 function addInfo(){panel.querySelectorAll('.card>h2').forEach(h=>{const k='i_'+h.dataset.k;if(!L[k])return;const w=document.createElement('div');w.className='ch';h.replaceWith(w);
  const b=document.createElement('button');b.className='ib';b.textContent='i';b.setAttribute('aria-expanded','false');const p=document.createElement('p');p.className='info';p.dataset.k=k;p.hidden=true;
  b.onclick=()=>{p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden);b.setAttribute('aria-expanded',String(!p.hidden))};w.append(h,b);w.after(p)})}
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();addInfo();applyLang()}
+/* Fussnote (Etsy-Hinweis; spaeter Links zu Datenschutz/Impressum) */
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p data-k="etsyNote"></p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');
