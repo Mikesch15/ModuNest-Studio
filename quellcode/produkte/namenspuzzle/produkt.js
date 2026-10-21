@@ -5,16 +5,16 @@ Object.assign(L,{
  help2:['Wähle Grösse, Farben und auf Wunsch eine zweite Zeile (z. B. Geburtsdatum). Die 3D-Vorschau zeigt alles sofort.','Choose size, colours and optionally a second line (e.g. date of birth). The 3D preview updates instantly.'],
  help3:['Unter «Herunterladen» holst du die Dateien. Dafür brauchst du die Bestellnummer deines Etsy-Kaufs. Jedes Puzzle zählt 1.','Get your files under «Download». You need the order number of your Etsy purchase. Each puzzle counts 1.'],
  help4:['Drucke Brett und Buchstaben ohne Stützen – am schönsten mit verschiedenen Farben.','Print board and letters without supports – nicest in different colours.'],
- helpTip:['Tipp: Lade zuerst das kostenlose Probe-Teil herunter (ganz unten) und prüfe die Passung. Bei jedem Abschnitt erklärt dir das ⓘ, was die Einstellungen bewirken.','Tip: download the free test piece first (at the bottom) and check the fit. In every section, the ⓘ explains what the settings do.'],
+ helpTip:['Tipp: Lade zuerst die kostenlose Passungsprobe herunter (ganz unten) und prüfe die Passung. Bei jedem Abschnitt erklärt dir das ⓘ, was die Einstellungen bewirken.','Tip: download the free fit test first (at the bottom) and check the fit. In every section, the ⓘ explains what the settings do.'],
  pzText:['Name & Text','Name & text'],pzName:['Name (nur Buchstaben)','Name (letters only)'],pzSub:['Zweite Zeile (optional, z. B. Geburtsdatum)','Second line (optional, e.g. date of birth)'],
  pzSize:['Grösse','Size'],pzH:['Buchstabenhöhe','Letter height'],pzT:['Brettdicke','Board thickness'],pzKnob:['Greifknöpfe (für kleine Hände)','Grip knobs (for small hands)'],
  pzFit:['Passung','Fit'],pzFitPick:['Spiel (1 stramm … 5 locker)','Clearance (1 tight … 5 loose)'],
- pzFitText:['Lade das Probe-Teil herunter (erster Buchstabe mit kleinem Brett), drucke es und prüfe: Der Buchstabe soll leicht hinein- und herausgehen. Wähle dann die passende Nummer.','Download the test piece (first letter with a small board), print it and check: the letter should go in and out easily. Then choose the matching number.'],
- pzFitDl:['Probe-Teil herunterladen (gratis)','Download test piece (free)'],
+ pzFitText:['Lade die Passungsprobe herunter: ein kleines Herz und ein Brettchen mit 5 Vertiefungen (1 stramm … 5 locker, zusammen ca. 15 g). Drucke sie mit demselben Filament wie später das Puzzle und probiere das Herz in jeder Vertiefung. Wähle die Nummer, bei der es leicht hinein- und herausgeht. Durch das Loch im Boden lässt es sich herausdrücken.','Download the fit test: a small heart and a little board with 5 pockets (1 tight … 5 loose, about 15 g in total). Print it with the same filament you will use for the puzzle and try the heart in each pocket. Choose the number where it goes in and out easily. Push it out through the hole in the bottom.'],
+ pzFitDl:['Passungsprobe herunterladen (gratis)','Download fit test (free)'],
  cBoard:['Brett','Board'],cL0:['Buchstabe 1, 7 …','Letter 1, 7 …'],cL1:['Buchstabe 2, 8 …','Letter 2, 8 …'],cL2:['Buchstabe 3, 9 …','Letter 3, 9 …'],cL3:['Buchstabe 4, 10 …','Letter 4, 10 …'],cL4:['Buchstabe 5, 11 …','Letter 5, 11 …'],cL5:['Buchstabe 6, 12 …','Letter 6, 12 …'],
  i_pzText:['Erlaubt sind Buchstaben (auch Ä, Ö, Ü), Zahlen und Leerzeichen, höchstens 12 Zeichen. Die Pünktchen von Ä/Ö/Ü werden mit dem Buchstaben verbunden, damit keine losen Kleinteile entstehen. Die zweite Zeile wird ins Brett graviert.','Letters (incl. Ä, Ö, Ü), digits and spaces are allowed, up to 12 characters. The dots of Ä/Ö/Ü are joined to the letter so there are no loose small parts. The second line is engraved into the board.'],
  i_pzSize:['Buchstabenhöhe: Grösse der Puzzleteile. Ist der Name zu lang für das Druckbett, verkleinert die App die Buchstaben automatisch. Brettdicke: dickeres Brett = tiefere Vertiefungen. Greifknöpfe: kleine Knöpfe oben auf den Buchstaben, damit Kinder sie leicht herausnehmen können.','Letter height: size of the pieces. If the name is too long for the print bed, the app shrinks the letters automatically. Board thickness: thicker board = deeper recesses. Grip knobs: small knobs on top of the letters so children can lift them out easily.'],
- i_pzFit:['Jeder Drucker druckt etwas anders. Das Probe-Teil zeigt, welches Spiel bei dir passt. Für Kinderhände lieber etwas lockerer wählen.','Every printer prints slightly differently. The test piece shows which clearance suits yours. For small hands, rather choose a bit looser.'],
+ i_pzFit:['Jeder Drucker druckt etwas anders. Die Passungsprobe zeigt, welches Spiel bei dir passt. Für Kinderhände lieber etwas lockerer wählen.','Every printer prints slightly differently. The fit test shows which clearance suits yours. For small hands, rather choose a bit looser.'],
  pzSafety:['Sicherheit: Kleinteile – für Kinder unter 3 Jahren nur unter Aufsicht. Teile vor dem Spielen auf scharfe Kanten prüfen.','Safety: small parts – children under 3 only under supervision. Check parts for sharp edges before play.'],
  sBoard:['Brett','Board'],sLetters:['Teile','Pieces'],sMat:['Filament max.','Filament max.'],sThick:['Dicke','Thickness'],
  eName:['Bitte einen Namen eingeben oder eine Figur wählen.','Please enter a name or choose a figure.'],
@@ -63,42 +63,52 @@ function pzLetter(ch,fs,capH,res,tol){
  const R=pzRings(W+8,Hm,res,tol,(x,k)=>{x.save();x.scale(1,-1);x.font=fs+'px '+PZ_FONT;x.textBaseline='alphabetic';x.fillText(ch,(wl-wr)/2,capH/2);x.restore();pzJoin(k)});
  let y0=1e9,y1=-1e9;for(const r of R)for(const p of r){y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1])}
  return{ch,R,w:W,y0,y1}}
-// Stelle fuer den Greifknopf: moeglichst nahe am Schwerpunkt (Teil hebt gerade ab), aber mit genug Abstand
-// zum Rand und zu gravierten Linien D. Rueckgabe Punkt p und Randabstand d.
-function pzDeep(R,D=[]){const inR=p=>R.reduce((n,r)=>n+(pip(p,r)?1:0),0)%2===1,inD=p=>D.some(r=>pip(p,r));
+// Stelle fuer den Greifknopf: auf der Strichmitte (Kamm des Randabstands), moeglichst nahe am Ziel.
+// Buchstaben (sym): Ziel = Mitte des Umrisses, seitliche Abweichung zaehlt doppelt -> Knopf steht optisch mittig.
+// Figuren: Ziel = Schwerpunkt (Teil hebt gerade ab). Gravierte Linien D werden gemieden. Rueckgabe Punkt p, Randabstand d.
+function pzDeep(R,D=[],sym=false){const inR=p=>R.reduce((n,r)=>n+(pip(p,r)?1:0),0)%2===1,inD=p=>D.some(r=>pip(p,r));
  let bx=1e9,by=1e9,Bx=-1e9,By=-1e9,A=0,cx=0,cy=0;
  for(const r of R)for(let i=0,n=r.length;i<n;i++){const a=r[i],b=r[(i+1)%n],c=a[0]*b[1]-b[0]*a[1];A+=c;cx+=(a[0]+b[0])*c;cy+=(a[1]+b[1])*c;
   bx=Math.min(bx,a[0]);by=Math.min(by,a[1]);Bx=Math.max(Bx,a[0]);By=Math.max(By,a[1])}
- cx/=3*A||1;cy/=3*A||1;const E=R.concat(D),pts=[];let bd=0;
- for(let x=bx;x<=Bx;x+=.5)for(let y=by;y<=By;y+=.5){const p=[x,y];if(!inR(p)||inD(p))continue;let d=1e9;
-  for(const r of E)for(let i=0,n=r.length;i<n;i++){const a=r[i],b=r[(i+1)%n],vx=b[0]-a[0],vy=b[1]-a[1],l=vx*vx+vy*vy||1,u=Math.max(0,Math.min(1,((x-a[0])*vx+(y-a[1])*vy)/l));d=Math.min(d,Math.hypot(x-a[0]-u*vx,y-a[1]-u*vy))}
-  pts.push([x,y,d]);bd=Math.max(bd,d)}
- // 1. naechster Punkt zum Schwerpunkt, an dem ein kleiner Knopf (r 2.5) Platz hat; 2. in dessen Umkreis (4 mm) die Strichmitte
- let best=null,bc=1e18;for(const q of pts)if(q[2]>=Math.min(3.7,bd)){const c=(q[0]-cx)**2+(q[1]-cy)**2;if(c<bc){bc=c;best=q}}
- if(best){const b0=best;for(const q of pts)if(q[2]>best[2]&&(q[0]-b0[0])**2+(q[1]-b0[1])**2<=16)best=q}
+ cx/=3*A||1;cy/=3*A||1;if(sym){cx=(bx+Bx)/2;cy=(by+By)/2}
+ const st=.5,nx=Math.floor((Bx-bx)/st)+1,ny=Math.floor((By-by)/st)+1,G=new Float32Array(nx*ny).fill(-1),E=R.concat(D);let bd=0;
+ for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const x=bx+i*st,y=by+j*st;if(!inR([x,y])||inD([x,y]))continue;let d=1e9;
+  for(const r of E)for(let k=0,n=r.length;k<n;k++){const a=r[k],b=r[(k+1)%n],vx=b[0]-a[0],vy=b[1]-a[1],l=vx*vx+vy*vy||1,u=Math.max(0,Math.min(1,((x-a[0])*vx+(y-a[1])*vy)/l));d=Math.min(d,Math.hypot(x-a[0]-u*vx,y-a[1]-u*vy))}
+  G[i*ny+j]=d;bd=Math.max(bd,d)}
+ const g=(i,j)=>i<0||j<0||i>=nx||j>=ny?-1:G[i*ny+j],need=sym?Math.min(3.7,.9*bd):Math.min(6.2,Math.max(Math.min(3.7,.9*bd),.7*bd)),wx=sym?4:1;
+ let best=null,bc=1e18;
+ for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const d=g(i,j);if(d<need)continue;
+  if(!((d>=g(i-1,j)-.02&&d>=g(i+1,j)-.02)||(d>=g(i,j-1)-.02&&d>=g(i,j+1)-.02)))continue;
+  const x=bx+i*st,y=by+j*st,c=wx*(x-cx)**2+(y-cy)**2;if(c<bc){bc=c;best=[x,y,d]}}
+ // Figuren: im Umkreis von 4 mm die Stelle mit dem meisten Platz (groesserer Knopf)
+ if(best&&!sym){const[x0,y0]=best;for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const d=g(i,j),x=bx+i*st,y=by+j*st;if(d>best[2]&&(x-x0)**2+(y-y0)**2<=16)best=[x,y,d]}}
  return best?{p:[best[0],best[1]],d:best[2]}:{p:[0,0],d:0}}
 
 /* Figuren: Zeichnung in 0..100 (y nach unten, Tiere schauen nach links). Flaechen: C Kreis, E Ellipse (Winkel in Grad),
    S SVG-Pfad (optional mit Rundung rd). Gravur (0.6 mm tief, Linienbreite 1.4 mm): L SVG-Linie, O Punkt (Radius mm).
    Regeln: Beine/Spalten mind. ~6 Einheiten breit (bei 50 mm = 3 mm), Gravur mind. 4 Einheiten vom Rand. */
 const PZ_SHAPES={
- kuh:d=>{ // Hochlandrind: zottiges Fell, Stirnfransen, lange Hoerner
-  d.S('M34 30 C34 22 42 20 50 20 L82 20 C90 20 95 26 95 34 L95 60 Q92 66 89 62 Q86 67 83 62 Q80 67 77 62 Q74 67 71 62 Q68 67 65 62 Q62 67 59 62 Q56 67 53 62 Q50 67 47 62 Q44 67 41 62 Q38 66 35 60 Z');
-  for(const x of [36,52,70,85])d.S(`M${x} 56 L${x+10} 56 L${x+10} 88 Q${x+10} 92 ${x+7} 92 L${x+3} 92 Q${x} 92 ${x} 88 Z`);
-  d.S('M93 26 C99 32 99 48 97 58 C101 60 101 68 96 68 C91 68 90 62 92 58 C93 48 93 36 90 30 Z');
-  d.S('M14 30 C18 25 30 25 34 30 L38 46 C38 56 33 63 26 64 C18 65 10 62 9 55 C8 47 10 37 14 30 Z');
-  d.C(14,31,6);d.C(21,28,6);d.C(28,28,6);d.C(34,32,5.5);
-  d.S('M16 32 C6 32 0 26 2 12 C3 9 8 9 8 13 C8 20 11 24 17 24 Z',4);
-  d.S('M30 28 C37 27 41 22 41 13 C41 9 46 9 47 13 C48 25 42 33 32 34 Z',4);
-  d.E(9,40,7,4,-20);
-  d.O(18,44,1.6);d.O(15,56,1.1);d.O(23,57,1.1);
-  d.L('M84 28 Q88 32 84 36');d.L('M86 44 Q90 48 86 52');d.L('M44 52 Q48 56 44 60')},
+ kuh:d=>{ // Hochlandrind: Kopf von vorn mit weit ausladenden Hoernern, Stirnlocke ueber den Augen, langes zottiges Fell
+  d.S('M36 36 C46 28 66 30 84 30 C94 30 99 37 99 48 C99 58 97 64 94 68 L40 68 C33 62 31 46 36 36 Z');
+  for(let x=39;x<=95;x+=6)d.E(x,70,3.8,6.5);d.E(98,58,3.5,7);
+  for(const[x,w]of[[40,10],[55,9],[72,9],[87,10]])d.S(`M${x} 70 L${x+w} 70 L${x+w-.5} 88 Q${x+w-.5} 92 ${x+w-3.5} 92 L${x+3} 92 Q${x} 92 ${x+.5} 88 Z`);
+  d.S('M96 40 C101 50 101 66 100 76 C103 80 101 86 97 84 C94 82 95 78 97 76 C97 64 96 52 93 44 Z');
+  d.S('M10 26 C12 20 32 20 34 26 C36 36 34 44 31 50 C29 56 27 61 22 61 C17 61 15 56 13 50 C10 44 8 36 10 26 Z');
+  d.C(13,25,5);d.C(19,22,5.5);d.C(25,22,5.5);d.C(31,25,5);
+  d.E(5,35,8,4,15);d.E(39,35,8,4,-15);
+  d.S('M14 27 C4 28 -6 25 -9 16 C-11 10 -9 4 -6 1 C-3 4 -3 9 -2 13 C0 19 5 21 14 21 Z',2);
+  d.S('M30 27 C40 28 50 25 53 16 C55 10 53 4 50 1 C47 4 47 9 46 13 C44 19 39 21 30 21 Z',2);
+  d.L('M15 28 Q16 34 15 40');d.L('M22 27 L22 42');d.L('M29 28 Q28 34 29 40');d.O(19,55,1.1);d.O(25,55,1.1);
+  d.L('M90 38 q3 6 0 12');d.L('M48 38 q3 6 0 12');d.L('M60 58 l1 7');d.L('M78 58 l1 7')},
  schaf:d=>{
-  for(const[a,b,r]of[[42,36,12],[55,30,13],[69,32,12],[81,40,11],[83,52,10],[72,58,11],[58,59,11],[45,57,11],[37,47,10]])d.C(a,b,r);d.S('M40 36 L82 36 L82 56 L40 56 Z');
-  for(const x of [40,52,66,78])d.S(`M${x} 58 L${x+8} 58 L${x+8} 88 Q${x+8} 91 ${x+5} 91 L${x+3} 91 Q${x} 91 ${x} 88 Z`);
-  d.E(22,42,11,14,25);d.E(31,31,9,4.5,-25);
-  d.O(19,40,1.6);d.O(14,52,1);
-  d.L('M48 40 q3 -4 6 0 q3 -4 6 0');d.L('M66 44 q3 -4 6 0 q3 -4 6 0');d.L('M52 50 q3 -4 6 0 q3 -4 6 0')},
+  d.E(60,46,30,19);for(let k=0;k<22;k++){const a=k/22*6.2832;d.C(60+30*Math.cos(a),46+19*Math.sin(a),6.5)}
+  d.C(92,40,5);
+  for(const x of [36,50,68,82])d.S(`M${x} 58 L${x+8} 58 L${x+7.5} 84 Q${x+7.5} 88 ${x+5} 88 L${x+2.5} 88 Q${x} 88 ${x} 84 Z`);
+  d.S('M34 32 C28 28 18 30 13 38 L6 50 C4 55 6 60 11 60 C15 60 19 58 23 54 L34 46 Z');
+  d.C(28,31,6.5);d.C(34,29,6);
+  d.E(23,24,9,3.6,-55);
+  d.O(19,41,1.5);d.O(9,53,1);d.L('M9 58 Q12 59 14 57');d.L('M33 37 C29 42 29 48 33 53');
+  d.L('M74 32 q2 -3 4 0 q2 -3 4 0');d.L('M80 50 q2 -3 4 0 q2 -3 4 0');d.L('M42 54 q2 -3 4 0 q2 -3 4 0')},
  schwein:d=>{
   d.E(58,50,34,22);d.C(28,46,17);d.S('M6 40 Q6 37 9 37 L16 37 L16 57 L9 57 Q6 57 6 54 Z');d.S('M14 40 L20 36 L20 58 L14 54 Z');
   d.S('M24 33 L32 13 Q34 10 37 13 L42 30 Z',3);
@@ -193,8 +203,10 @@ async function buildPuzzle(res,tol,opt={}){
  const bt=[];cap(A,0,false,bt);walls(A,0,T,bt);cap(A.concat(rev(P),rev(E)),T,true,bt);walls(rev(P),T-Pd,T,bt);cap(P,T-Pd,true,bt);
  if(E.length){walls(rev(E),T-1,T,bt);cap(E,T-1,true,bt)}
  const parts=[{key:'cBoard',name:'Brett',tris:Float32Array.from(bt),asm:[(X,Y,Z)=>[X,Y,Z]]}];
+ // Greifknopf: bei allen Buchstaben gleich gross (einheitliches Bild), Figuren so gross wie moeglich (max. 5 mm)
+ const kn=S.knob?pieces.map(g=>pzDeep(g.R,g.D,!PZ_SHAPES[g.ch])):[],rL=Math.min(5,...pieces.map((g,i)=>PZ_SHAPES[g.ch]?9:kn[i].d-1.2).filter(r=>r>=2.5));
  pieces.forEach((g,i)=>{const t=g.D&&g.D.length?plateWithPocket(g.R,g.D,LT,.6):extrude(g.R,0,LT);
-  if(S.knob){const k=pzDeep(g.R,g.D),r=Math.min(5,k.d-1.2);if(r>=2.5)t.push(...extrude(pzCircle(k.p[0],k.p[1],r),LT,LT+PZ_KNOB_H))}
+  if(S.knob){const k=kn[i],r=PZ_SHAPES[g.ch]?Math.min(5,k.d-1.2):Math.min(rL,k.d-1.2);if(r>=2.5)t.push(...extrude(pzCircle(k.p[0],k.p[1],r),LT,LT+PZ_KNOB_H))}
   parts.push({key:'cL'+(i%6),name:(PZ_SHAPES[g.ch]?'Figur '+(i+1)+' '+g.ch:'Buchstabe '+(i+1)+' '+g.ch),tris:Float32Array.from(t),asm:[(X,Y,Z)=>[X+g.cx,Y+g.oy,Z+T-Pd+.05]]})});
  return{ok:true,err:'',parts,units:[[Math.round(Wb),Math.round(Db),pzHash(name+'|'+shapes.join(','))]],info:{name:name+(shapes.length?(name?' + ':'')+shapes.map(id=>tr('sh_'+id)).join(', '):''),Wb,Db,T,H,scaled,n:pieces.length,cut:[...String(S.name||'').trim()].length>12}}}
 
@@ -217,8 +229,21 @@ function present(reframe){if(!built)return;const arr=built.ok?arrange(built.part
  const i=built.info||{},mass=built.ok?built.parts.reduce((s,p)=>s+Math.abs(volume(p.tris)),0)/1000*1.24:0;
  document.getElementById('stats').innerHTML=built.ok?[[tr('sBoard'),Math.round(i.Wb)+' × '+Math.round(i.Db)+' mm'],[tr('sLetters'),i.n],[tr('sThick'),i.T+' mm'],[tr('sMat'),'≈ '+Math.round(mass)+' g']].map(a=>`<div class="stat"><span>${a[0]}</span><strong>${a[1]}</strong></div>`).join(''):'';
  status.innerHTML=built.ok?(i.name+(i.scaled?'<br><b>'+trf('wScaled',i.H)+'</b>':'')+(i.cut?'<br><b>'+tr('wCut')+'</b>':'')):'<b>'+built.err+'</b>';renderCart()}
-async function downloadPzTest(){const n=pzName(S.name).replace(/ /g,'')[0]||'A',r=await buildPuzzle(9,.02,{name:n,sub:''});
- download(zip(r.parts.map((p,i)=>({name:`${i+1}-${p.name}.stl`,data:stlOf(p.tris)}))),'Namenspuzzle-Probe-'+n+'.zip')}
+// Passungs-Probe: kleines Herz + Brettchen mit 5 Vertiefungen (Spiel 1..5, Nummer graviert), Loch im Boden zum Herausdruecken.
+// Wenig Material (ca. 15 g); der Kunde probiert das eine Herz in allen Vertiefungen.
+async function buildPzTest(res,tol){try{await document.fonts.load('100px '+PZ_FONT)}catch(e){}
+ const CL=[.2,.3,.4,.5,.6],T=4,Pd=2.4,M=5,g=pzShape('herz',16,res,tol),w=g.w,dx=w+2*.6+4,NH=6;
+ const W=CL.length*dx-4+2*M,D=(g.y1-g.y0)+1.2+NH+3+2*M,cy=D/2-M-.6-g.y1,ny=-D/2+M,X=i=>-W/2+M+.6+w/2+i*dx;
+ const ring=draw=>pzRings(W+4,D+4,res,tol,draw);
+ const A=ring(x=>{x.beginPath();x.roundRect(-W/2,-D/2,W,D,4);x.fill()});
+ const P=ring(x=>{x.lineJoin='round';CL.forEach((c,i)=>{x.lineWidth=2*c;pzPath(x,g.R,X(i),cy);x.fill('evenodd');x.stroke()})});
+ const Hh=ring(x=>{CL.forEach((c,i)=>{x.beginPath();x.arc(X(i),cy,3,0,6.2832);x.fill()})});
+ const E=ring(x=>{x.save();x.scale(1,-1);x.font='bold '+(NH*1.4)+'px '+PZ_FONT;x.textAlign='center';x.textBaseline='alphabetic';CL.forEach((c,i)=>x.fillText(String(i+1),X(i),-ny));x.restore()});
+ const bt=[];cap(A.concat(rev(Hh)),0,false,bt);walls(A,0,T,bt);walls(rev(Hh),0,T-Pd,bt);cap(A.concat(rev(P),rev(E)),T,true,bt);walls(rev(P),T-Pd,T,bt);cap(P.concat(rev(Hh)),T-Pd,true,bt);
+ walls(rev(E),T-.6,T,bt);cap(E,T-.6,true,bt);
+ return[{key:'cBoard',name:'Probe-Brett',tris:Float32Array.from(bt)},{key:'cL0',name:'Probe-Herz',tris:Float32Array.from(extrude(g.R,0,Pd+1.6))}]}
+async function downloadPzTest(){const r=await buildPzTest(9,.02);
+ download(zip(r.map((p,i)=>({name:`${i+1}-${p.name}.stl`,data:stlOf(p.tris)}))),'Namenspuzzle-Passungsprobe.zip')}
 
 /* ================= Namenspuzzle: Produktbeschreibung fuer den Kern ================= */
 const PZ_KEYS=['name','sub','shapes','H','T','knob','fit','cBoard','cL0','cL1','cL2','cL3','cL4','cL5'];
