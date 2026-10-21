@@ -420,7 +420,7 @@ function pzLetter(ch,fs,capH,res,tol){
 // Stelle fuer den Greifknopf: auf der Strichmitte (Kamm des Randabstands), moeglichst nahe am Ziel.
 // Buchstaben (sym): Ziel = Mitte des Umrisses, seitliche Abweichung zaehlt doppelt -> Knopf steht optisch mittig.
 // Figuren: Ziel = Schwerpunkt (Teil hebt gerade ab). Gravierte Linien D werden gemieden. Rueckgabe Punkt p, Randabstand d.
-function pzDeep(R,D=[],sym=false){const inR=p=>R.reduce((n,r)=>n+(pip(p,r)?1:0),0)%2===1,inD=p=>D.some(r=>pip(p,r));
+function pzDeep(R,D=[],sym=false,needIn){const inR=p=>R.reduce((n,r)=>n+(pip(p,r)?1:0),0)%2===1,inD=p=>D.some(r=>pip(p,r));
  let bx=1e9,by=1e9,Bx=-1e9,By=-1e9,A=0,cx=0,cy=0;
  for(const r of R)for(let i=0,n=r.length;i<n;i++){const a=r[i],b=r[(i+1)%n],c=a[0]*b[1]-b[0]*a[1];A+=c;cx+=(a[0]+b[0])*c;cy+=(a[1]+b[1])*c;
   bx=Math.min(bx,a[0]);by=Math.min(by,a[1]);Bx=Math.max(Bx,a[0]);By=Math.max(By,a[1])}
@@ -429,14 +429,14 @@ function pzDeep(R,D=[],sym=false){const inR=p=>R.reduce((n,r)=>n+(pip(p,r)?1:0),
  for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const x=bx+i*st,y=by+j*st;if(!inR([x,y])||inD([x,y]))continue;let d=1e9;
   for(const r of E)for(let k=0,n=r.length;k<n;k++){const a=r[k],b=r[(k+1)%n],vx=b[0]-a[0],vy=b[1]-a[1],l=vx*vx+vy*vy||1,u=Math.max(0,Math.min(1,((x-a[0])*vx+(y-a[1])*vy)/l));d=Math.min(d,Math.hypot(x-a[0]-u*vx,y-a[1]-u*vy))}
   G[i*ny+j]=d;bd=Math.max(bd,d)}
- const g=(i,j)=>i<0||j<0||i>=nx||j>=ny?-1:G[i*ny+j],need=sym?Math.min(3.7,.9*bd):Math.min(6.2,Math.max(Math.min(3.7,.9*bd),.7*bd)),wx=sym?4:1;
+ const g=(i,j)=>i<0||j<0||i>=nx||j>=ny?-1:G[i*ny+j],need=needIn??(sym?Math.min(3.7,.9*bd):Math.min(6.2,Math.max(Math.min(3.7,.9*bd),.7*bd))),wx=sym?4:1;
  let best=null,bc=1e18;
  for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const d=g(i,j);if(d<need)continue;
   if(!((d>=g(i-1,j)-.02&&d>=g(i+1,j)-.02)||(d>=g(i,j-1)-.02&&d>=g(i,j+1)-.02)))continue;
   const x=bx+i*st,y=by+j*st,c=wx*(x-cx)**2+(y-cy)**2;if(c<bc){bc=c;best=[x,y,d]}}
  // Figuren: im Umkreis von 4 mm die Stelle mit dem meisten Platz (groesserer Knopf)
  if(best&&!sym){const[x0,y0]=best;for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const d=g(i,j),x=bx+i*st,y=by+j*st;if(d>best[2]&&(x-x0)**2+(y-y0)**2<=16)best=[x,y,d]}}
- return best?{p:[best[0],best[1]],d:best[2]}:{p:[0,0],d:0}}
+ return best?{p:[best[0],best[1]],d:best[2],bd}:{p:[0,0],d:0,bd}}
 
 /* Figuren: Zeichnung in 0..100 (y nach unten, Tiere schauen nach links). Flaechen: C Kreis, E Ellipse (Winkel in Grad),
    S SVG-Pfad (optional mit Rundung rd). Gravur (0.6 mm tief, Linienbreite 1.4 mm): L SVG-Linie, O Punkt (Radius mm).
@@ -557,10 +557,13 @@ async function buildPuzzle(res,tol,opt={}){
  const bt=[];cap(A,0,false,bt);walls(A,0,T,bt);cap(A.concat(rev(P),rev(E)),T,true,bt);walls(rev(P),T-Pd,T,bt);cap(P,T-Pd,true,bt);
  if(E.length){walls(rev(E),T-1,T,bt);cap(E,T-1,true,bt)}
  const parts=[{key:'cBoard',name:'Brett',tris:Float32Array.from(bt),asm:[(X,Y,Z)=>[X,Y,Z]]}];
- // Greifknopf: bei allen Buchstaben gleich gross (einheitliches Bild), Figuren so gross wie moeglich (max. 5 mm)
- const kn=S.knob?pieces.map(g=>pzDeep(g.R,g.D,!PZ_SHAPES[g.ch])):[],rL=Math.min(5,...pieces.map((g,i)=>PZ_SHAPES[g.ch]?9:kn[i].d-1.2).filter(r=>r>=2.5));
+ // Greifknopf: bei allen Buchstaben gleich gross, knapp so gross wie im schmalsten Buchstaben moeglich (max. 5 mm);
+ // dafuer wandert er bei duennen Querbalken auf einen dickeren Strich. Figuren so gross wie moeglich.
+ let kn=S.knob?pieces.map(g=>pzDeep(g.R,g.D,!PZ_SHAPES[g.ch])):[];
+ const rL=Math.min(5,...pieces.map((g,i)=>PZ_SHAPES[g.ch]?9:kn[i].bd-1.8)); // 0.6 mm Reserve: Knopf passt auf normale Striche, nicht nur auf Ecken
+ if(S.knob&&rL>=2.5)kn=kn.map((k,i)=>PZ_SHAPES[pieces[i].ch]?k:pzDeep(pieces[i].R,pieces[i].D,true,rL+1.2-.01));
  pieces.forEach((g,i)=>{const t=g.D&&g.D.length?plateWithPocket(g.R,g.D,LT,.6):extrude(g.R,0,LT);
-  if(S.knob){const k=kn[i],r=PZ_SHAPES[g.ch]?Math.min(5,k.d-1.2):Math.min(rL,k.d-1.2);if(r>=2.5)t.push(...extrude(pzCircle(k.p[0],k.p[1],r),LT,LT+PZ_KNOB_H))}
+  if(S.knob){const k=kn[i],r=PZ_SHAPES[g.ch]?Math.min(5,k.d-1.2):Math.min(rL,k.d-1.19);if(r>=2.5)t.push(...extrude(pzCircle(k.p[0],k.p[1],r),LT,LT+PZ_KNOB_H))}
   parts.push({key:'cL'+(i%6),name:(PZ_SHAPES[g.ch]?'Figur '+(i+1)+' '+g.ch:'Buchstabe '+(i+1)+' '+g.ch),tris:Float32Array.from(t),asm:[(X,Y,Z)=>[X+g.cx,Y+g.oy,Z+T-Pd+.05]]})});
  return{ok:true,err:'',parts,units:[[Math.round(Wb),Math.round(Db),pzHash(name+'|'+shapes.join(','))]],info:{name:name+(shapes.length?(name?' + ':'')+shapes.map(id=>tr('sh_'+id)).join(', '):''),Wb,Db,T,H,scaled,n:pieces.length,cut:[...String(S.name||'').trim()].length>12}}}
 
