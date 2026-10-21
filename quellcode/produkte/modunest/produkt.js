@@ -92,7 +92,7 @@ function buildPlanUI(){let c=card('space');c._t=PL;
  const list=document.createElement('div');list.id='modlist';c.append(add,list);
  c=card('plset');seg(c,'wall','wall',[[1.6,'1.6 mm'],[2,'2.0 mm'],[2.4,'2.4 mm'],[3,'3.0 mm']]);rng(c,'r','corners',0,12,1,'mm');chk(c,'stack','stack');chk(c,'sharpSeam','sharpSeam');chk(c,'filler','filler');seg(c,'tex','tex',[['none','tx_none'],['ribs','tx_ribs'],['waves','tx_waves'],['facets','tx_facets']]);
  c=card('plmsg');const ul=document.createElement('ul');ul.id='plmsgs';c.append(ul);renderMods()}
-window.__mn={slotsFor,S,PL,buildPlan,planSolve,renderMods,buildAll,openEdges,volume,fitTestTris,arrange,get built(){return built}};
+window.__mn={slotsFor,S,PL,buildPlan,planSolve,renderMods,buildAll,openEdges,get volume(){return volume},fitTestTris,arrange,get built(){return built}};
 
 /* ================= ModuNest: Produktbeschreibung fuer den Kern ================= */
 const SKEYS=['wall','r','stack','conn','sharpSeam','filler','tex','fit','mode','cBox','cLid','cTray','cKey'];

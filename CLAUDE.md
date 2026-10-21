@@ -30,6 +30,10 @@ cd quellcode && python3 assemble.py   # baut alles (braucht Pillow für die Icon
 - `tests/` – Playwright-Skripte; Chromium unter /opt/pw-browsers; Pfade anpassen: /home/claude/mn/dist/modunest-studio.html → quellcode/dist/modunest.html, playwright z. B. aus /opt/node22/lib/node_modules. p21 simuliert noch die alte Abrechnung. Wichtig: `p18.mjs` (Geometrie; Ausgabe beim Umbau 21.10. identisch), `p19.mjs` (Screenshots), `p11.mjs` (Planer, Verbinder-Ecken).
 - `quellcode/backend/` – Supabase: `schema.sql`, Edge Functions `modunest` (redeem/consume/admin) und `etsy-webhook`, `ANLEITUNG.md`.
 
+## Namenspuzzle (`produkte/namenspuzzle/`, Prototyp 21.10.)
+- `produkt.js`: Name (A–Z, ÄÖÜ, Ziffern, max. 12) → je Buchstabe Ringe aus Canvas-Text (`pzLetter`, Schrift KFModern), abgetrennte Teile (Ä/Ö/Ü-Punkte) per `pzJoin` mit Steg verbunden (keine Kleinteile). Brett = Platte mit Vertiefungen (Buchstaben-Ringe + Spiel `pzClr` je Passung 1–5: 0.2–0.6 mm) und optional gravierter 2. Zeile; Buchstaben = Extrusion + Greifknopf am tiefsten Punkt (`pzDeep`). Brett max. 250 mm breit (Buchstaben werden verkleinert), unter 30 mm Buchstabenhöhe Fehler (Kindersicherheit). Gratis-Probe-Teil (erster Buchstabe). Abrechnung: 1 Puzzle = 1 Einheit; `units` = [Brettbreite, Bretttiefe, Hash des Namens] → Gratis-Korrektur nur für denselben Namen. store `np`.
+- Offen: Hof-Tiere als Puzzleteile, reale Druck-/Passungstests, Etsy-Angebot fürs Puzzle.
+
 ## Geometrie-Konventionen (wichtig)
 - Eigenes Raster: Canvas → Marching Squares → Douglas-Peucker → Polygon-Triangulation. Aussenringe CCW, Löcher CW. Übereinandergestapelte Bänder (`extrude(ring,z0,z1)`) erzeugen mehrere Hüllen → `openEdges` zählt viel (bekannt, Bambu-Verhalten ungeprüft).
 - `marching()` spiegelt y; in `buildMod` korrigiert `ringW` per `scale(1,-1)`. Danach gilt: Zeichenkoordinaten = Weltkoordinaten, Vorderseite = −y ('T'), hinten +y ('B'). Planer-y wächst nach hinten; vorderste Reihe y=0.

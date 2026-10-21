@@ -10,6 +10,8 @@ function arrangePrint(parts){const gap=10,maxW=246;let cx=0,cy=0,rowH=0;const ou
   out.push({...p,tris:xf(p.tris,(x,y,z)=>[x-a[0]+cx,y-a[1]+cy,z])});cx+=w+gap;rowH=Math.max(rowH,d)}
  let mnx=1e9,mny=1e9,mxx=-1e9,mxy=-1e9;out.forEach(p=>{const{a,b}=bbox(p.tris);mnx=Math.min(mnx,a[0]);mny=Math.min(mny,a[1]);mxx=Math.max(mxx,b[0]);mxy=Math.max(mxy,b[1])});
  const ox=(mnx+mxx)/2,oy=(mny+mxy)/2;out.forEach(p=>p.tris=xf(p.tris,(x,y,z)=>[x-ox,y-oy,z]));out.span=[mxx-mnx,mxy-mny];return out}
+/* Volumen eines Dreiecksnetzes (mm^3) */
+const volume=t=>{let v=0;for(let i=0;i<t.length;i+=9)v+=t[i]*(t[i+4]*t[i+8]-t[i+5]*t[i+7])-t[i+1]*(t[i+3]*t[i+8]-t[i+5]*t[i+6])+t[i+2]*(t[i+3]*t[i+7]-t[i+4]*t[i+6]);return v/6};
 function frame(parts){let a=[1e9,1e9,1e9],b=[-1e9,-1e9,-1e9];parts.forEach(p=>{const q=bbox(p.tris);for(let k=0;k<3;k++){a[k]=Math.min(a[k],q.a[k]);b[k]=Math.max(b[k],q.b[k])}});
  const s=[b[0]-a[0],b[1]-a[1],b[2]-a[2]];cam.tx=(a[0]+b[0])/2;cam.ty=(a[1]+b[1])/2;cam.tz=(a[2]+b[2])/2;cam.el=.85;cam.dist=Math.max(s[0]*2.2,s[1]*2.6,s[2]*3.4,140)}
 fit=()=>{if(built)frame(arrange(built.parts,S.view))};

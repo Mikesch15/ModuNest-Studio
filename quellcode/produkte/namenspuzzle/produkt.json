@@ -1,0 +1,6 @@
+{
+ "id": "namenspuzzle",
+ "name": {"de": "Namenspuzzle", "en": "Name puzzle"},
+ "text": {"de": "Steckpuzzle mit dem Namen deines Kindes – jeder Buchstabe ein Puzzleteil, in deinen Farben.", "en": "Name puzzle for kids – every letter a piece, in your colours."},
+ "dateien": ["produkt.js"]
+}

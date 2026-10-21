@@ -3,7 +3,7 @@
  "short_name": "ModuNest",
  "description": "Konfigurator von Art vom Hof",
  "id": "/ModuNest-Studio/app/modunest-studio",
- "start_url": "modunest/index.html",
+ "start_url": "index.html",
  "scope": "./",
  "display": "standalone",
  "lang": "de",

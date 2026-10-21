@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>ModuNest Admin</title>
 <link rel="icon" href="../icons/admin-192.png">
-<link rel="manifest" href="manifest.webmanifest?v=de062ba6">
+<link rel="manifest" href="manifest.webmanifest?v=5b5df6ea">
 <link rel="apple-touch-icon" href="../icons/admin-apple-180.png">
 <meta name="theme-color" content="#1e1a17">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MN Admin">
@@ -134,7 +134,7 @@ async function call(p,b){try{const r=await fetch($('api').value.trim().replace(/
 const fmt=c=>String(c).replace(/(.{4})(?=.)/g,'$1-');
 document.querySelectorAll('.ib').forEach(b=>b.onclick=()=>{const p=$(b.dataset.i);p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden)});
 $('eye').onclick=()=>{$('key').type=$('key').type==='password'?'text':'password'};
-let ORD=[],LST=[];const PRODUCTS=[{"id": "modunest", "name": {"de": "ModuNest Kisten", "en": "ModuNest boxes"}}],pname=id=>{const p=PRODUCTS.find(p=>p.id===id);return p?p.name.de:id};
+let ORD=[],LST=[];const PRODUCTS=[{"id": "modunest", "name": {"de": "ModuNest Kisten", "en": "ModuNest boxes"}}, {"id": "namenspuzzle", "name": {"de": "Namenspuzzle", "en": "Name puzzle"}}],pname=id=>{const p=PRODUCTS.find(p=>p.id===id);return p?p.name.de:id};
 $('lpr').innerHTML=PRODUCTS.map(p=>`<option value="${esc(p.id)}">${esc(p.name.de)}</option>`).join('');
 function render(){const q=$('q').value.trim().toLowerCase(),l=$('list');
  const f=ORD.filter(o=>!q||[o.receipt_id,o.code,o.note,...(o.items||[]).map(i=>i.title)].some(v=>String(v||'').toLowerCase().includes(q))).sort((a,b)=>(b.status==='pruefen')-(a.status==='pruefen'));

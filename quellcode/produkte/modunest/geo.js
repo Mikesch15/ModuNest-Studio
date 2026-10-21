@@ -21,7 +21,6 @@ function lidTris(R,RT,stack){const o=[];
  walls(R.O,0,LT,o);
  if(stack){cap(R.O.concat(rev(R.F)),LT,true,o);walls(R.F,LT,LT+FOOT,o);cap(R.F,LT+FOOT,true,o)}else cap(R.O,LT,true,o);
  return o}
-const volume=t=>{let v=0;for(let i=0;i<t.length;i+=9)v+=t[i]*(t[i+4]*t[i+8]-t[i+5]*t[i+7])-t[i+1]*(t[i+3]*t[i+8]-t[i+5]*t[i+6])+t[i+2]*(t[i+3]*t[i+7]-t[i+4]*t[i+6]);return v/6};
 
 async function buildAll(S,res,tol){
  try{await document.fonts.load('40px KFModern')}catch(e){}
