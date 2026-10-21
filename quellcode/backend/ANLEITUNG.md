@@ -56,3 +56,18 @@ Gespeichert werden Bestellnummer, Anzahl Exporte und für den Missbrauchsschutz 
 - Die Dateien werden weiter im Browser des Käufers berechnet. Die Prüfung stoppt normales Weitergeben, aber wer den Programmcode ändert, kann sie umgehen. Echten Schutz gäbe erst Berechnung auf einem Server («Stufe 2»), das ist ein späterer Umbau.
 - Ungetestet gegen echtes Supabase und echtes Etsy: die Server-Funktionen. Getestet ist nur der Konfigurator-Teil mit einem simulierten Server.
 - Die Bestellnummer ist keine geheime Zahl. Schutz bieten Versuchsbegrenzung (10 pro 15 Min. und IP) und die Exportzählung.
+
+
+## Etsy-Verbindung (damit der Server sieht, WAS gekauft wurde)
+Etsy meldet bei einer bezahlten Bestellung nur die Bestellnummer. Die gekauften Artikel holt der Server über die Etsy-API – dafür braucht er einmalig deine Erlaubnis (nur Lesen von Bestellungen).
+
+1. **App-Schlüssel holen:** etsy.com/developers/your-apps → App «modunest-studio» → dort stehen **Keystring** und **Shared Secret** (Auge-Symbol zum Anzeigen). Nicht in einen Chat kopieren.
+2. **Rücksprung-Adresse eintragen:** In den App-Einstellungen bei Etsy die Callback-/Redirect-Adresse hinzufügen:
+   `https://sfoscpgsumukhihkdutw.supabase.co/functions/v1/modunest/etsy-callback`
+   (Falls es dieses Feld nicht gibt: weiter mit 3. – meldet der Admin danach «Etsy hat die Verbindung abgelehnt», fehlt genau dieser Eintrag.)
+3. **Secrets in Supabase:** Dashboard → Edge Functions → Secrets → zwei neue Einträge:
+   `ETSY_KEYSTRING` = Keystring, `ETSY_SHARED_SECRET` = Shared Secret. Speichern.
+4. **Verbinden:** Admin öffnen (https://mikesch15.github.io/ModuNest-Studio/admin/) → Abschnitt «Etsy-Verbindung» → «Mit Etsy verbinden» → bei Etsy anmelden und **Zugriff erlauben** → du landest wieder im Admin mit «✓ Etsy ist verbunden».
+5. **Angebote eintragen:** Abschnitt «Konfigurator-Angebote».
+
+Die Verbindung erneuert sich bei jedem Öffnen des Admins (spätestens alle 90 Tage einmal öffnen). Bestellungen, die vor der Verbindung kamen, im Admin mit «Bei Etsy abrufen» nachholen.

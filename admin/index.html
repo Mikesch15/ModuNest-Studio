@@ -90,6 +90,12 @@ select{width:100%;padding:10px 12px;font:inherit;color:var(--ink);background:var
 <div class="list" id="list"><div class="empty">Noch nicht verbunden.</div></div>
 </section>
 
+<section class="card needkey"><div class="ch"><h2>Etsy-Verbindung</h2><button class="ib" data-i="i6">i</button></div>
+<p class="info" id="i6" hidden>Etsy meldet bei einer Bestellung nur die Bestellnummer. Damit der Server nachschauen kann, <b>was</b> gekauft wurde, braucht er einmalig deine Erlaubnis (nur Lesen von Bestellungen). Ohne Verbindung landen alle Bestellungen unter «prüfen». Die Verbindung erneuert sich jedes Mal, wenn du den Admin öffnest; nach 90 Tagen ohne Öffnen musst du neu verbinden.</p>
+<div id="estat" class="sub" style="font-size:14px">–</div>
+<button class="b p" id="econn">Mit Etsy verbinden</button><div class="msg" id="emsg"></div>
+</section>
+
 <section class="card needkey"><div class="ch"><h2>Konfigurator-Angebote</h2><button class="ib" data-i="i5">i</button></div>
 <p class="info" id="i5" hidden>Nur diese Etsy-Angebote geben Kisten. Pro Angebot: wie viele Kisten ein Stück enthält und für welches Produkt es ist. Kauft jemand 2 Stück, gibt es doppelt so viele Kisten; andere Artikel derselben Bestellung zählen nicht. Die <b>Angebotsnummer</b> steht in der Adresse deines Angebots: etsy.com/listing/<b>1234567890</b>/… (oder Shop-Manager → Angebote → Angebot öffnen). «Pausieren» lässt ein altes Angebot keine Kisten mehr geben, ohne es zu löschen. Änderungen gelten für neue Bestellungen.</p>
 <p class="warn" id="lw" hidden>Noch keine Angebote eingetragen. Bis dahin landen alle Etsy-Bestellungen unter «prüfen».</p>
@@ -118,7 +124,7 @@ select{width:100%;padding:10px 12px;font:inherit;color:var(--ink);background:var
 const $=i=>document.getElementById(i),WEB=location.protocol.startsWith('http'),SHOP=WEB?new URL('../',location.href).href:'https://mikesch15.github.io/ModuNest-Studio/',DEF_API=(window.MN_CONFIG&&window.MN_CONFIG.api)||'https://sfoscpgsumukhihkdutw.supabase.co/functions/v1/modunest';
 const st={get:k=>{try{return localStorage.getItem(k)||sessionStorage.getItem(k)}catch(e){return null}},set:(k,v,keep)=>{try{(keep?localStorage:sessionStorage).setItem(k,v);(keep?sessionStorage:localStorage).removeItem(k)}catch(e){}}};
 $('api').value=st.get('mna-api')||DEF_API;$('key').value=st.get('mna-key')||'';try{$('rem').checked=!!localStorage.getItem('mna-key')}catch(e){}
-const ERR={auth:'Admin-Schlüssel falsch.',net:'Keine Verbindung. Internet und Server-Adresse prüfen.',receipt:'Bestellnummer: nur Ziffern, mindestens 6.',listing:'Angebotsnummer: nur Ziffern, mindestens 6.',notfound:'Server kennt diese Funktion nicht – ist die neueste Version veröffentlicht?'};
+const ERR={auth:'Admin-Schlüssel falsch.',net:'Keine Verbindung. Internet und Server-Adresse prüfen.',receipt:'Bestellnummer: nur Ziffern, mindestens 6.',listing:'Angebotsnummer: nur Ziffern, mindestens 6.','etsy-secrets':'In Supabase fehlen noch die Secrets ETSY_KEYSTRING und ETSY_SHARED_SECRET (siehe Anleitung).',etsy:'Etsy-Abfrage fehlgeschlagen – ist die Verbindung aktiv?',notfound:'Server kennt diese Funktion nicht – ist die neueste Version veröffentlicht?'};
 const say=(id,t,ok)=>{const e=$(id);e.textContent=t;e.className='msg '+(ok?'ok':'err')};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function call(p,b){try{const r=await fetch($('api').value.trim().replace(/\/$/,'')+'/'+p,{method:'POST',headers:{'content-type':'application/json','x-admin-key':$('key').value.trim()},body:JSON.stringify(b||{})});const j=await r.json().catch(()=>({}));return r.ok?j:{error:j.error||('http'+r.status)}}catch(e){return{error:'net'}}}
@@ -136,11 +142,21 @@ function render(){const q=$('q').value.trim().toLowerCase(),l=$('list');
   const pend=o.status==='pruefen',lines=(o.items||[]).map(i=>`<li class="${i.credits?'':'z'}">${i.qty}× ${esc(i.title||'Angebot '+i.listing_id)} <small>(${esc(i.listing_id)})</small> → ${i.credits} Kisten</li>`).join('');
   return `<div class="it${pend?' pend':''}"><div class="top">${pend?'<span class="tag w">prüfen</span>':''}<span class="tag ${o.source==='etsy'?'':'m'}">${o.source==='etsy'?'Etsy':'Code'}</span><span class="nr">${esc(nr)}</span>${o.source!=='etsy'?`<button class="mini" data-cp="${esc(nr)}">kopieren</button>`:''}<span class="date">${esc(new Date(o.created_at).toLocaleDateString('de-CH'))}</span></div>
   <div class="bar"><i style="width:${pc}%"></i></div><div class="sub"><span>${o.used} von ${o.credits} Kisten verbraucht</span><span>${esc(o.note||'')}</span></div>${lines?`<ul class="lines">${lines}</ul>`:(pend?'<div class="sub">Etsy hat keine Artikel mitgeschickt.</div>':'')}
+  ${pend&&o.source==='etsy'?`<div class="fix"><button class="mini" data-ef="${esc(o.receipt_id)}">Bei Etsy abrufen</button>${o.note?`<small>${esc(o.note)}</small>`:''}</div>`:''}
   ${pend?`<div class="fix">Freigeben mit <input type="number" min="1" max="500" value="${o.credits||6}" data-rid="${esc(o.receipt_id)}"> Kisten <button class="mini" data-ok="${esc(o.receipt_id)}">Freigeben</button></div>`:''}</div>`}).join('');
+ l.querySelectorAll('[data-ef]').forEach(b=>b.onclick=async()=>{b.disabled=true;b.textContent='frage Etsy …';const r=await call('admin/etsy-fetch',{receipt_id:b.dataset.ef});if(r.ok){if(r.status!=='ok')alert('Etsy: in dieser Bestellung ist kein eingetragenes Konfigurator-Angebot. Prüfe die Angebotsliste oder gib von Hand frei.');load()}else{b.disabled=false;b.textContent='Bei Etsy abrufen';alert((ERR[r.error]||('Fehler: '+r.error))+(r.detail?'\n'+r.detail:''))}});
  l.querySelectorAll('[data-ok]').forEach(b=>b.onclick=async()=>{const rid=b.dataset.ok,n=+l.querySelector(`input[data-rid="${rid}"]`).value;if(!(n>=1))return;b.disabled=true;const r=await call('admin/add',{receipt_id:rid,credits:n});if(r.ok)load();else{b.disabled=false;alert(ERR[r.error]||('Fehler: '+r.error))}});
  l.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>copy(b.dataset.cp,b))}
 async function load(){const r=await call('admin/list');if(r.error){say('cmsg',ERR[r.error]||('Fehler: '+r.error));$('m').classList.add('lock');return false}
- ORD=r.orders||[];render();$('m').classList.remove('lock');loadL();return true}
+ ORD=r.orders||[];render();$('m').classList.remove('lock');loadL();loadE();return true}
+async function loadE(){const r=await call('admin/etsy-status'),e=$('estat');if(r.error){e.textContent='Status unbekannt ('+(ERR[r.error]||r.error)+')';return}
+ if(!r.configured){e.innerHTML='⚠️ Noch nicht eingerichtet: In Supabase fehlen die Secrets <b>ETSY_KEYSTRING</b> und <b>ETSY_SHARED_SECRET</b>.';$('econn').disabled=true;return}
+ $('econn').disabled=false;
+ if(!r.connected){e.innerHTML='⚠️ Nicht verbunden – Bestellungen landen unter «prüfen».';$('econn').textContent='Mit Etsy verbinden';return}
+ e.innerHTML=(r.ok===false?'⚠️ Verbindung gestört: '+esc(r.problem||'')+' – bitte neu verbinden.':'✓ Verbunden mit Shop <b>'+esc(r.shop_name||r.shop_id)+'</b>')+'<br><small>gültig bis '+new Date(r.valid_until).toLocaleDateString('de-CH')+' (verlängert sich beim Öffnen des Admins)</small>';$('econn').textContent='Neu verbinden'}
+$('econn').onclick=async()=>{if(!WEB){say('emsg','Bitte den Admin über die Internet-Adresse öffnen (nicht als Datei).');return}$('econn').disabled=true;const r=await call('admin/etsy-start',{ret:location.href.split('?')[0]});$('econn').disabled=false;
+ if(r.url)location.href=r.url;else say('emsg',ERR[r.error]||('Fehler: '+r.error))};
+{const q=new URLSearchParams(location.search).get('etsy');if(q){const T={ok:['✓ Etsy ist verbunden.',1],abgebrochen:['Verbindung bei Etsy abgebrochen.'],ungueltig:['Verbindung abgelaufen – bitte nochmal «Mit Etsy verbinden».'],fehler:['Etsy hat die Verbindung abgelehnt. Prüfe die Callback-Adresse in deiner Etsy-App (siehe Anleitung).']}[q]||['Unbekannte Antwort von Etsy.'];say('emsg',T[0],T[1]);history.replaceState(null,'',location.pathname)}}
 async function loadL(){const r=await call('admin/listings');if(r.error)return;LST=r.listings||[];$('lw').hidden=!!LST.length;
  $('llist').innerHTML=LST.map(x=>`<div class="ls${x.active?'':' off'}"><b>${esc(x.title||'Angebot')}<br><small>Nr. ${esc(x.listing_id)} · ${esc(pname(x.product))}${x.active?'':' · pausiert'}</small></b><span>${x.credits} Kisten/Stück</span><button class="mini" data-ed="${esc(x.listing_id)}">ändern</button><button class="mini" data-pa="${esc(x.listing_id)}">${x.active?'pausieren':'aktivieren'}</button><button class="mini" data-rm="${esc(x.listing_id)}">löschen</button></div>`).join('');
  const g=id=>LST.find(x=>x.listing_id===id);

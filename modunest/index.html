@@ -98,6 +98,7 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 #gate #gx{position:fixed;top:14px;right:14px;width:44px!important;height:44px;padding:0;margin:0;border-radius:50%;font-size:18px;line-height:1}#gate input{background:var(--card)}
 .mo>.chk,.mo>label:last-child{flex:1 1 100%}.colors label:has(input[type=checkbox]){display:flex;align-items:center;gap:8px;color:var(--ink)}.colors input[type=checkbox]{width:20px;height:20px;flex:none;margin:0}
 @media(min-width:900px){main{height:calc(100vh - 83px)}}
+#adminbtn{display:inline-grid;place-items:center;border-radius:999px;background:var(--warm);color:#fff;text-decoration:none;font-weight:700;font-size:12px;padding:3px 10px}#adminbtn[hidden]{display:none}
 #homebtn{display:inline-grid;place-items:center;min-width:34px;border:1px solid var(--ink);border-radius:999px;color:var(--ink);text-decoration:none;font-weight:700;padding:3px 10px}#homebtn[hidden]{display:none}
 .lang{display:flex;gap:6px}.lang button{min-width:34px}#helpbtn{font-weight:700}
 .ch{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -116,7 +117,7 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 </style>
 </head>
 <body>
-<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><a id="homebtn" href="../" hidden>⌂</a><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
+<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><a id="adminbtn" href="../admin/" hidden>Admin</a><a id="homebtn" href="../" hidden>⌂</a><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
 <div id="help"><div class="hbox"><img class="logo hlogo" src="data:," alt="Art vom Hof"><h2 data-k="helpT"></h2><ol><li data-k="help1"></li><li data-k="help2"></li><li data-k="help3"></li><li data-k="help4"></li></ol><p data-k="helpTip"></p><button id="helpgo" data-k="helpGo"></button></div></div>
 <div id="gate"><div><img class="logo glogo" src="data:," alt="Art vom Hof"><h2 id="gt"></h2><p id="gd"></p><input type="text" id="gcode" placeholder="XXXX-XXXX-XXXX" autocomplete="off"><p class="ghelp" data-k="gateHelp"></p><div id="gmsg"></div><button id="gok"></button><button id="gx" class="gx">×</button></div></div>
 <main>
@@ -896,6 +897,10 @@ document.getElementById('gl').addEventListener('pointerdown',()=>document.queryS
 panel.dataset.mode=S.mode||'';buildUI();refresh();
 /* Mehrere Produkte: Knopf zur Produktauswahl; installierbar (PWA) ueber ../sw.js */
 if(PRODUCT_COUNT>1){const h=document.getElementById('homebtn');h.hidden=false;h.title=h.ariaLabel=tr('home')}
+/* Admin-Zugang nur fuer Mike: Knopf erscheint nur auf Geraeten, auf denen der Admin-Schluessel gespeichert ist;
+   sonst 5x schnell aufs Logo tippen. Der Schutz selbst ist der Admin-Schluessel auf dem Server. */
+try{if(localStorage.getItem('mna-key')||sessionStorage.getItem('mna-key'))document.getElementById('adminbtn').hidden=false}catch(e){}
+{let n=0,t=0;document.querySelector('header .logo').addEventListener('click',()=>{const now=Date.now();n=now-t<600?n+1:1;t=now;if(n>=5)location.href='../admin/'})}
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('../sw.js',{scope:'../'}).catch(()=>{});
 </script>
 </body>

@@ -1,8 +1,10 @@
 // API fuer den Konfigurator: /redeem, /consume (Guthaben = Kisten), /admin/create, /admin/list, /admin/add,
-//   /admin/listings, /admin/listing (speichern), /admin/listing-del (Konfigurator-Angebote fuer den Etsy-Webhook)
+//   /admin/listings, /admin/listing (speichern), /admin/listing-del (Konfigurator-Angebote fuer den Etsy-Webhook),
+//   /admin/etsy-start, /etsy-callback, /admin/etsy-status, /admin/etsy-fetch (Etsy-Verbindung, siehe ../_shared/etsy.ts)
 // Secrets: TOKEN_SECRET (lange Zufallszeichenfolge), ADMIN_KEY, ALLOWED_ORIGIN (z.B. https://deinname.github.io),
 //          SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (automatisch)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { accessToken, authorizeUrl, clientId, etsyConfigured, etsyGet, evaluate, receiptTransactions, redirectUri, saveToken, tokenRequest } from "../_shared/etsy.ts";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const ORIGIN = Deno.env.get("ALLOWED_ORIGIN") ?? "*";
@@ -30,6 +32,22 @@ function match(paid: number[][], b: number[][]) {
   const used = new Array(paid.length).fill(false);
   return b.map((m) => { const j = paid.findIndex((q, k) => !used[k] && Array.isArray(q) && q.every((v, t) => Math.abs(v - m[t]) <= TOL)); if (j < 0) return null; used[j] = true; return paid[j]; });
 }
+const rnd = (n: number) => b64u(crypto.getRandomValues(new Uint8Array(n)));
+// Rueckkehr nach der Etsy-Anmeldung: Code gegen Tokens tauschen, Shop merken, zurueck in den Admin.
+async function etsyCallback(u: URL) {
+  const { data: a } = await sb.from("etsy_auth").select("state,verifier,ret,started_at").eq("id", 1).maybeSingle();
+  const back = (q: string) => new Response(null, { status: 302, headers: { location: (a?.ret || ORIGIN + "/ModuNest-Studio/admin/") + "?etsy=" + q } });
+  const err = u.searchParams.get("error"); if (err) return back("abgebrochen");
+  if (!a?.state || u.searchParams.get("state") !== a.state || Date.now() - new Date(a.started_at).getTime() > 15 * 60 * 1000) return back("ungueltig");
+  try {
+    const j = await tokenRequest({ grant_type: "authorization_code", redirect_uri: redirectUri(), code: u.searchParams.get("code") ?? "", code_verifier: a.verifier });
+    const me = await etsyGet(sb, "/users/me", j.access_token);
+    let shop_name = "";
+    try { shop_name = (await etsyGet(sb, `/shops/${me.shop_id}`, j.access_token)).shop_name ?? ""; } catch (_) { /* nur Anzeige */ }
+    await saveToken(sb, j, { shop_id: String(me.shop_id ?? ""), shop_name, state: null, verifier: null });
+    return back("ok");
+  } catch (e) { console.error("etsy-callback", (e as Error).message); return back("fehler"); }
+}
 const newCode = () => { const a = crypto.getRandomValues(new Uint8Array(12)); return Array.from(a, (x) => ALPHA[x % 32]).join(""); };
 
 Deno.serve(async (req) => {
@@ -37,6 +55,7 @@ Deno.serve(async (req) => {
   const cors = corsFor(path.startsWith("admin/") ? (req.headers.get("origin") ?? "*") : ORIGIN);
   const json = (o: unknown, status = 200) => new Response(JSON.stringify(o), { status, headers: { ...cors, "content-type": "application/json" } });
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
+  if (path === "etsy-callback") return etsyCallback(new URL(req.url));
   const ip = (req.headers.get("x-forwarded-for") ?? "?").split(",")[0].trim();
   let b: any = {}; try { b = await req.json(); } catch (_) {}
 
@@ -121,6 +140,35 @@ Deno.serve(async (req) => {
     if (path === "admin/listing-del") {
       const { error } = await sb.from("listings").delete().eq("listing_id", String(b.listing_id ?? ""));
       return error ? json({ error: error.message }, 500) : json({ ok: true });
+    }
+    if (path === "admin/etsy-start") { // { ret: Adresse der Admin-Seite }
+      if (!etsyConfigured()) return json({ error: "etsy-secrets" }, 400);
+      const ret = String(b.ret ?? ""), state = rnd(16), verifier = rnd(48);
+      const challenge = b64u(new Uint8Array(await crypto.subtle.digest("SHA-256", enc.encode(verifier))));
+      const { error } = await sb.from("etsy_auth").upsert({ id: 1, state, verifier, started_at: new Date().toISOString(), ret: ORIGIN !== "*" && ret.startsWith(ORIGIN) ? ret.split("?")[0] : null });
+      if (error) return json({ error: error.message }, 500);
+      const q = new URLSearchParams({ response_type: "code", client_id: clientId(), redirect_uri: redirectUri(), scope: "transactions_r shops_r", state, code_challenge: challenge, code_challenge_method: "S256" });
+      return json({ url: authorizeUrl + "?" + q, redirect_uri: redirectUri() });
+    }
+    if (path === "admin/etsy-status") { // erneuert dabei das Token -> Verbindung bleibt aktiv, solange der Admin ab und zu geoeffnet wird
+      const { data: a } = await sb.from("etsy_auth").select("refresh_token,refreshed_at,shop_id,shop_name").eq("id", 1).maybeSingle();
+      const st: Record<string, unknown> = { configured: etsyConfigured(), connected: !!a?.refresh_token, shop_id: a?.shop_id ?? null, shop_name: a?.shop_name ?? null, redirect_uri: redirectUri() };
+      if (a?.refresh_token) {
+        try { if (Date.now() - new Date(a.refreshed_at).getTime() > 24 * 3600 * 1000) await accessToken(sb, true); st.ok = true; }
+        catch (e) { st.ok = false; st.problem = (e as Error).message; }
+        const { data: c } = await sb.from("etsy_auth").select("refreshed_at").eq("id", 1).maybeSingle();
+        st.valid_until = new Date(new Date(c?.refreshed_at).getTime() + 90 * 24 * 3600 * 1000).toISOString();
+      }
+      return json(st);
+    }
+    if (path === "admin/etsy-fetch") { // { receipt_id }: Artikel einer Bestellung bei Etsy holen und neu berechnen
+      const rid = norm(b.receipt_id); if (!/^\d{6,}$/.test(rid)) return json({ error: "receipt" }, 400);
+      let tx: any[];
+      try { tx = await receiptTransactions(sb, rid); } catch (e) { return json({ error: "etsy", detail: (e as Error).message }, 502); }
+      const r = await evaluate(sb, tx);
+      const status = r.status === "ok" && r.credits > 0 ? "ok" : "pruefen";
+      const { error } = await sb.from("orders").update({ items: r.items, credits: r.credits, status, note: status === "ok" ? null : "keine Konfigurator-Artikel gefunden" }).eq("receipt_id", rid);
+      return error ? json({ error: error.message }, 500) : json({ ok: true, credits: r.credits, status, items: r.items });
     }
   }
   return json({ error: "notfound" }, 404);

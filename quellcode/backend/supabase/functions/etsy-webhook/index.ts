@@ -2,7 +2,9 @@
 // Secrets: ETSY_WEBHOOK_SECRET (whsec_...), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (automatisch).
 // Welche Angebote zum Konfigurator gehoeren und wie viele Kisten sie geben, steht in der Tabelle `listings`
 // (pflegt Mike im Admin). Andere Shop-Artikel geben 0 Kisten; Bestellungen nur mit solchen Artikeln werden ignoriert.
+// Etsy schickt nur event_type, resource_url, shop_id -> die Artikel holt die Funktion ueber die Etsy-API (Verbindung im Admin).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { evaluate, receiptTransactions } from "../_shared/etsy.ts";
 
 const b64 = (u8: Uint8Array) => btoa(String.fromCharCode(...u8));
 const unb64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
@@ -31,25 +33,16 @@ Deno.serve(async (req) => {
   const receipt = String(d.receipt_id ?? d.order_id ?? d.id ?? (d.resource_url ?? "").split("/").pop() ?? "");
   if (!receipt) { console.error("no receipt id, fields:", Object.keys(d).join(",")); return new Response("no receipt", { status: 400 }); }
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  const { data: lst } = await sb.from("listings").select("listing_id,title,product,credits").eq("active", true);
-  const known = new Map((lst ?? []).map((l: any) => [String(l.listing_id), l]));
-  const qty = (q: unknown) => Math.max(1, Math.min(100, Number(q) | 0 || 1));
-  const tx: any[] | null = Array.isArray(d.transactions) ? d.transactions : null;
-  const items = tx?.map((t) => {
-    const lid = String(t.listing_id ?? ""), l: any = known.get(lid), q = qty(t.quantity);
-    return { listing_id: lid, title: String(t.title ?? l?.title ?? "").slice(0, 120), qty: q, product: l?.product ?? null, credits: l ? l.credits * q : 0 };
-  }) ?? null;
-  let credits = 0, status = "ok";
-  if (items && items.length && known.size) {
-    credits = items.reduce((a, i) => a + i.credits, 0);
-    if (!credits) { console.log("order.paid", receipt, "ohne Konfigurator-Artikel -> ignoriert"); return new Response("ignored"); }
-  } else {
-    // Artikel nicht mitgeschickt oder noch keine Angebote eingetragen: nicht raten, im Admin pruefen lassen
-    status = "pruefen";
-    console.log("order.paid", receipt, "Artikel unbekannt -> pruefen; fields:", Object.keys(d).join(","), "tx:", tx ? tx.length : "keine");
+  let tx: any[] | null = Array.isArray(d.transactions) ? d.transactions : null, note: string | null = null;
+  if (!tx) {
+    try { tx = await receiptTransactions(sb, receipt, d.shop_id ? String(d.shop_id) : undefined); }
+    catch (e) { note = "Etsy-Abfrage: " + String((e as Error).message ?? e).slice(0, 150); console.log("order.paid", receipt, note); }
   }
+  const { items, credits, status, relevant } = await evaluate(sb, tx);
+  if (!relevant) { console.log("order.paid", receipt, "ohne Konfigurator-Artikel -> ignoriert"); return new Response("ignored"); }
+  if (status === "pruefen") console.log("order.paid", receipt, "Artikel unbekannt -> pruefen; fields:", Object.keys(d).join(","), "tx:", tx ? tx.length : "keine");
   console.log("order.paid", receipt, "items", items?.length ?? 0, "credits", credits, "status", status);
-  const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: receipt, listing_id: items?.[0]?.listing_id || null, credits, items, status }, { onConflict: "receipt_id", ignoreDuplicates: true });
+  const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: receipt, listing_id: items?.[0]?.listing_id || null, credits, items, status, note }, { onConflict: "receipt_id", ignoreDuplicates: true });
   if (error) { console.error(error); return new Response("db error", { status: 500 }); }
   return new Response("ok");
 });

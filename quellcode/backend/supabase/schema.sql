@@ -64,3 +64,12 @@ alter table public.listings enable row level security;
 -- Bestellungen: gekaufte Artikel und Status ('ok' | 'pruefen' = Artikel unbekannt, Mike gibt im Admin frei)
 alter table public.orders add column if not exists items jsonb;
 alter table public.orders add column if not exists status text not null default 'ok';
+
+-- Etsy-Verbindung (OAuth, nur Lesen von Bestellungen): eine Zeile, nur service role (Edge Functions)
+create table if not exists public.etsy_auth (
+  id int primary key default 1 check (id = 1),
+  access_token text, refresh_token text, expires_at timestamptz, refreshed_at timestamptz,
+  shop_id text, shop_name text,
+  state text, verifier text, ret text, started_at timestamptz
+);
+alter table public.etsy_auth enable row level security;

@@ -54,6 +54,10 @@ document.getElementById('gl').addEventListener('pointerdown',()=>document.queryS
 panel.dataset.mode=S.mode||'';buildUI();refresh();
 /* Mehrere Produkte: Knopf zur Produktauswahl; installierbar (PWA) ueber ../sw.js */
 if(PRODUCT_COUNT>1){const h=document.getElementById('homebtn');h.hidden=false;h.title=h.ariaLabel=tr('home')}
+/* Admin-Zugang nur fuer Mike: Knopf erscheint nur auf Geraeten, auf denen der Admin-Schluessel gespeichert ist;
+   sonst 5x schnell aufs Logo tippen. Der Schutz selbst ist der Admin-Schluessel auf dem Server. */
+try{if(localStorage.getItem('mna-key')||sessionStorage.getItem('mna-key'))document.getElementById('adminbtn').hidden=false}catch(e){}
+{let n=0,t=0;document.querySelector('header .logo').addEventListener('click',()=>{const now=Date.now();n=now-t<600?n+1:1;t=now;if(n>=5)location.href='../admin/'})}
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('../sw.js',{scope:'../'}).catch(()=>{});
 </script>
 </body>
