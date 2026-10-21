@@ -1,0 +1,25 @@
+# Veroeffentlicht die Supabase-Funktionen automatisch, sobald sich ihr Code auf main aendert.
+# Einmalig noetig: GitHub → Settings → Secrets and variables → Actions → Secret SUPABASE_ACCESS_TOKEN
+# (Token von supabase.com/dashboard/account/tokens).
+name: Supabase-Funktionen veröffentlichen
+on:
+  push:
+    branches: [main]
+    paths: ['quellcode/backend/supabase/functions/**', '.github/workflows/supabase-deploy.yml']
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: modunest
+        working-directory: quellcode/backend
+        run: supabase functions deploy modunest --project-ref sfoscpgsumukhihkdutw --no-verify-jwt
+      - name: etsy-webhook
+        working-directory: quellcode/backend
+        run: supabase functions deploy etsy-webhook --project-ref sfoscpgsumukhihkdutw --no-verify-jwt
