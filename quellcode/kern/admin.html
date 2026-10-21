@@ -58,68 +58,89 @@ button:disabled{opacity:.5;cursor:default}
 .fix{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px}.fix input{width:76px;padding:6px 8px}
 .ls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid var(--line);border-radius:14px;padding:8px 10px;background:var(--bg)}.ls.off{opacity:.55}.ls b{flex:1 1 150px;min-width:0}.ls small{color:var(--mut)}
 select{width:100%;padding:10px 12px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px}#res{display:grid;gap:8px}#res[hidden]{display:none}
+
+nav{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 16px;display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+nav a{flex:none;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;font-size:13px;font-weight:600}
+nav a .n{display:inline-block;min-width:18px;margin-left:4px;padding:0 5px;border-radius:99px;background:#d9a21b;color:#1e1a17;font-size:11px;text-align:center}
+section{scroll-margin-top:56px}
+table.t{width:100%;border-collapse:collapse;font-size:13px}table.t th,table.t td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right}table.t th:first-child,table.t td:first-child{text-align:left}table.t th{color:var(--mut);font-weight:600;font-size:12px}
+.det{display:grid;gap:8px;border-top:1px dashed var(--line);padding-top:8px}.det[hidden]{display:none}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:3px 10px;font-size:13px}.kv span{color:var(--mut)}
+.pg{display:grid;grid-template-columns:1fr 80px 80px;gap:6px;align-items:center;font-size:13px}.pg input{padding:6px 8px}.pg .h{color:var(--mut);font-size:11px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.tag.x{background:var(--err);color:#fff}.it.blk{opacity:.7;border-color:var(--err)}
+.prod{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--bg);display:grid;gap:8px}.prod .top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.prod b{flex:1 1 140px}
+.feats{display:flex;flex-wrap:wrap;gap:4px 14px}
+.exl{margin:0;padding-left:18px;font-size:12px;color:var(--mut);max-height:220px;overflow:auto}
+#connbox{display:grid;gap:10px}.conn-ok #connbox{display:none}#connmini{display:none;font-size:14px}.conn-ok #connmini{display:flex;gap:8px;align-items:center}
 </style>
 </head>
 <body>
-<header><img class="logo" src="LOGO_DATA" alt="Art vom Hof"><div><h1>ModuNest Admin</h1><p>Nur für dich: Codes erstellen und Bestellungen verwalten</p></div></header>
+<header><img class="logo" src="LOGO_DATA" alt="Art vom Hof"><div><h1>ModuNest Admin</h1><p>Bestellungen, Produkte, Angebote und Codes</p></div></header>
+<nav id="nav"><a href="#s-dash">Übersicht</a><a href="#s-orders">Bestellungen<span class="n" id="navp" hidden></span></a><a href="#s-prod">Produkte</a><a href="#s-list">Angebote</a><a href="#s-codes">Codes &amp; Nachtrag</a><a href="#s-etsy">Etsy</a><a href="#s-conn">Verbindung</a></nav>
 <main id="m" class="lock">
 
-<section class="card"><div class="ch"><h2>So geht’s</h2></div>
-<ol style="margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px">
-<li>Admin-Schlüssel eingeben und <b>Verbinden</b> tippen.</li>
-<li>In der <b>Übersicht</b> siehst du alle Bestellungen und wie viele Kisten verbraucht sind.</li>
-<li>Unter <b>Konfigurator-Angebote</b> trägst du einmal deine Etsy-Angebote ein, die zum Konfigurator gehören, mit Kisten pro Stück.</li>
-<li>Gelb markierte Bestellungen (<b>prüfen</b>) gibst du mit der richtigen Kistenzahl frei.</li>
-<li>Hat ein Käufer ein Problem, trägst du seine <b>Etsy-Bestellnummer</b> ein oder schenkst ihm einen <b>Code</b>.</li>
-</ol>
-<p class="info">Etsy-Bestellungen kommen nach der Zahlung automatisch hierher. Gezählt werden nur deine Konfigurator-Angebote, andere Shop-Artikel nicht. Normalerweise musst du nichts tun. Das <b>ⓘ</b> bei jedem Abschnitt erklärt mehr.</p>
-</section>
-
-<section class="card"><div class="ch"><h2>Verbindung</h2><button class="ib" data-i="i1">i</button></div>
-<p class="info" id="i1" hidden>Den Admin-Schlüssel hast du selbst in Supabase als Secret <b>ADMIN_KEY</b> gespeichert (Edge Functions → Secrets). Er wird nur an deinen Server geschickt. «Merken» speichert ihn im Browser dieses Geräts – nur auf deinem eigenen Handy/Computer benutzen. Die Server-Adresse musst du normalerweise nicht ändern.</p>
+<section class="card" id="s-conn"><div class="ch"><h2>Verbindung</h2><button class="ib" data-i="i1">i</button></div>
+<p class="info" id="i1" hidden>Den Admin-Schlüssel hast du selbst in Supabase als Secret <b>ADMIN_KEY</b> gespeichert (Edge Functions → Secrets). Er wird nur an deinen Server geschickt. «Merken» speichert ihn im Browser dieses Geräts – nur auf deinem eigenen Handy/Computer benutzen. Auf Geräten mit gespeichertem Schlüssel siehst du auch Produkte im Status «Test».</p>
+<div id="connmini"><span>✓ Verbunden</span><button class="mini" id="connedit">ändern</button></div>
+<div id="connbox">
 <label>Admin-Schlüssel<div class="keyw"><input id="key" type="password" autocomplete="off" placeholder="ADMIN_KEY"><button class="eye" id="eye" title="Anzeigen" type="button">👁</button></div></label>
 <label class="chk"><input type="checkbox" id="rem"> Auf diesem Gerät merken</label>
 <details><summary style="font-size:13px;color:var(--mut);cursor:pointer">Server-Adresse</summary><input id="api" type="url" style="margin-top:6px"></details>
-<button class="b p" id="conn">Verbinden</button><div class="msg" id="cmsg"></div>
+<button class="b p" id="conn">Verbinden</button></div><div class="msg" id="cmsg"></div>
 </section>
 
-<section class="card needkey"><div class="ch"><h2>Übersicht</h2><button class="ib" data-i="i2">i</button></div>
-<p class="info" id="i2" hidden><b>Etsy</b> = Bestellung (kommt automatisch nach der Zahlung), <b>Code</b> = von dir erstellter Code. Darunter stehen die gekauften Artikel (grau = kein Konfigurator-Angebot, gibt 0 Kisten). Der Balken zeigt, wie viele Kisten schon heruntergeladen wurden. <b>Gelb «prüfen»</b>: Etsy hat nicht mitgeteilt, was gekauft wurde, oder es waren noch keine Angebote eingetragen. Schau die Bestellung in Etsy an (Shop-Manager → Bestellungen) und gib sie mit der richtigen Kistenzahl frei – vorher kann der Käufer nichts herunterladen. Fehlt eine bezahlte Bestellung, war Etsy evtl. langsam (ein paar Minuten warten) – sonst unten von Hand eintragen.</p>
+<section class="card needkey" id="s-dash"><div class="ch"><h2>Übersicht</h2><button class="ib" data-i="i0">i</button></div>
+<p class="info" id="i0" hidden>Pro Produkt: <b>gekauft</b> = Guthaben aus allen Bestellungen und Codes, <b>verbraucht</b> = davon heruntergeladen, <b>offen</b> = noch nicht genutzt. Bestellungen aus der Zeit vor der Trennung nach Produkten zählen unter «alle Produkte». Downloads (Masse) speichert der Server nur 2 Tage.</p>
 <p class="warn" id="pendw" hidden></p>
-<div class="stats"><div class="stat"><span>Bestellungen</span><strong id="sN">–</strong></div><div class="stat"><span>Kisten gekauft</span><strong id="sC">–</strong></div><div class="stat"><span>Kisten verbraucht</span><strong id="sU">–</strong></div></div>
-<div class="row"><input id="q" type="search" placeholder="Suchen: Nummer, Code oder Notiz"><button class="b narrow" id="reload">Neu laden</button></div>
+<div class="stats"><div class="stat"><span>Bestellungen</span><strong id="sN">–</strong></div><div class="stat"><span>davon letzte 30 Tage</span><strong id="s30">–</strong></div><div class="stat"><span>Downloads 48 h</span><strong id="sX">–</strong></div></div>
+<table class="t" id="ptab"></table>
+<details><summary style="font-size:13px;color:var(--mut);cursor:pointer">Letzte Downloads</summary><ul class="exl" id="exall"></ul></details>
+<button class="b" id="reload">Alles neu laden</button>
+</section>
+
+<section class="card needkey" id="s-orders"><div class="ch"><h2>Bestellungen</h2><button class="ib" data-i="i2">i</button></div>
+<p class="info" id="i2" hidden><b>Etsy</b> = Bestellung (kommt automatisch nach der Zahlung), <b>Code</b> = von dir erstellter Code. Darunter die gekauften Artikel (grau = kein Konfigurator-Angebot). <b>Gelb «prüfen»</b>: Etsy hat nicht mitgeteilt, was gekauft wurde, oder es waren noch keine Angebote eingetragen – schau die Bestellung in Etsy an und gib sie mit Produkt und Anzahl frei. <b>Details</b> öffnet alles zur Bestellung: Guthaben und Verbrauch pro Produkt ändern, Notiz, Status (<b>gesperrt</b> = kann nichts mehr herunterladen), Downloads der letzten 2 Tage, löschen.</p>
+<div class="row"><input id="q" type="search" placeholder="Suchen: Nummer, Code, Notiz, Artikel"><select id="flt" class="narrow" style="flex:0 1 170px"><option value="">Alle</option><option value="pruefen">Zu prüfen</option><option value="gesperrt">Gesperrt</option><option value="etsy">Nur Etsy</option><option value="manual">Nur Codes</option><option value="open">Mit Guthaben übrig</option></select></div>
 <div class="list" id="list"><div class="empty">Noch nicht verbunden.</div></div>
 </section>
 
-<section class="card needkey"><div class="ch"><h2>Etsy-Verbindung</h2><button class="ib" data-i="i6">i</button></div>
-<p class="info" id="i6" hidden>Etsy meldet bei einer Bestellung nur die Bestellnummer. Damit der Server nachschauen kann, <b>was</b> gekauft wurde, braucht er einmalig deine Erlaubnis (nur Lesen von Bestellungen). Ohne Verbindung landen alle Bestellungen unter «prüfen». Die Verbindung erneuert sich jedes Mal, wenn du den Admin öffnest; nach 90 Tagen ohne Öffnen musst du neu verbinden.</p>
-<div id="estat" class="sub" style="font-size:14px">–</div>
-<button class="b p" id="econn">Mit Etsy verbinden</button><div class="msg" id="emsg"></div>
-<details><summary style="font-size:13px;color:var(--mut);cursor:pointer">Verbindung testen (ohne Kauf)</summary>
-<p class="info" style="margin-top:6px">Gib die Nummer einer beliebigen <b>alten Bestellung</b> aus deinem Shop ein (Shop-Manager → Bestellungen). Der Server fragt Etsy, was darin gekauft wurde, und zeigt, wie viele Kisten das geben würde. Es wird nichts gespeichert.</p>
-<div class="row"><input id="tlid" type="text" inputmode="numeric" placeholder="Bestellnummer"><button class="b narrow" id="tlbtn">Nachschlagen</button></div><div class="msg" id="tlmsg"></div><ul class="lines" id="tlout"></ul></details>
+<section class="card needkey" id="s-prod"><div class="ch"><h2>Produkte</h2><button class="ib" data-i="i7">i</button></div>
+<p class="info" id="i7" hidden><b>Live</b> = für alle sichtbar. <b>Test</b> = nur auf deinen Geräten mit gespeichertem Admin-Schlüssel sichtbar; Kunden sehen «Bald verfügbar». Herunterladen geht im Test nur mit deinen Codes. <b>Aus</b> = für alle gesperrt. Bei den Optionen kannst du einzelne Teile eines Konfigurators abschalten (z. B. noch nicht fertig getestet) – sie verschwinden dann aus der App. Änderungen gelten beim nächsten Öffnen der App.</p>
+<div class="list" id="plist"></div>
+<button class="b p" id="psave">Produkte speichern</button><div class="msg" id="pmsg"></div>
 </section>
 
-<section class="card needkey"><div class="ch"><h2>Konfigurator-Angebote</h2><button class="ib" data-i="i5">i</button></div>
-<p class="info" id="i5" hidden>Nur diese Etsy-Angebote geben Kisten. Pro Angebot: wie viele Kisten ein Stück enthält und für welches Produkt es ist (beim Namenspuzzle: 1 = ein Puzzle). Das Guthaben gilt nur für dieses Produkt. Kauft jemand 2 Stück, gibt es doppelt so viele Kisten; andere Artikel derselben Bestellung zählen nicht. Die <b>Angebotsnummer</b> steht in der Adresse deines Angebots: etsy.com/listing/<b>1234567890</b>/… (oder Shop-Manager → Angebote → Angebot öffnen). «Pausieren» lässt ein altes Angebot keine Kisten mehr geben, ohne es zu löschen. Änderungen gelten für neue Bestellungen.</p>
+<section class="card needkey" id="s-list"><div class="ch"><h2>Konfigurator-Angebote</h2><button class="ib" data-i="i5">i</button></div>
+<p class="info" id="i5" hidden>Nur diese Etsy-Angebote geben Guthaben. Pro Angebot: für welches Produkt und wie viele Einheiten ein Stück enthält (ModuNest: Kisten, Namenspuzzle: 1 = ein Puzzle). Das Guthaben gilt nur für dieses Produkt. Kauft jemand 2 Stück, gibt es doppelt so viel; andere Artikel derselben Bestellung zählen nicht. Die <b>Angebotsnummer</b> steht in der Adresse deines Angebots: etsy.com/listing/<b>1234567890</b>/…. «Pausieren» lässt ein altes Angebot nichts mehr geben, ohne es zu löschen. Änderungen gelten für neue Bestellungen.</p>
 <p class="warn" id="lw" hidden>Noch keine Angebote eingetragen. Bis dahin landen alle Etsy-Bestellungen unter «prüfen».</p>
 <div class="list" id="llist"></div>
 <div class="row"><label>Angebotsnummer<input id="lid" type="text" inputmode="numeric" placeholder="z. B. 1234567890"></label><label>Bezeichnung<input id="lti" type="text" maxlength="120" placeholder="z. B. Kisten-Set 6"></label></div>
-<div class="row"><label>Produkt<select id="lpr"></select></label><label class="narrow">Kisten pro Stück<input id="lcr" type="number" min="0" max="500" value="6"></label></div>
+<div class="row"><label>Produkt<select id="lpr" class="psel"></select></label><label class="narrow">Einheiten pro Stück<input id="lcr" type="number" min="0" max="500" value="6"></label></div>
 <button class="b p" id="lsave">Angebot speichern</button><div class="msg" id="lmsg"></div>
 </section>
 
-<section class="card needkey"><div class="ch"><h2>Code erstellen</h2><button class="ib" data-i="i3">i</button></div>
-<p class="info" id="i3" hidden>Für Sonderfälle: Geschenk, Ersatz, Test oder wenn die Etsy-Nummer nicht funktioniert. Der Code funktioniert im Konfigurator genau wie eine Etsy-Bestellnummer. Jede Kiste (Modul) braucht 1. Schreib in die Notiz, für wen der Code ist.</p>
-<div class="row"><label class="narrow">Kisten<input id="cr" type="number" min="1" max="200" value="6"></label><label>Notiz<input id="note" type="text" maxlength="200" placeholder="z. B. Etsy-Name, Grund"></label></div>
+<section class="card needkey" id="s-codes"><div class="ch"><h2>Code erstellen</h2><button class="ib" data-i="i3">i</button></div>
+<p class="info" id="i3" hidden>Für Sonderfälle: Geschenk, Ersatz, Test oder wenn die Etsy-Nummer nicht funktioniert. Der Code funktioniert im Konfigurator wie eine Etsy-Bestellnummer, aber <b>nur für das gewählte Produkt</b>. Mit Codes kannst du auch Produkte im Status «Test» herunterladen. Schreib in die Notiz, für wen der Code ist. Mehr Guthaben oder ein weiteres Produkt gibst du später unter Bestellungen → Details.</p>
+<div class="row"><label>Produkt<select id="cpr" class="psel"></select></label><label class="narrow">Anzahl<input id="cr" type="number" min="1" max="500" value="6"></label></div>
+<label>Notiz<input id="note" type="text" maxlength="200" placeholder="z. B. Etsy-Name, Grund"></label>
 <button class="b p" id="mk">Code erstellen</button><div class="msg" id="mmsg"></div>
 <div id="res" hidden><div class="code" id="code"></div><div class="row"><button class="b" id="cpc">Code kopieren</button><button class="b" id="cpm">Nachricht an Käufer kopieren</button></div></div>
 </section>
 
 <section class="card needkey"><div class="ch"><h2>Etsy-Bestellung eintragen</h2><button class="ib" data-i="i4">i</button></div>
-<p class="info" id="i4" hidden>Wenn ein Käufer meldet, dass seine Bestellnummer nicht geht: Nummer in Etsy prüfen (Shop-Manager → Bestellungen) und hier eintragen. Ist die Nummer schon vorhanden, wird die <b>Gesamtzahl Kisten</b> auf den neuen Wert gesetzt – so kannst du Kisten nachschenken. Bereits verbrauchte Kisten bleiben verbraucht. Von Hand eingetragene oder freigegebene Bestellungen gelten für alle Produkte.</p>
-<div class="row"><label>Etsy-Bestellnummer<input id="rid" type="text" inputmode="numeric" placeholder="z. B. 3456789012"></label><label class="narrow">Kisten gesamt<input id="rc" type="number" min="1" max="200" value="6"></label></div>
+<p class="info" id="i4" hidden>Wenn ein Käufer meldet, dass seine Bestellnummer nicht geht: Nummer in Etsy prüfen (Shop-Manager → Bestellungen) und hier mit Produkt und Anzahl eintragen. Gibt es die Bestellung schon, wird das Guthaben <b>für dieses Produkt</b> auf den neuen Wert gesetzt (andere Produkte bleiben). Bereits Verbrauchtes bleibt verbraucht.</p>
+<div class="row"><label>Etsy-Bestellnummer<input id="rid" type="text" inputmode="numeric" placeholder="z. B. 3456789012"></label><label>Produkt<select id="rpr" class="psel"></select></label><label class="narrow">Anzahl<input id="rc" type="number" min="1" max="500" value="6"></label></div>
 <button class="b p" id="add">Eintragen</button><div class="msg" id="amsg"></div>
+</section>
+
+<section class="card needkey" id="s-etsy"><div class="ch"><h2>Etsy-Verbindung</h2><button class="ib" data-i="i6">i</button></div>
+<p class="info" id="i6" hidden>Etsy meldet bei einer Bestellung nur die Bestellnummer. Damit der Server nachschauen kann, <b>was</b> gekauft wurde, braucht er einmalig deine Erlaubnis (nur Lesen von Bestellungen). Ohne Verbindung landen alle Bestellungen unter «prüfen». Die Verbindung erneuert sich jedes Mal, wenn du den Admin öffnest; nach 90 Tagen ohne Öffnen musst du neu verbinden.</p>
+<div id="estat" class="sub" style="font-size:14px">–</div>
+<button class="b p" id="econn">Mit Etsy verbinden</button><div class="msg" id="emsg"></div>
+<details><summary style="font-size:13px;color:var(--mut);cursor:pointer">Verbindung testen (ohne Kauf)</summary>
+<p class="info" style="margin-top:6px">Gib die Nummer einer beliebigen <b>alten Bestellung</b> aus deinem Shop ein (Shop-Manager → Bestellungen). Der Server fragt Etsy, was darin gekauft wurde, und zeigt, was das geben würde. Es wird nichts gespeichert.</p>
+<div class="row"><input id="tlid" type="text" inputmode="numeric" placeholder="Bestellnummer"><button class="b narrow" id="tlbtn">Nachschlagen</button></div><div class="msg" id="tlmsg"></div><ul class="lines" id="tlout"></ul></details>
 </section>
 <p class="legal"><a href="../app/impressum/" style="color:var(--warm);font-weight:600;font-size:13px">Impressum</a> · <a href="../app/datenschutz/" style="color:var(--warm);font-weight:600;font-size:13px">Datenschutz</a></p>
 <p class="legal">Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.</p>
@@ -134,27 +155,72 @@ const ERR={auth:'Admin-Schlüssel falsch.',net:'Keine Verbindung. Internet und S
 const say=(id,t,ok)=>{const e=$(id);e.textContent=t;e.className='msg '+(ok?'ok':'err')};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function call(p,b){try{const r=await fetch($('api').value.trim().replace(/\/$/,'')+'/'+p,{method:'POST',headers:{'content-type':'application/json','x-admin-key':$('key').value.trim()},body:JSON.stringify(b||{})});const j=await r.json().catch(()=>({}));return r.ok?j:{error:j.error||('http'+r.status)}}catch(e){return{error:'net'}}}
-const fmt=c=>String(c).replace(/(.{4})(?=.)/g,'$1-');
+const fmt=c=>String(c).replace(/(.{4})(?=.)/g,'$1-'),dt=d=>new Date(d).toLocaleString('de-CH',{dateStyle:'short',timeStyle:'short'});
+async function copy(t,b){try{await navigator.clipboard.writeText(t);const o=b.textContent;b.textContent='✓ kopiert';setTimeout(()=>b.textContent=o,1500)}catch(e){prompt('Zum Kopieren:',t)}}
 document.querySelectorAll('.ib').forEach(b=>b.onclick=()=>{const p=$(b.dataset.i);p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden)});
 $('eye').onclick=()=>{$('key').type=$('key').type==='password'?'text':'password'};
-let ORD=[],LST=[];const PRODUCTS=PRODUCTS_JSON,pname=id=>{const p=PRODUCTS.find(p=>p.id===id);return p?p.name.de:id};
-$('lpr').innerHTML=PRODUCTS.map(p=>`<option value="${esc(p.id)}">${esc(p.name.de)}</option>`).join('');
-function render(){const q=$('q').value.trim().toLowerCase(),l=$('list');
- const f=ORD.filter(o=>!q||[o.receipt_id,o.code,o.note,...(o.items||[]).map(i=>i.title)].some(v=>String(v||'').toLowerCase().includes(q))).sort((a,b)=>(b.status==='pruefen')-(a.status==='pruefen'));
- const np=ORD.filter(o=>o.status==='pruefen').length;$('pendw').hidden=!np;$('pendw').textContent=np+' Bestellung(en) warten auf deine Prüfung (gelb markiert).';
- $('sN').textContent=ORD.length;$('sC').textContent=ORD.reduce((a,o)=>a+o.credits,0);$('sU').textContent=ORD.reduce((a,o)=>a+o.used,0);
+let ORD=[],LST=[],EXP=[],SITE={products:{}};const OPEN=new Set();
+const PRODUCTS=PRODUCTS_JSON,pname=id=>{const p=PRODUCTS.find(p=>p.id===id);return p?p.name.de:id},unit=id=>({modunest:'Kisten',namenspuzzle:'Puzzles'})[id]||'Einheiten';
+document.querySelectorAll('.psel').forEach(s=>s.innerHTML=PRODUCTS.map(p=>`<option value="${esc(p.id)}">${esc(p.name.de)}</option>`).join(''));
+const nrOf=o=>o.source==='etsy'?o.receipt_id:fmt(o.code),stOf=id=>((SITE.products||{})[id]||{}).status||'live',ST={live:'Live',test:'Test',aus:'Aus'};
+const perTxt=o=>o.per?Object.entries(o.per).map(([k,v])=>esc(pname(k))+': '+((o.pused||{})[k]||0)+'/'+v).join(', '):'alle Produkte';
+const itemsHtml=o=>(o.items||[]).map(i=>`<li class="${i.credits?'':'z'}">${i.qty}× ${esc(i.title||'Angebot '+i.listing_id)} <small>(${esc(i.listing_id)})</small> → ${i.credits} ${i.product?esc(unit(i.product))+' '+esc(pname(i.product)):'(kein Konfigurator-Angebot)'}</li>`).join('');
+
+/* ---- Uebersicht ---- */
+function dash(){const np=ORD.filter(o=>o.status==='pruefen').length;$('pendw').hidden=!np;$('pendw').textContent=np+' Bestellung(en) warten auf deine Prüfung (gelb markiert, unter Bestellungen).';$('navp').hidden=!np;$('navp').textContent=np;
+ $('sN').textContent=ORD.length;$('s30').textContent=ORD.filter(o=>Date.now()-new Date(o.created_at)<30*864e5).length;$('sX').textContent=EXP.length+(EXP.length>=200?'+':'');
+ const rows=PRODUCTS.map(p=>{const os=ORD.filter(o=>o.per&&o.per[p.id]>0);const b=os.reduce((a,o)=>a+(+o.per[p.id]||0),0),u=os.reduce((a,o)=>a+(+(o.pused||{})[p.id]||0),0);return[esc(p.name.de)+` <small>(${ST[stOf(p.id)]})</small>`,os.length,b,u,b-u]});
+ const old=ORD.filter(o=>!o.per);if(old.length){const b=old.reduce((a,o)=>a+o.credits,0),u=old.reduce((a,o)=>a+o.used,0);rows.push(['alle Produkte <small>(alt)</small>',old.length,b,u,b-u])}
+ $('ptab').innerHTML='<tr><th>Produkt</th><th>Bestell.</th><th>gekauft</th><th>verbraucht</th><th>offen</th></tr>'+rows.map(r=>'<tr>'+r.map(v=>`<td>${v}</td>`).join('')+'</tr>').join('');
+ $('exall').innerHTML=EXP.slice(0,40).map(e=>{const o=ORD.find(o=>o.id===e.order_id);return`<li>${esc(dt(e.at))} · ${esc(pname(e.product))} · ${(e.dims||[]).length} ${esc(unit(e.product))} · ${o?esc(nrOf(o)):'?'}</li>`}).join('')||'<li>Keine Downloads in den letzten 2 Tagen.</li>'}
+
+/* ---- Bestellungen ---- */
+function render(){const q=$('q').value.trim().toLowerCase(),fl=$('flt').value,l=$('list');
+ const f=ORD.filter(o=>(!q||[o.receipt_id,o.code,o.note,...(o.items||[]).map(i=>i.title)].some(v=>String(v||'').toLowerCase().includes(q)))&&
+  (!fl||(fl==='pruefen'||fl==='gesperrt'?o.status===fl:fl==='open'?o.credits>o.used:o.source===fl))).sort((a,b)=>(b.status==='pruefen')-(a.status==='pruefen'));
  if(!f.length){l.innerHTML='<div class="empty">'+(ORD.length?'Nichts gefunden.':'Noch keine Bestellungen.')+'</div>';return}
- l.innerHTML=f.map((o,i)=>{const nr=o.source==='etsy'?o.receipt_id:fmt(o.code),pc=o.credits?Math.min(100,Math.round(o.used/o.credits*100)):0;
-  const pend=o.status==='pruefen',lines=(o.items||[]).map(i=>`<li class="${i.credits?'':'z'}">${i.qty}× ${esc(i.title||'Angebot '+i.listing_id)} <small>(${esc(i.listing_id)})</small> → ${i.credits} Kisten</li>`).join('');
-  return `<div class="it${pend?' pend':''}"><div class="top">${pend?'<span class="tag w">prüfen</span>':''}<span class="tag ${o.source==='etsy'?'':'m'}">${o.source==='etsy'?'Etsy':'Code'}</span><span class="nr">${esc(nr)}</span>${o.source!=='etsy'?`<button class="mini" data-cp="${esc(nr)}">kopieren</button>`:''}<span class="date">${esc(new Date(o.created_at).toLocaleDateString('de-CH'))}</span></div>
-  <div class="bar"><i style="width:${pc}%"></i></div><div class="sub"><span>${o.used} von ${o.credits} Kisten verbraucht${o.per?' ('+Object.entries(o.per).map(([k,v])=>esc(pname(k))+': '+((o.pused||{})[k]||0)+'/'+v).join(', ')+')':''}</span><span>${esc(o.note||'')}</span></div>${lines?`<ul class="lines">${lines}</ul>`:(pend?'<div class="sub">Etsy hat keine Artikel mitgeschickt.</div>':'')}
-  ${pend&&o.source==='etsy'?`<div class="fix"><button class="mini" data-ef="${esc(o.receipt_id)}">Bei Etsy abrufen</button>${o.note?`<small>${esc(o.note)}</small>`:''}</div>`:''}
-  ${pend?`<div class="fix">Freigeben mit <input type="number" min="1" max="500" value="${o.credits||6}" data-rid="${esc(o.receipt_id)}"> Kisten <button class="mini" data-ok="${esc(o.receipt_id)}">Freigeben</button></div>`:''}</div>`}).join('');
+ l.innerHTML=f.map(o=>{const nr=nrOf(o),pc=o.credits?Math.min(100,Math.round(o.used/o.credits*100)):0,pend=o.status==='pruefen',blk=o.status==='gesperrt',lines=itemsHtml(o),id=esc(o.id);
+  const pu=o.pused||{},pe=o.per||(PRODUCTS.length?{[PRODUCTS[0].id]:o.credits}:{}),pu2=o.per?pu:(PRODUCTS.length?{[PRODUCTS[0].id]:o.used}:{});
+  return `<div class="it${pend?' pend':''}${blk?' blk':''}"><div class="top">${pend?'<span class="tag w">prüfen</span>':''}${blk?'<span class="tag x">gesperrt</span>':''}<span class="tag ${o.source==='etsy'?'':'m'}">${o.source==='etsy'?'Etsy':'Code'}</span><span class="nr">${esc(nr)}</span><button class="mini" data-cp="${esc(nr)}">kopieren</button><span class="date">${esc(new Date(o.created_at).toLocaleDateString('de-CH'))}</span></div>
+  <div class="bar"><i style="width:${pc}%"></i></div><div class="sub"><span>${o.used} von ${o.credits} verbraucht (${perTxt(o)})</span><span>${esc(o.note||'')}</span></div>${lines?`<ul class="lines">${lines}</ul>`:(pend?'<div class="sub">Etsy hat keine Artikel mitgeschickt.</div>':'')}
+  ${pend&&o.source==='etsy'?`<div class="fix"><button class="mini" data-ef="${esc(o.receipt_id)}">Bei Etsy abrufen</button></div><div class="fix">Freigeben: <select class="mini" data-fp="${id}" style="width:auto">${PRODUCTS.map(p=>`<option value="${esc(p.id)}">${esc(p.name.de)}</option>`).join('')}</select><input type="number" min="1" max="500" value="${o.credits||6}" data-fn="${id}"><button class="mini" data-ok="${esc(o.receipt_id)}" data-oid="${id}">Freigeben</button></div>`:''}
+  <div class="acts"><button class="mini" data-dt="${id}">${OPEN.has(o.id)?'Details schliessen':'Details'}</button></div>
+  <div class="det" data-det="${id}" ${OPEN.has(o.id)?'':'hidden'}>
+   <div class="kv"><span>Art</span><b>${o.source==='etsy'?'Etsy-Bestellung':'Code (von dir)'}</b><span>Nummer</span><b>${esc(nr)}</b><span>Erstellt</span><b>${esc(dt(o.created_at))}</b>${o.listing_id?`<span>Angebot</span><b>${esc(o.listing_id)}</b>`:''}</div>
+   ${o.per?'':'<p class="warn" style="margin:0">Alte Bestellung: gilt bisher für alle Produkte. Beim Speichern gilt das Guthaben nur noch für die Produkte unten.</p>'}
+   <div class="pg"><span class="h">Guthaben je Produkt</span><span class="h">gekauft</span><span class="h">verbraucht</span>${PRODUCTS.map(p=>`<span>${esc(p.name.de)} <small>(${esc(unit(p.id))})</small></span><input type="number" min="0" max="5000" data-pp="${esc(p.id)}" value="${+pe[p.id]||0}"><input type="number" min="0" max="5000" data-pu="${esc(p.id)}" value="${+pu2[p.id]||0}">`).join('')}</div>
+   <div class="row"><label class="narrow" style="flex:0 1 150px">Status<select data-st><option value="ok"${o.status==='ok'?' selected':''}>ok</option><option value="pruefen"${pend?' selected':''}>prüfen</option><option value="gesperrt"${blk?' selected':''}>gesperrt</option></select></label><label>Notiz<input type="text" maxlength="200" data-no value="${esc(o.note||'')}"></label></div>
+   <div class="acts"><button class="b p" data-sv="${id}">Speichern</button><button class="b" data-ex="${id}">Downloads</button><button class="b" data-del="${id}" style="border-color:var(--err);color:var(--err)">Löschen</button></div>
+   <div class="msg" data-om="${id}"></div><ul class="exl" data-exl="${id}"></ul></div></div>`}).join('');
+ const by=id=>ORD.find(o=>o.id===id),det=id=>l.querySelector(`[data-det="${id}"]`);
+ l.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>{const id=b.dataset.dt;OPEN.has(id)?OPEN.delete(id):OPEN.add(id);render()});
+ l.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>copy(b.dataset.cp,b));
  l.querySelectorAll('[data-ef]').forEach(b=>b.onclick=async()=>{b.disabled=true;b.textContent='frage Etsy …';const r=await call('admin/etsy-fetch',{receipt_id:b.dataset.ef});if(r.ok){if(r.status!=='ok')alert('Etsy: in dieser Bestellung ist kein eingetragenes Konfigurator-Angebot. Prüfe die Angebotsliste oder gib von Hand frei.');load()}else{b.disabled=false;b.textContent='Bei Etsy abrufen';alert((ERR[r.error]||('Fehler: '+r.error))+(r.detail?'\n'+r.detail:''))}});
- l.querySelectorAll('[data-ok]').forEach(b=>b.onclick=async()=>{const rid=b.dataset.ok,n=+l.querySelector(`input[data-rid="${rid}"]`).value;if(!(n>=1))return;b.disabled=true;const r=await call('admin/add',{receipt_id:rid,credits:n});if(r.ok)load();else{b.disabled=false;alert(ERR[r.error]||('Fehler: '+r.error))}});
- l.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>copy(b.dataset.cp,b))}
-async function load(){const r=await call('admin/list');if(r.error){say('cmsg',ERR[r.error]||('Fehler: '+r.error));$('m').classList.add('lock');return false}
- ORD=r.orders||[];render();$('m').classList.remove('lock');loadL();loadE();return true}
+ l.querySelectorAll('[data-ok]').forEach(b=>b.onclick=async()=>{const id=b.dataset.oid,n=+l.querySelector(`[data-fn="${id}"]`).value,pr=l.querySelector(`[data-fp="${id}"]`).value;if(!(n>=1))return;b.disabled=true;const r=await call('admin/add',{receipt_id:b.dataset.ok,credits:n,product:pr});if(r.ok)load();else{b.disabled=false;alert(ERR[r.error]||('Fehler: '+r.error))}});
+ l.querySelectorAll('[data-sv]').forEach(b=>b.onclick=async()=>{const id=b.dataset.sv,d=det(id),per={},pused={};d.querySelectorAll('[data-pp]').forEach(i=>{if(+i.value>0)per[i.dataset.pp]=+i.value});d.querySelectorAll('[data-pu]').forEach(i=>{if(+i.value>0)pused[i.dataset.pu]=+i.value});
+  b.disabled=true;const r=await call('admin/order',{id,per,pused,status:d.querySelector('[data-st]').value,note:d.querySelector('[data-no]').value.trim()});b.disabled=false;
+  if(r.ok)load();else{const m=d.querySelector('[data-om]');m.textContent=ERR[r.error]||('Fehler: '+r.error);m.className='msg err'}});
+ l.querySelectorAll('[data-ex]').forEach(b=>b.onclick=async()=>{const id=b.dataset.ex,u=l.querySelector(`[data-exl="${id}"]`);u.innerHTML='<li>lade …</li>';const r=await call('admin/exports',{id});
+  u.innerHTML=(r.exports||[]).map(e=>`<li>${esc(dt(e.at))} · ${esc(pname(e.product))} · ${(e.dims||[]).map(m=>m.map(v=>Math.round(v)).join('×')).join(', ')}</li>`).join('')||'<li>Keine Downloads in den letzten 2 Tagen.</li>'});
+ l.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{const o=by(b.dataset.del);if(!confirm(`Bestellung ${nrOf(o)} wirklich löschen?\nDie Nummer funktioniert danach nicht mehr. Das lässt sich nicht rückgängig machen.\n(Nur sperren: Status «gesperrt».)`))return;const r=await call('admin/order-del',{id:o.id});if(r.ok){OPEN.delete(o.id);load()}else alert(ERR[r.error]||('Fehler: '+r.error))})}
+$('q').oninput=render;$('flt').onchange=render;
+
+/* ---- Produkte ---- */
+function renderP(){$('plist').innerHTML=PRODUCTS.map(p=>{const c=(SITE.products||{})[p.id]||{},s=c.status||'live',off=c.off||[];
+ return `<div class="prod" data-prod="${esc(p.id)}"><div class="top"><b>${esc(p.name.de)}</b><select data-ps style="width:auto">${Object.entries({live:'Live – für alle',test:'Test – nur deine Geräte',aus:'Aus – gesperrt'}).map(([k,v])=>`<option value="${k}"${s===k?' selected':''}>${v}</option>`).join('')}</select><a class="mini" href="${esc(SHOP+p.id+'/')}" target="_blank" rel="noopener" style="text-decoration:none">öffnen</a></div>
+ ${(p.features||[]).length?`<div class="feats">${p.features.map(f=>`<label class="chk"><input type="checkbox" data-pf="${esc(f.id)}"${off.includes(f.id)?'':' checked'}> ${esc(f.name)}</label>`).join('')}</div>`:'<small style="color:var(--mut)">Keine einzeln abschaltbaren Optionen.</small>'}</div>`}).join('')}
+$('psave').onclick=async()=>{const products={};$('plist').querySelectorAll('[data-prod]').forEach(d=>{products[d.dataset.prod]={status:d.querySelector('[data-ps]').value,off:[...d.querySelectorAll('[data-pf]')].filter(i=>!i.checked).map(i=>i.dataset.pf)}});
+ $('psave').disabled=true;const r=await call('admin/settings',{site:{products}});$('psave').disabled=false;
+ if(r.site){SITE=r.site;try{localStorage.setItem('mn-site',JSON.stringify(SITE))}catch(e){}renderP();dash();say('pmsg','✓ Gespeichert. Gilt beim nächsten Öffnen der App.',true)}else say('pmsg',ERR[r.error]||('Fehler: '+r.error))};
+
+/* ---- Laden ---- */
+async function load(){const r=await call('admin/list');if(r.error){say('cmsg',ERR[r.error]||('Fehler: '+r.error));$('m').classList.add('lock');document.body.classList.remove('conn-ok');return false}
+ ORD=r.orders||[];$('m').classList.remove('lock');document.body.classList.add('conn-ok');
+ const[x,s]=await Promise.all([call('admin/exports'),call('admin/settings')]);EXP=x.exports||[];if(s.site){SITE=s.site;try{localStorage.setItem('mn-site',JSON.stringify(SITE))}catch(e){}}
+ dash();render();renderP();loadL();loadE();return true}
+$('reload').onclick=load;$('connedit').onclick=()=>document.body.classList.remove('conn-ok');
+
+/* ---- Etsy ---- */
 async function loadE(){const r=await call('admin/etsy-status'),e=$('estat');if(r.error){e.textContent='Status unbekannt ('+(ERR[r.error]||r.error)+')';return}
  if(!r.configured){e.innerHTML='⚠️ Noch nicht eingerichtet: In Supabase fehlen die Secrets <b>ETSY_KEYSTRING</b> und <b>ETSY_SHARED_SECRET</b>.';$('econn').disabled=true;return}
  $('econn').disabled=false;
@@ -163,34 +229,38 @@ async function loadE(){const r=await call('admin/etsy-status'),e=$('estat');if(r
 $('tlbtn').onclick=async()=>{const rid=$('tlid').value.replace(/\D/g,'');if(rid.length<6){say('tlmsg',ERR.receipt);return}$('tlbtn').disabled=true;say('tlmsg','frage Etsy …',true);$('tlout').innerHTML='';
  const r=await call('admin/etsy-lookup',{receipt_id:rid});$('tlbtn').disabled=false;
  if(!r.ok){say('tlmsg',(ERR[r.error]||('Fehler: '+r.error))+(r.detail?' ('+r.detail+')':''));return}
- say('tlmsg','✓ Etsy hat geantwortet: '+(r.items||[]).length+' Artikel, ergibt '+r.credits+' Kisten'+(r.status==='pruefen'?' (noch keine passenden Konfigurator-Angebote eingetragen)':'')+'.',true);
- $('tlout').innerHTML=(r.items||[]).map(i=>`<li class="${i.credits?'':'z'}">${i.qty}× ${esc(i.title||'Angebot')} <small>(${esc(i.listing_id)})</small> → ${i.credits} Kisten</li>`).join('')};
+ say('tlmsg','✓ Etsy hat geantwortet: '+(r.items||[]).length+' Artikel'+(r.per&&Object.keys(r.per).length?', ergibt '+Object.entries(r.per).map(([k,v])=>v+' '+unit(k)+' '+pname(k)).join(' + '):', ergibt nichts')+(r.status==='pruefen'?' (noch keine passenden Konfigurator-Angebote eingetragen)':'')+'.',true);
+ $('tlout').innerHTML=itemsHtml(r)};
 $('econn').onclick=async()=>{if(!WEB){say('emsg','Bitte den Admin über die Internet-Adresse öffnen (nicht als Datei).');return}$('econn').disabled=true;const r=await call('admin/etsy-start',{ret:location.href.split('?')[0]});$('econn').disabled=false;
  if(r.url)location.href=r.url;else say('emsg',ERR[r.error]||('Fehler: '+r.error))};
 {const q=new URLSearchParams(location.search).get('etsy');if(q){const T={ok:['✓ Etsy ist verbunden.',1],abgebrochen:['Verbindung bei Etsy abgebrochen.'],ungueltig:['Verbindung abgelaufen – bitte nochmal «Mit Etsy verbinden».'],fehler:['Etsy hat die Verbindung abgelehnt. Prüfe die Callback-Adresse in deiner Etsy-App (siehe Anleitung).']}[q]||['Unbekannte Antwort von Etsy.'];say('emsg',T[0],T[1]);history.replaceState(null,'',location.pathname)}}
+
+/* ---- Angebote ---- */
 async function loadL(){const r=await call('admin/listings');if(r.error)return;LST=r.listings||[];$('lw').hidden=!!LST.length;
- $('llist').innerHTML=LST.map(x=>`<div class="ls${x.active?'':' off'}"><b>${esc(x.title||'Angebot')}<br><small>Nr. ${esc(x.listing_id)} · ${esc(pname(x.product))}${x.active?'':' · pausiert'}</small></b><span>${x.credits} Kisten/Stück</span><button class="mini" data-ed="${esc(x.listing_id)}">ändern</button><button class="mini" data-pa="${esc(x.listing_id)}">${x.active?'pausieren':'aktivieren'}</button><button class="mini" data-rm="${esc(x.listing_id)}">löschen</button></div>`).join('');
+ $('llist').innerHTML=LST.map(x=>`<div class="ls${x.active?'':' off'}"><b>${esc(x.title||'Angebot')}<br><small>Nr. ${esc(x.listing_id)} · ${esc(pname(x.product))}${x.active?'':' · pausiert'}</small></b><span>${x.credits} ${esc(unit(x.product))}/Stück</span><button class="mini" data-ed="${esc(x.listing_id)}">ändern</button><button class="mini" data-pa="${esc(x.listing_id)}">${x.active?'pausieren':'aktivieren'}</button><button class="mini" data-rm="${esc(x.listing_id)}">löschen</button></div>`).join('');
  const g=id=>LST.find(x=>x.listing_id===id);
  $('llist').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{const x=g(b.dataset.ed);$('lid').value=x.listing_id;$('lti').value=x.title;$('lpr').value=x.product;$('lcr').value=x.credits;$('lid').focus()});
  $('llist').querySelectorAll('[data-pa]').forEach(b=>b.onclick=async()=>{const x=g(b.dataset.pa);await call('admin/listing',{...x,active:!x.active});loadL()});
- $('llist').querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const x=g(b.dataset.rm);if(!confirm(`Angebot «${x.title||x.listing_id}» löschen? Es gibt dann keine Kisten mehr.`))return;await call('admin/listing-del',{listing_id:x.listing_id});loadL()})}
-$('lsave').onclick=async()=>{const lid=$('lid').value.replace(/\D/g,''),n=+$('lcr').value;if(lid.length<6){say('lmsg',ERR.listing);return}if(!(n>=0)){say('lmsg','Bitte Kisten pro Stück angeben.');return}
+ $('llist').querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{const x=g(b.dataset.rm);if(!confirm(`Angebot «${x.title||x.listing_id}» löschen? Es gibt dann kein Guthaben mehr.`))return;await call('admin/listing-del',{listing_id:x.listing_id});loadL()})}
+$('lsave').onclick=async()=>{const lid=$('lid').value.replace(/\D/g,''),n=+$('lcr').value;if(lid.length<6){say('lmsg',ERR.listing);return}if(!(n>=0)){say('lmsg','Bitte Anzahl pro Stück angeben.');return}
  $('lsave').disabled=true;const ex=LST.find(x=>x.listing_id===lid);const r=await call('admin/listing',{listing_id:lid,title:$('lti').value.trim(),product:$('lpr').value,credits:n,active:ex?ex.active:true});$('lsave').disabled=false;
  if(r.ok){say('lmsg','✓ Angebot '+lid+(ex?' geändert.':' gespeichert.'),true);$('lid').value='';$('lti').value='';loadL()}else say('lmsg',ERR[r.error]||('Fehler: '+r.error))};
-async function copy(t,b){try{await navigator.clipboard.writeText(t);const o=b.textContent;b.textContent='✓ kopiert';setTimeout(()=>b.textContent=o,1500)}catch(e){prompt('Zum Kopieren:',t)}}
-$('conn').onclick=async()=>{if(!$('key').value.trim()){say('cmsg','Bitte Admin-Schlüssel eingeben.');return}$('conn').disabled=true;say('cmsg','Verbinde …',true);
- if(await load()){say('cmsg','✓ Verbunden.',true);st.set('mna-key',$('key').value.trim(),$('rem').checked);st.set('mna-api',$('api').value.trim(),true)}$('conn').disabled=false};
-$('rem').onchange=()=>{if($('key').value.trim())st.set('mna-key',$('key').value.trim(),$('rem').checked);if(!$('rem').checked)try{localStorage.removeItem('mna-key')}catch(e){}};
-$('reload').onclick=load;$('q').oninput=render;
-$('mk').onclick=async()=>{const n=+$('cr').value;if(!(n>=1)){say('mmsg','Bitte Anzahl Kisten angeben.');return}$('mk').disabled=true;
- const r=await call('admin/create',{credits:n,note:$('note').value.trim()});$('mk').disabled=false;
- if(r.code){const c=fmt(r.code);$('code').textContent=c;$('res').hidden=false;say('mmsg','✓ Code erstellt ('+n+' Kisten).',true);
-  $('cpc').onclick=()=>copy(c,$('cpc'));$('cpm').onclick=()=>copy(`Hallo! Hier ist dein Code für den ModuNest-Konfigurator: ${c}\nÖffne ${SHOP} , stelle deine Kisten zusammen und gib den Code beim Herunterladen ein. Er reicht für ${n} Kiste(n). Viel Spass beim Drucken!`,$('cpm'));load()}
+
+/* ---- Codes / Nachtrag ---- */
+$('mk').onclick=async()=>{const n=+$('cr').value,pr=$('cpr').value;if(!(n>=1)){say('mmsg','Bitte Anzahl angeben.');return}$('mk').disabled=true;
+ const r=await call('admin/create',{credits:n,product:pr,note:$('note').value.trim()});$('mk').disabled=false;
+ if(r.code){const c=fmt(r.code),u=unit(pr);$('code').textContent=c;$('res').hidden=false;say('mmsg','✓ Code erstellt ('+n+' '+u+', '+pname(pr)+').',true);
+  $('cpc').onclick=()=>copy(c,$('cpc'));$('cpm').onclick=()=>copy(`Hallo! Hier ist dein Code für den Konfigurator «${pname(pr)}»: ${c}\nÖffne ${SHOP}${pr}/ , gestalte dein Produkt und gib den Code beim Herunterladen ein. Er reicht für ${n} ${u}. Viel Spass beim Drucken!`,$('cpm'));load()}
  else say('mmsg',ERR[r.error]||('Fehler: '+r.error))};
-$('add').onclick=async()=>{const rid=$('rid').value.replace(/\D/g,''),n=+$('rc').value;if(rid.length<6){say('amsg',ERR.receipt);return}$('add').disabled=true;
- const ex=ORD.find(o=>o.receipt_id===rid);if(ex&&!confirm(`Bestellung ${rid} gibt es schon (${ex.used} von ${ex.credits} Kisten verbraucht).\nGesamtzahl auf ${n} Kisten setzen?`)){$('add').disabled=false;return}
- const r=await call('admin/add',{receipt_id:rid,credits:n});$('add').disabled=false;
- if(r.ok){say('amsg','✓ Bestellung '+rid+' hat jetzt '+n+' Kisten.',true);$('rid').value='';load()}else say('amsg',ERR[r.error]||('Fehler: '+r.error))};
+$('add').onclick=async()=>{const rid=$('rid').value.replace(/\D/g,''),n=+$('rc').value,pr=$('rpr').value;if(rid.length<6){say('amsg',ERR.receipt);return}if(!(n>=1)){say('amsg','Bitte Anzahl angeben.');return}$('add').disabled=true;
+ const ex=ORD.find(o=>o.receipt_id===rid);if(ex&&!confirm(`Bestellung ${rid} gibt es schon (${perTxt(ex)}).\nGuthaben für ${pname(pr)} auf ${n} setzen?`)){$('add').disabled=false;return}
+ const r=await call('admin/add',{receipt_id:rid,credits:n,product:pr});$('add').disabled=false;
+ if(r.ok){say('amsg','✓ Bestellung '+rid+': '+n+' '+unit(pr)+' für '+pname(pr)+'.',true);$('rid').value='';load()}else say('amsg',ERR[r.error]||('Fehler: '+r.error))};
+
+/* ---- Verbinden ---- */
+$('conn').onclick=async()=>{if(!$('key').value.trim()){say('cmsg','Bitte Admin-Schlüssel eingeben.');return}$('conn').disabled=true;say('cmsg','Verbinde …',true);
+ if(await load()){say('cmsg','',true);st.set('mna-key',$('key').value.trim(),$('rem').checked);st.set('mna-api',$('api').value.trim(),true)}$('conn').disabled=false};
+$('rem').onchange=()=>{if($('key').value.trim())st.set('mna-key',$('key').value.trim(),$('rem').checked);if(!$('rem').checked)try{localStorage.removeItem('mna-key')}catch(e){}};
 if($('key').value)$('conn').click();
 if('serviceWorker' in navigator&&WEB)navigator.serviceWorker.register('../sw.js',{scope:'../'}).catch(()=>{});
 </script>

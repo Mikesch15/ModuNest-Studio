@@ -65,6 +65,8 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 .vhint{position:absolute;left:10px;bottom:10px;right:10px;width:max-content;max-width:calc(100% - 20px);font-size:11px;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px;pointer-events:none;transition:opacity .6s}
 .vhint.gone{opacity:0}
 #help{position:fixed;inset:0;z-index:40;background:rgba(30,26,23,.45);display:none;place-items:center;padding:16px;overflow:auto}
+#closed{position:fixed;inset:0;z-index:60;background:var(--bg);display:none;place-items:center;padding:16px}#closed a{padding:11px 18px;border-radius:999px;background:var(--acc);color:var(--on);text-decoration:none;font-weight:600}
+#testtag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#d9a21b;color:#1e1a17;align-self:center}
 .hbox{background:var(--card);border-radius:22px;max-width:440px;width:100%;padding:22px 20px;display:grid;gap:10px;justify-items:center;box-shadow:0 10px 40px rgba(0,0,0,.25)}
 .hlogo{width:96px;height:96px}.hbox h2{font-family:Script,cursive;font-size:32px;margin:0}
 .hbox ol{margin:0;padding-left:22px;display:grid;gap:8px;font-size:14px;line-height:1.45;justify-self:stretch}.hbox ol li::marker{color:var(--warm);font-weight:700}
@@ -76,7 +78,8 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 </style>
 </head>
 <body>
-<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><a id="adminbtn" href="../../admin/" hidden>Admin</a><a id="homebtn" href="../" hidden>⌂</a><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
+<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><span id="testtag" hidden></span><a id="adminbtn" href="../../admin/" hidden>Admin</a><a id="homebtn" href="../" hidden>⌂</a><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
+<div id="closed"><div class="hbox"><img class="logo hlogo" src="data:," alt="Art vom Hof"><h2 data-k="closedT"></h2><p data-k="closedD"></p><a href="../" data-k="toProducts"></a></div></div>
 <div id="help"><div class="hbox"><img class="logo hlogo" src="data:," alt="Art vom Hof"><h2 data-k="helpT"></h2><ol><li data-k="help1"></li><li data-k="help2"></li><li data-k="help3"></li><li data-k="help4"></li></ol><p data-k="helpTip"></p><button id="helpgo" data-k="helpGo"></button></div></div>
 <div id="gate"><div><img class="logo glogo" src="data:," alt="Art vom Hof"><h2 id="gt"></h2><p id="gd"></p><input type="text" id="gcode" placeholder="XXXX-XXXX-XXXX" autocomplete="off"><p class="ghelp" data-k="gateHelp"></p><div id="gmsg"></div><button id="gok"></button><button id="gx" class="gx">×</button></div></div>
 <main>
@@ -88,4 +91,9 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 'use strict';
 /* Einstellungen kommen aus config.js (window.MN_CONFIG); fehlt die Datei (z. B. offline), gilt der Testmodus */
 const CONFIG=Object.assign({requireCode:false,api:''},window.MN_CONFIG||{});
+/* Freigabe der Produkte und Optionen (Admin → Produkte): zuletzt bekannte Fassung, frisch vom Server in shell.js.
+   Auf Geraeten mit Admin-Schluessel sind auch Produkte im Status «test» nutzbar. */
+let SITE={};try{SITE=JSON.parse(localStorage.getItem('mn-site')||'{}')}catch(e){}
+const ADMIN_DEV=(()=>{try{return!!(localStorage.getItem('mna-key')||sessionStorage.getItem('mna-key'))}catch(e){return false}})();
+const prodCfg=()=>(SITE.products||{})[PRODUCT.id]||{},featOn=id=>!(prodCfg().off||[]).includes(id);
 const LOGO='LOGO_DATA';document.querySelectorAll('img.logo').forEach(i=>i.src=LOGO);document.querySelector('link[rel=icon]').href=LOGO;

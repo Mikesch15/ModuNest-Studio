@@ -1,4 +1,5 @@
-// API fuer den Konfigurator: /redeem, /left, /consume (Guthaben = Kisten, je Produkt), /admin/create, /admin/list, /admin/add,
+// API fuer den Konfigurator: /redeem, /left, /config, /consume (Guthaben = Kisten, je Produkt), /admin/create, /admin/list, /admin/add,
+//   /admin/order, /admin/order-del, /admin/exports, /admin/settings,
 //   /admin/listings, /admin/listing (speichern), /admin/listing-del (Konfigurator-Angebote fuer den Etsy-Webhook),
 //   /admin/etsy-start, /etsy-callback, /admin/etsy-status, /admin/etsy-fetch, /admin/etsy-lookup (Etsy-Verbindung, siehe ../_shared/etsy.ts)
 // Secrets: TOKEN_SECRET (lange Zufallszeichenfolge), ADMIN_KEY, ALLOWED_ORIGIN (z.B. https://deinname.github.io),
@@ -52,6 +53,9 @@ async function etsyCallback(u: URL) {
 // Produkte, z.B. Codes und von Hand freigegebene Bestellungen); pused = davon verbraucht. Gesamtzahl credits/used gilt immer.
 const prodOf = (v: unknown) => String(v ?? "modunest").replace(/[^a-z0-9-]/g, "").slice(0, 40) || "modunest";
 const leftFor = (o: any, product: string) => { const t = o.credits - o.used; if (!o.per) return t; return Math.max(0, Math.min(t, (Number(o.per[product]) || 0) - (Number(o.pused?.[product]) || 0))); };
+// Freigabe der Produkte (Admin -> Produkte): settings.site = { products: { id: { status: 'live'|'test'|'aus', off: [Optionen] } } }
+const siteCfg = async () => { const { data } = await sb.from("settings").select("value").eq("key", "site").maybeSingle(); return (data?.value ?? {}) as any; };
+const PRODUCTS_OK = /^[a-z0-9-]{1,40}$/;
 const newCode = () => { const a = crypto.getRandomValues(new Uint8Array(12)); return Array.from(a, (x) => ALPHA[x % 32]).join(""); };
 
 Deno.serve(async (req) => {
@@ -74,9 +78,11 @@ Deno.serve(async (req) => {
     const { data } = await q.maybeSingle();
     if (!data) return json({ error: "bad" }, 404);
     if (data.status === "pruefen") return json({ error: "pending" }, 409); // Etsy-Bestellung noch nicht von Mike geprueft
+    if (data.status === "gesperrt") return json({ error: "blocked" }, 403);
     const exp = Date.now() + TTL;
     return json({ token: await sign({ id: data.id, exp }), left: leftFor(data, prodOf(b.product)), exp });
   }
+  if (path === "config") return json(await siteCfg()); // oeffentlich: welche Produkte/Optionen freigegeben sind
   if (path === "left") { // { token, product }: Restguthaben fuer dieses Produkt (Anzeige beim Oeffnen einer Produktseite)
     const p = await check(b.token); if (!p) return json({ error: "token" }, 401);
     const { data: o } = await sb.from("orders").select("credits,used,per,pused").eq("id", p.id).single();
@@ -93,6 +99,11 @@ Deno.serve(async (req) => {
       if (!cfgs.length) return json({ error: "bad" }, 400);
       // Produkt (z.B. "modunest"): Gratis-Korrekturen und Guthaben (orders.per) je Produkt
       const product = prodOf(b.product);
+      // Bestellung gesperrt/ungeprueft oder Produkt nicht freigegeben ('test' nur mit Codes von Mike)
+      const { data: ord } = await sb.from("orders").select("status,source").eq("id", p.id).single();
+      if (!ord || ord.status !== "ok") return json({ error: ord?.status === "gesperrt" ? "blocked" : "token" }, 403);
+      const pst = (await siteCfg())?.products?.[product]?.status ?? "live";
+      if (pst === "aus" || (pst === "test" && ord.source !== "manual")) return json({ error: "closed" }, 403);
       const { data: prev } = await sb.from("exports").select("dims").eq("order_id", p.id).eq("product", product).gte("at", new Date(Date.now() - FREE_MS).toISOString());
       const free: number[] = [], rec: number[][][] = [];
       let n = 0;
@@ -124,17 +135,51 @@ Deno.serve(async (req) => {
     if (req.headers.get("x-admin-key") !== Deno.env.get("ADMIN_KEY")) return json({ error: "auth" }, 401);
     if (path === "admin/create") {
       const code = newCode();
-      const { error } = await sb.from("orders").insert({ source: "manual", code, credits: Math.max(1, Number(b.credits) | 0 || 6), note: String(b.note ?? "").slice(0, 200) });
+      const n = Math.max(1, Math.min(500, Number(b.credits) | 0 || 6)), product = prodOf(b.product);
+      const { error } = await sb.from("orders").insert({ source: "manual", code, credits: n, per: { [product]: n }, note: String(b.note ?? "").slice(0, 200) });
       return error ? json({ error: error.message }, 500) : json({ code });
     }
     if (path === "admin/list") {
-      const { data } = await sb.from("orders").select("source,receipt_id,code,credits,used,note,items,status,per,pused,created_at").order("created_at", { ascending: false }).limit(200);
+      const { data } = await sb.from("orders").select("id,source,receipt_id,code,listing_id,credits,used,note,items,status,per,pused,created_at").order("created_at", { ascending: false }).limit(1000);
       return json({ orders: data });
     }
-    if (path === "admin/add") { // Etsy-Bestellung von Hand nachtragen oder Kisten-Gesamtzahl aendern: { receipt_id, credits }
+    if (path === "admin/add") { // Etsy-Bestellung von Hand nachtragen / freigeben: { receipt_id, credits, product } -> Guthaben fuer dieses Produkt
       const rid = norm(b.receipt_id); if (!/^\d{6,}$/.test(rid)) return json({ error: "receipt" }, 400);
-      const { error } = await sb.from("orders").upsert({ source: "etsy", receipt_id: rid, credits: Math.max(1, Number(b.credits) | 0 || 6), note: "manuell", status: "ok", per: null }, { onConflict: "receipt_id" });
+      const n = Math.max(1, Math.min(500, Number(b.credits) | 0 || 6)), product = prodOf(b.product);
+      const { data: ex } = await sb.from("orders").select("per,used,pused").eq("receipt_id", rid).maybeSingle();
+      const per = { ...(ex?.per ?? {}), [product]: n }, credits = Object.values(per).reduce((a: number, v) => a + (Number(v) || 0), 0);
+      const row: Record<string, unknown> = { source: "etsy", receipt_id: rid, credits, per, status: "ok" };
+      if (!ex) row.note = "manuell";
+      const { error } = await sb.from("orders").upsert(row, { onConflict: "receipt_id" });
       return error ? json({ error: error.message }, 500) : json({ ok: true });
+    }
+    if (path === "admin/order") { // Bestellung bearbeiten: { id, per: {produkt: Guthaben}, pused: {produkt: verbraucht}, note, status }
+      const num = (o: any) => Object.fromEntries(Object.entries(o ?? {}).filter(([k]) => PRODUCTS_OK.test(k)).map(([k, v]) => [k, Math.max(0, Math.min(5000, Number(v) | 0))]));
+      const per = num(b.per), pused = num(b.pused), sum = (o: Record<string, number>) => Object.values(o).reduce((a, v) => a + v, 0);
+      const status = ["ok", "pruefen", "gesperrt"].includes(b.status) ? b.status : "ok";
+      const { error } = await sb.from("orders").update({ per, pused, credits: sum(per), used: Math.min(sum(pused), sum(per)), note: String(b.note ?? "").slice(0, 200), status }).eq("id", String(b.id ?? ""));
+      return error ? json({ error: error.message }, 500) : json({ ok: true });
+    }
+    if (path === "admin/order-del") {
+      const { error } = await sb.from("orders").delete().eq("id", String(b.id ?? ""));
+      return error ? json({ error: error.message }, 500) : json({ ok: true });
+    }
+    if (path === "admin/exports") { // Downloads (Masse) der letzten 2 Tage; { id } fuer eine Bestellung, sonst alle
+      let q = sb.from("exports").select("order_id,product,dims,at").order("at", { ascending: false }).limit(200);
+      if (b.id) q = q.eq("order_id", String(b.id));
+      const { data } = await q;
+      return json({ exports: data ?? [] });
+    }
+    if (path === "admin/settings") { // { site } speichern oder (ohne site) lesen
+      if (b.site) {
+        const prods: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries((b.site as any).products ?? {})) if (PRODUCTS_OK.test(k)) {
+          const x: any = v ?? {}; prods[k] = { status: ["live", "test", "aus"].includes(x.status) ? x.status : "live", off: (Array.isArray(x.off) ? x.off : []).map((o: unknown) => String(o).replace(/[^a-z0-9-]/g, "").slice(0, 40)).filter(Boolean).slice(0, 50) };
+        }
+        const { error } = await sb.from("settings").upsert({ key: "site", value: { products: prods }, updated_at: new Date().toISOString() });
+        if (error) return json({ error: error.message }, 500);
+      }
+      return json({ site: await siteCfg() });
     }
     if (path === "admin/listings") {
       const { data } = await sb.from("listings").select("listing_id,title,product,credits,active,created_at").order("created_at");

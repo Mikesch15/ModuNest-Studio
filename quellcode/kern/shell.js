@@ -55,6 +55,15 @@ document.getElementById('helpgo').onclick=()=>{help.style.display='none';try{loc
 try{if(!localStorage.getItem('mn-help'))help.style.display='grid'}catch(e){}
 document.getElementById('gl').addEventListener('pointerdown',()=>document.querySelector('.vhint').classList.add('gone'),{once:true});
 panel.dataset.mode=S.mode||'';buildUI();refresh();
+/* Produkt gesperrt («aus») oder in Entwicklung («test», nur mit Admin-Schluessel) -> Hinweis statt Konfigurator.
+   Geaenderte Optionen -> Oberflaeche neu aufbauen (ui() raeumt gesperrte Optionen aus dem Zustand). */
+function siteGate(){const st=prodCfg().status||'live',t=document.getElementById('testtag');
+ document.getElementById('closed').style.display=st==='aus'||(st==='test'&&!ADMIN_DEV)?'grid':'none';
+ t.hidden=st==='live';t.textContent=st==='aus'?'AUS':'TEST'}
+siteGate();
+(async()=>{if(!CONFIG.api)return;try{const r=await fetch(CONFIG.api.replace(/\/$/,'')+'/config',{method:'POST',headers:{'content-type':'application/json'},body:'{}'});if(!r.ok)return;
+ const j=await r.json(),old=JSON.stringify(prodCfg().off||[]);SITE=j;try{localStorage.setItem('mn-site',JSON.stringify(j))}catch(e){}
+ siteGate();if(JSON.stringify(prodCfg().off||[])!==old){buildUI();changed()}}catch(e){}})();
 /* Mehrere Produkte: Knopf zur Produktauswahl; installierbar (PWA) ueber ../sw.js */
 if(PRODUCT_COUNT>1){const h=document.getElementById('homebtn');h.hidden=false;h.title=h.ariaLabel=tr('home')}
 /* Admin-Zugang nur fuer Mike: Knopf erscheint nur auf Geraeten, auf denen der Admin-Schluessel gespeichert ist;

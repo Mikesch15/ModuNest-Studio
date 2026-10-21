@@ -9,10 +9,16 @@
 <link rel="apple-touch-icon" href="../icons/apple-180.png">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ModuNest">
 <title>ModuNest Studio – Art vom Hof</title>
+<script src="../config.js"></script>
 <script>
-/* Produktauswahl. Bei nur einem Produkt direkt weiter (alte Links bleiben gueltig). */
-const PRODUCTS=PRODUCTS_JSON;
-if(PRODUCTS.length===1)location.replace(PRODUCTS[0].id+'/'+location.search+location.hash);
+/* Produktauswahl. Gezeigt werden freigegebene Produkte (Admin → Produkte; «test» nur auf Geraeten mit Admin-Schluessel).
+   Ist nur eines sichtbar, geht es direkt weiter (alte Links bleiben gueltig). */
+const ALL=PRODUCTS_JSON;let SITE={};try{SITE=JSON.parse(localStorage.getItem('mn-site')||'{}')}catch(e){}
+const ADMIN_DEV=(()=>{try{return!!(localStorage.getItem('mna-key')||sessionStorage.getItem('mna-key'))}catch(e){return false}})();
+const stOf=id=>((SITE.products||{})[id]||{}).status||'live';
+const visible=()=>ALL.filter(p=>stOf(p.id)==='live'||(ADMIN_DEV&&stOf(p.id)!=='aus'));
+let PRODUCTS=visible();
+if(PRODUCTS.length===1&&!ADMIN_DEV)location.replace(PRODUCTS[0].id+'/'+location.search+location.hash);
 </script>
 <style>
 @font-face{font-family:"Script";src:url(FONT_DATA) format("woff2");font-weight:700;font-display:swap}
@@ -45,9 +51,11 @@ const T={tag:['Konfiguratoren von Art vom Hof','Configurators by Art vom Hof'],i
 let lang=(navigator.language||'de').toLowerCase().startsWith('de')?0:1;try{const l=localStorage.getItem('mn-lang');if(l!==null)lang=+l}catch(e){}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function show(){const k=lang?'en':'de';document.documentElement.lang=k;document.getElementById('tag').textContent=T.tag[lang];document.getElementById('intro').textContent=T.intro[lang];document.getElementById('legal').textContent=T.legal[lang];document.getElementById('priv').textContent=T.privacy[lang];document.getElementById('imp').textContent=T.imprint[lang];document.getElementById('lang').textContent=lang?'DE':'EN';
- document.getElementById('grid').innerHTML=PRODUCTS.map(p=>`<a class="p" href="${esc(p.id)}/"><img ${p.bild?'':'class="lg"'} src="${p.bild||document.querySelector('header .logo').src}" alt=""><h2>${esc(p.name[k])}</h2><p>${esc(p.text[k])}</p><span>${T.open[lang]}</span></a>`).join('')}
+ document.getElementById('grid').innerHTML=PRODUCTS.map(p=>`<a class="p" href="${esc(p.id)}/"><img ${p.bild?'':'class="lg"'} src="${p.bild||document.querySelector('header .logo').src}" alt=""><h2>${esc(p.name[k])}${stOf(p.id)!=='live'?' <small style="font:700 11px system-ui;padding:3px 8px;border-radius:99px;background:#d9a21b;color:#1e1a17;vertical-align:middle">TEST</small>':''}</h2><p>${esc(p.text[k])}</p><span>${T.open[lang]}</span></a>`).join('')}
 document.getElementById('lang').onclick=()=>{lang=lang?0:1;try{localStorage.setItem('mn-lang',lang)}catch(e){}show()};
 show();
+{const api=((window.MN_CONFIG||{}).api||'').replace(/\/$/,'');if(api)fetch(api+'/config',{method:'POST',headers:{'content-type':'application/json'},body:'{}'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;SITE=j;try{localStorage.setItem('mn-site',JSON.stringify(j))}catch(e){}
+ PRODUCTS=visible();if(PRODUCTS.length===1&&!ADMIN_DEV)location.replace(PRODUCTS[0].id+'/');else show()}).catch(()=>{})}
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('../sw.js',{scope:'../'}).catch(()=>{});
 </script>
 </body>

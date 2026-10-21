@@ -42,8 +42,11 @@ function arrange(parts,mode){
   const ys=dvY(S.D);
   return parts.flatMap(p=>p.key==='cKey'?ys.flatMap(y=>built.info.kz.zs.map(zz=>({...p,tris:xf(p.tris,(x,yy,z)=>[x+S.W/2,yy+y,z])}))):[p]).map(p=>p.key==='cLid'?{...p,tris:xf(p.tris,(x,y,z)=>[x,-y,-z+S.H+LT+10])}:p.key==='cTray'?{...p,tris:xf(p.tris,(x,y,z)=>[x,y,z+fl+S.wall+.1])}:p)}
  return arrangePrint(parts)}
-function ui(){
- let c=card('mode');seg(c,'mode','',[['single','mSingle'],['plan','mPlan']]);
+// Im Admin gesperrte Optionen (featOn) aus dem Zustand raeumen und nicht anbieten
+function cleanFeat(){if(!featOn('plan'))S.mode='single';if(!featOn('tex'))S.tex='none';
+ for(const m of [PL.one,...PL.mods]){if(!m)continue;if((m.type==='drawer'&&!featOn('drawer'))||(m.type==='tall'&&!featOn('tall')))m.type='box';if((m.lid==='slide'&&!featOn('slide'))||(m.lid==='hinge'&&!featOn('hinge')))m.lid='none'}}
+function ui(){cleanFeat();
+ let c=card('mode');if(featOn('plan'))seg(c,'mode','',[['single','mSingle'],['plan','mPlan']]);
  buildPlanUI();
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
  ['cBox','cLid','cTray','cKey'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
@@ -75,22 +78,22 @@ function mkSel(m,key,lk,vals,lab){const l=document.createElement('label'),s=docu
 function renderMods(){const list=document.getElementById('modlist');list.innerHTML='';const single=S.mode==='single',ms=single?[PL.one]:PL.mods;
  ms.forEach((m,ix)=>{const row=document.createElement('div');row.className='mrow';
   const h=document.createElement('div');h.className='mh';const b=document.createElement('b');b.textContent=tr('t_'+m.type)+(single?'':' '+(ix+1));const x=document.createElement('button');x.textContent='✕';x.title=tr('del');x.onclick=()=>{PL.mods.splice(ix,1);renderMods();changed()};h.append(b,x);row.append(h);
-  if(single){const o=document.createElement('div');o.className='mo';o.append(mkSel(m,'type','typeSel',['box','drawer'],'t_'));const sl=o.querySelector('select');sl.onchange=()=>{m.type=sl.value;renderMods();changed()};row.append(o)}
+  if(single){const o=document.createElement('div');o.className='mo';o.append(mkSel(m,'type','typeSel',['box','drawer'].filter(featOn),'t_'));const sl=o.querySelector('select');sl.onchange=()=>{m.type=sl.value;renderMods();changed()};row.append(o)}
   const g=document.createElement('div');g.className='mg';
   [['w','mW',20,PL.W],['d','mD',20,PL.D],['h','mH',15,PL.H]].forEach(([k,lk,mn,mx])=>{const l=document.createElement('label'),sp=document.createElement('span');sp.textContent=tr(lk);l.append(sp,numIn(m,k,mn,Math.max(mx,mn)));g.append(l)});
   row.append(g);
   const o=document.createElement('div');o.className='mo';
   if(m.type==='drawer')o.append(mkSel(m,'nd','nDr',[1,2,3,4]));
-  else{o.append(mkSel(m,'cols','cols',[1,2,3,4]),mkSel(m,'rows','rows',[1,2,3,4]),mkSel(m,'div','divN',[0,1,2,3]),mkSel(m,'lid','lidSel',['none','plug','slide','hinge'],'lid_'));
+  else{o.append(mkSel(m,'cols','cols',[1,2,3,4]),mkSel(m,'rows','rows',[1,2,3,4]),mkSel(m,'div','divN',[0,1,2,3]),mkSel(m,'lid','lidSel',['none','plug','slide','hinge'].filter(featOn),'lid_'));
    const l3=document.createElement('label');l3.className='chk';const c3=document.createElement('input');c3.type='checkbox';c3.checked=!!m.tray;c3.onchange=()=>{m.tray=c3.checked;changed()};const s3=document.createElement('span');s3.textContent=tr('tray');l3.append(c3,s3);o.append(l3);
    const l4=document.createElement('label'),s4=document.createElement('span'),i4=document.createElement('input');s4.textContent=tr('label');i4.type='text';i4.maxLength=40;i4.value=m.label||'';i4.oninput=()=>{m.label=i4.value;changed()};l4.append(s4,i4);o.append(l4)}
   row.append(o);list.append(row)})}
 function buildPlanUI(){let c=card('space');c._t=PL;
  rng(c,'W','width',50,600,5,'mm');rng(c,'D','depth',50,400,5,'mm');rng(c,'H','height',25,250,5,'mm');chk(c,'fill','fill');c.lastChild.classList.add('pfill');
  c=card('plmods');const add=document.createElement('div');add.className='addrow';
- ['box','tall','drawer'].forEach(ty=>{const b=document.createElement('button');b.className='btn';b.dataset.k='add_'+ty;b.onclick=()=>{const d=MODDEF[ty];PL.mods.push({type:ty,w:d.w,d:d.d,h:Math.min(d.h,PL.H),div:0,lid:'none'});renderMods();changed()};add.append(b)});
+ ['box','tall','drawer'].filter(featOn).forEach(ty=>{const b=document.createElement('button');b.className='btn';b.dataset.k='add_'+ty;b.onclick=()=>{const d=MODDEF[ty];PL.mods.push({type:ty,w:d.w,d:d.d,h:Math.min(d.h,PL.H),div:0,lid:'none'});renderMods();changed()};add.append(b)});
  const list=document.createElement('div');list.id='modlist';c.append(add,list);
- c=card('plset');seg(c,'wall','wall',[[1.6,'1.6 mm'],[2,'2.0 mm'],[2.4,'2.4 mm'],[3,'3.0 mm']]);rng(c,'r','corners',0,12,1,'mm');chk(c,'stack','stack');chk(c,'sharpSeam','sharpSeam');chk(c,'filler','filler');seg(c,'tex','tex',[['none','tx_none'],['ribs','tx_ribs'],['waves','tx_waves'],['facets','tx_facets']]);
+ c=card('plset');seg(c,'wall','wall',[[1.6,'1.6 mm'],[2,'2.0 mm'],[2.4,'2.4 mm'],[3,'3.0 mm']]);rng(c,'r','corners',0,12,1,'mm');chk(c,'stack','stack');chk(c,'sharpSeam','sharpSeam');chk(c,'filler','filler');if(featOn('tex'))seg(c,'tex','tex',[['none','tx_none'],['ribs','tx_ribs'],['waves','tx_waves'],['facets','tx_facets']]);
  c=card('plmsg');const ul=document.createElement('ul');ul.id='plmsgs';c.append(ul);renderMods()}
 window.__mn={slotsFor,S,PL,buildPlan,planSolve,renderMods,buildAll,openEdges,get volume(){return volume},fitTestTris,arrange,get built(){return built}};
 

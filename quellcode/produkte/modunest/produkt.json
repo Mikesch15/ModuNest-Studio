@@ -13,5 +13,31 @@
   "planner.js",
   "geo2.js",
   "produkt.js"
+ ],
+ "features": [
+  {
+   "id": "plan",
+   "name": "Planer (mehrere Kisten)"
+  },
+  {
+   "id": "drawer",
+   "name": "Schubladenbox"
+  },
+  {
+   "id": "tall",
+   "name": "Hoher Behälter"
+  },
+  {
+   "id": "slide",
+   "name": "Schiebedeckel"
+  },
+  {
+   "id": "hinge",
+   "name": "Klappdeckel"
+  },
+  {
+   "id": "tex",
+   "name": "Oberflächen-Muster"
+  }
  ]
 }

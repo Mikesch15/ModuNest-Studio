@@ -95,3 +95,10 @@ begin
   return case when cap is null then o.credits - o.used - p_n else least(o.credits - o.used - p_n, cap - usedp - p_n) end;
 end $$;
 revoke all on function public.consume_credits2(uuid, int, text) from public, anon, authenticated;
+
+-- Freigabe der Produkte/Optionen (Admin -> Produkte), oeffentlich lesbar ueber /config
+create table if not exists public.settings (key text primary key, value jsonb not null default '{}', updated_at timestamptz not null default now());
+alter table public.settings enable row level security;
+insert into public.settings(key,value) values ('site','{"products":{"modunest":{"status":"live","off":[]},"namenspuzzle":{"status":"test","off":[]}}}') on conflict (key) do nothing;
+-- alte Bestellungen ohne Produkt-Aufteilung -> ModuNest (21.10.2026)
+update public.orders set per = jsonb_build_object('modunest', credits), pused = jsonb_build_object('modunest', used) where per is null and status = 'ok' and credits > 0;

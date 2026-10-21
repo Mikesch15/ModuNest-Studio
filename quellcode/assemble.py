@@ -83,7 +83,7 @@ write('index.html',redirect('app/'))
 for n in ('datenschutz','impressum'):write('app/%s/index.html'%n,open(K+n+'.html').read().replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT))
 
 # ---- Admin ----
-write('admin/index.html',man_link(open(K+'admin.html').read().replace('PRODUCTS_JSON',json.dumps([{'id':P['id'],'name':P['name']} for P in prods],ensure_ascii=False))
+write('admin/index.html',man_link(open(K+'admin.html').read().replace('PRODUCTS_JSON',json.dumps([{'id':P['id'],'name':P['name'],'features':P.get('features',[])} for P in prods],ensure_ascii=False))
   .replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT)))
 write('app/manifest.webmanifest',MAN_ROOT);write('admin/manifest.webmanifest',MAN_ADMIN)
 

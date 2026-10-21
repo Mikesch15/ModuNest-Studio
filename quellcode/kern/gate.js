@@ -7,13 +7,13 @@ function creditInfo(){const e=gEl('creditinfo');if(!e)return;e.textContent=!CONF
 // Restguthaben gilt je Produkt: beim Oeffnen einer Produktseite fuer dieses Produkt nachfragen
 async function refreshLeft(){if(!CONFIG.requireCode||!CONFIG.api||!SES||SES.exp<Date.now())return;const r=await apiCall('left',{token:SES.token,product:PRODUCT.id});if(r.ok){SES.left=r.j.left;saveSes();creditInfo()}}
 function gate(msg){gEl('gate').style.display='grid';gEl('gmsg').textContent=msg||''}
-async function redeem(code){const r=await apiCall('redeem',{code,product:PRODUCT.id});if(!r.ok)return tr(r.j.error==='rate'?'gateRate':r.j.error==='net'?'gateNet':r.j.error==='pending'?'gatePending':'gateBad');SES={token:r.j.token,left:r.j.left,exp:r.j.exp};saveSes();creditInfo();return''}
+async function redeem(code){const r=await apiCall('redeem',{code,product:PRODUCT.id});if(!r.ok)return tr(r.j.error==='rate'?'gateRate':r.j.error==='net'?'gateNet':r.j.error==='pending'?'gatePending':r.j.error==='blocked'?'gateBlocked':'gateBad');SES={token:r.j.token,left:r.j.left,exp:r.j.exp};saveSes();creditInfo();return''}
 function unlockedNow(){if(!CONFIG.requireCode)return true;if(!CONFIG.api){gate(tr('gateCfg'));return false}if(!SES||SES.exp<Date.now()){gate();return false}return true}
 /* Abrechnung pro Kiste (Modul). cfgs = je Konfiguration die Kistenmasse [lang,kurz,hoch]; der Server bucht nur ab,
    was nicht innerhalb 24 h schon bezahlt wurde (gleiche Kistenzahl, je Mass max. 5 mm Abweichung). */
 async function charge(cfgs){if(!CONFIG.requireCode)return{n:0,free:0};const r=await apiCall('consume',{token:SES.token,cfgs,product:PRODUCT.id});
  if(r.ok){SES.left=r.j.left;saveSes();creditInfo();return{n:r.j.n||0,free:(r.j.free||[]).length}}
- if(r.j.error==='credits'){SES.left=r.j.left||0;saveSes();creditInfo();gate(tr('gateEmpty'))}else if(r.j.error==='net')gate(tr('gateNet'));else{SES=null;saveSes();creditInfo();gate(tr('gateBad'))}return null}
+ if(r.j.error==='credits'){SES.left=r.j.left||0;saveSes();creditInfo();gate(tr('gateEmpty'))}else if(r.j.error==='net')gate(tr('gateNet'));else if(r.j.error==='closed')gate(tr('gateClosed'));else if(r.j.error==='blocked'){SES=null;saveSes();creditInfo();gate(tr('gateBlocked'))}else{SES=null;saveSes();creditInfo();gate(tr('gateBad'))}return null}
 gEl('gok').onclick=async()=>{const m=await redeem(gEl('gcode').value);if(m)gEl('gmsg').textContent=m;else gEl('gate').style.display='none'};
 gEl('gx').onclick=()=>{gEl('gate').style.display='none'};
 /* Warenkorb (pro Produkt eigener Speicher). Produkt liefert snap/applySnap/snapName/snapCount/snapInfo und build() -> {ok,err,parts,units} */
