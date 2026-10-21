@@ -24,7 +24,7 @@ function addInfo(){panel.querySelectorAll('.card>h2').forEach(h=>{const k='i_'+h
  const b=document.createElement('button');b.className='ib';b.textContent='i';b.setAttribute('aria-expanded','false');const p=document.createElement('p');p.className='info';p.dataset.k=k;p.hidden=true;
  b.onclick=()=>{p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden);b.setAttribute('aria-expanded',String(!p.hidden))};w.append(h,b);w.after(p)})}
 /* Fussnote (Etsy-Hinweis; spaeter Links zu Datenschutz/Impressum) */
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p></footer>');applyLang()}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');

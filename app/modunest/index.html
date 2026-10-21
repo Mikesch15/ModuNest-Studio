@@ -304,7 +304,7 @@ const L={
  help4:['Öffne die 3MF-Datei in Bambu Studio (oder die STL-Dateien in deinem Slicer).','Open the 3MF file in Bambu Studio (or the STL files in your slicer).'],
  helpTip:['Bei jedem Abschnitt erklärt dir das ⓘ, was die Einstellungen bewirken.','In every section, the ⓘ explains what the settings do.'],
  home:['Alle Produkte','All products'],
- privacy:['Datenschutz','Privacy policy'],
+ privacy:['Datenschutz','Privacy policy'],imprint:['Impressum','Legal notice'],
  etsyNote:['Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.','The term “Etsy” is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.'],
  helpBtn:['Anleitung','Help'],
  helpT:['So funktioniert’s','How it works'],
@@ -828,7 +828,7 @@ function addInfo(){panel.querySelectorAll('.card>h2').forEach(h=>{const k='i_'+h
  const b=document.createElement('button');b.className='ib';b.textContent='i';b.setAttribute('aria-expanded','false');const p=document.createElement('p');p.className='info';p.dataset.k=k;p.hidden=true;
  b.onclick=()=>{p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden);b.setAttribute('aria-expanded',String(!p.hidden))};w.append(h,b);w.after(p)})}
 /* Fussnote (Etsy-Hinweis; spaeter Links zu Datenschutz/Impressum) */
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p></footer>');applyLang()}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');

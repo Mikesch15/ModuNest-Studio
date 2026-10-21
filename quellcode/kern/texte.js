@@ -8,7 +8,7 @@ const L={
  help4:['Öffne die 3MF-Datei in Bambu Studio (oder die STL-Dateien in deinem Slicer).','Open the 3MF file in Bambu Studio (or the STL files in your slicer).'],
  helpTip:['Bei jedem Abschnitt erklärt dir das ⓘ, was die Einstellungen bewirken.','In every section, the ⓘ explains what the settings do.'],
  home:['Alle Produkte','All products'],
- privacy:['Datenschutz','Privacy policy'],
+ privacy:['Datenschutz','Privacy policy'],imprint:['Impressum','Legal notice'],
  etsyNote:['Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.','The term “Etsy” is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.'],
  helpBtn:['Anleitung','Help'],
  helpT:['So funktioniert’s','How it works'],

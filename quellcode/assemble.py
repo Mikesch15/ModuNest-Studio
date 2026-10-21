@@ -80,7 +80,7 @@ write('app/index.html',man_link(st))
 write('index.html',redirect('app/'))
 
 # ---- Rechtliches ----
-write('app/datenschutz/index.html',open(K+'datenschutz.html').read().replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT))
+for n in ('datenschutz','impressum'):write('app/%s/index.html'%n,open(K+n+'.html').read().replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT))
 
 # ---- Admin ----
 write('admin/index.html',man_link(open(K+'admin.html').read().replace('PRODUCTS_JSON',json.dumps([{'id':P['id'],'name':P['name']} for P in prods],ensure_ascii=False))

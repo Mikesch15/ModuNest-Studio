@@ -49,6 +49,6 @@ Käufer gibt Etsy-**Bestellnummer** (oder Admin-Code) ein → Server prüft → 
 - Realer Druck- und Bambu-Studio-Test (3MF mit mehreren Hüllen, „offene Kanten“), Passung Verbinder/Schubladen/Deckel/Einsatz.
 - Halt der Verbinder von unten (Rastung), Passungs-Teststück an neue Taschenform anpassen.
 - Stufe 2 Schutz: Dateien serverseitig erzeugen (headless Chromium), öffentliche Vorschau grob.
-- Etsy-PDF: `quellcode/etsy/anleitung_pdf.py` (fertig, ohne Platzhalter; Lizenz: kein Weiterverkauf). Datenschutz: `kern/datenschutz.html` → `app/datenschutz/`, verlinkt in allen Fussnoten. **Impressum fehlt noch:** Mike entscheidet, welche Postadresse öffentlich erscheint (Wohn- oder Geschäftsadresse); Name Mike Ledermann, artvomhof@gmail.com, keine UID/kein Telefon. Bestellungen werden per pg_cron nach 2 Jahren gelöscht. Etsy-Hinweis (Marke/API nicht zertifiziert) in allen Fussnoten.
+- Etsy-PDF: `quellcode/etsy/anleitung_pdf.py` (fertig, ohne Platzhalter; Lizenz: kein Weiterverkauf). Datenschutz: `kern/datenschutz.html` → `app/datenschutz/`, verlinkt in allen Fussnoten. Impressum: `kern/impressum.html` → `app/impressum/` (Mike Ledermann, Art vom Hof, Papillonallee 7b, 3172 Niederwangen BE, artvomhof@gmail.com; keine UID, kein Telefon; Shop etsy.com/shop/ArtvomHof). Bestellungen werden per pg_cron nach 2 Jahren gelöscht. Etsy-Hinweis (Marke/API nicht zertifiziert) in allen Fussnoten.
 - Fotos der gedruckten Teile für Etsy.
 - Füllstück nur für Kreuz-/T-Stösse; Randkerben nicht gefüllt.
