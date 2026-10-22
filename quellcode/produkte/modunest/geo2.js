@@ -68,7 +68,7 @@ async function buildMod(m,it,slots,res,tol){
   /* Schubladen */
   const dw=chW-2*dg,bY1=D/2-tbk-.3,td=Math.max(1.6,t*.8),tf=1.6,rd=Math.min(crd,4),hf=Hc-.6,dh=Math.min(nd>1?Hc-RHt-dg-.2:Hc-dg-.2,hf);
   const sw=Math.min(dw-6,34),dpt=Math.min(4,FB-2),zs0=hf-dpt-4,nsc=8,rm=new Map(),rg=(k,f)=>{if(!rm.has(k))rm.set(k,ring(f));return rm.get(k)};
-  const TP=rg('T',x=>rr(x,-dw/2+td,yF,dw/2-td,bY1-td,Math.max(.6,rd-td)));
+  const ri=Math.max(.6,rd-td),TP=rg('T',x=>rr4(x,-dw/2+td,yF,dw/2-td,bY1-td,[0,0,ri,ri])); // Innenraum: vorne (Griffseite) scharfe Ecken, hinten rund
   for(let i=0;i<nd;i++){const zi=zb+i*Hc;let cs=[0,tf,dh,hf];for(let k=1;k<FN;k++)cs.push(k*FR/FN);cs.push(FR);for(let k=0;k<=nsc;k++)cs.push(zs0+k*dpt/nsc);hcuts.forEach(v=>cs.push(v-zi));
    cs=[...new Set(cs.filter(v=>v>=-1e-9&&v<=hf+1e-9).map(v=>Math.round(v*1e4)/1e4))].sort((a,b)=>a-b);
    let dt=[];for(let j=0;j<cs.length-1;j++){const a=cs[j],b=cs[j+1];if(b-a<1e-6)continue;const mid=(a+b)/2,wb=mid<dh,dp=(dpt>0&&mid>zs0&&mid<zs0+dpt)?dpt-(mid-zs0):0,mk_=mkey(zi+mid);
