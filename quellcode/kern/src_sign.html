@@ -330,7 +330,7 @@ const m4={
 const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o};
 const prog=gl.createProgram();
 gl.attachShader(prog,sh(gl.VERTEX_SHADER,'attribute vec3 p;attribute vec3 n;uniform mat4 m;varying vec3 vn;void main(){gl_Position=m*vec4(p,1.);vn=n;}'));
-gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,'precision mediump float;varying vec3 vn;uniform vec3 c;void main(){vec3 n=normalize(vn);float l=max(dot(n,normalize(vec3(-.35,-.55,.8))),0.);float k=.38+.62*l+.12*max(dot(n,normalize(vec3(.6,.4,.3))),0.);gl_FragColor=vec4(c*k,1.);}'));
+gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,'precision mediump float;varying vec3 vn;uniform vec3 c;void main(){vec3 n=normalize(vn);if(!gl_FrontFacing)n=-n;float l=max(dot(n,normalize(vec3(-.35,-.55,.8))),0.);float k=.38+.62*l+.12*max(dot(n,normalize(vec3(.6,.4,.3))),0.);gl_FragColor=vec4(c*k,1.);}'));
 gl.linkProgram(prog);gl.useProgram(prog);
 const aP=gl.getAttribLocation(prog,'p'),aN=gl.getAttribLocation(prog,'n'),uM=gl.getUniformLocation(prog,'m'),uC=gl.getUniformLocation(prog,'c');
 gl.enable(gl.DEPTH_TEST);

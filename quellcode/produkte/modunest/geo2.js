@@ -73,7 +73,7 @@ async function buildMod(m,it,slots,res,tol){
    cs=[...new Set(cs.filter(v=>v>=-1e-9&&v<=hf+1e-9).map(v=>Math.round(v*1e4)/1e4))].sort((a,b)=>a-b);
    let dt=[];for(let j=0;j<cs.length-1;j++){const a=cs[j],b=cs[j+1];if(b-a<1e-6)continue;const mid=(a+b)/2,wb=mid<dh,dp=(dpt>0&&mid>zs0&&mid<zs0+dpt)?dpt-(mid-zs0):0,mk_=mkey(zi+mid);
     const A=rg('A'+mk_+wb+dp.toFixed(3)+(i===0&&mid<FR?'f'+Math.floor(mid/(FR/FN)):''),x=>{rr4(x,-W/2,-D/2,W/2,D/2,RADz(zi+mid));x.globalCompositeOperation='destination-out';x.fillRect(-W,yF,2*W,D);
-     if(dp>0)x.fillRect(-sw/2,-D,sw,D-D/2+dp);x.globalCompositeOperation='source-over';if(wb){const e=(i===0&&mid<FR)?Math.max(0,fin(Math.floor(mid/(FR/FN))*FR/FN)-dg+.1):0;rr(x,-dw/2+e,yF-.5,dw/2-e,bY1-e,rd)}});
+     if(dp>0)x.fillRect(-sw/2,-D,sw,D-D/2+dp);x.globalCompositeOperation='source-over';if(wb){const e=(i===0&&mid<FR)?Math.max(0,fin(Math.floor(mid/(FR/FN))*FR/FN)-dg+.1):0;rr4(x,-dw/2+e,yF-.5,dw/2-e,bY1-e,[0,0,rd,rd])}});
     dt=dt.concat(wb&&mid>tf?extrude(A.concat(rev(TP)),a,b):extrude(A,a,b))}
    parts.push({key:'cTray',name:m.name+' Drawer'+(nd>1?' '+(i+1):''),tris:dt,asm:[(X,Y,Z)=>[X+cx,Y+cy,Z+zi]],mod:it.i})}
   const vol=nd*((dw-2*td)*(bY1-td-yF)*(dh-tf))/1e6;
