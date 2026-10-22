@@ -23,7 +23,7 @@ const out=[],errs=[];
   {W:240,D:160,H:100,filler:true,sharpSeam:false,mods:[0,0,0,0].map(()=>({type:'box',w:120,d:80,h:60,div:0,lid:'plug'}))},
   {W:240,D:160,H:100,filler:true,mods:[60,40,80,60].map(h=>({type:'box',w:120,d:80,h,div:0,lid:'hinge',tray:h===80}))}];
  for(const c of cfgs)out.push(...await p.evaluate(async c=>{const m=window.__mn,{mods,...sc}=c,pl={};for(const k of['W','D','H'])if(k in sc){pl[k]=sc[k];delete sc[k]}
-  Object.assign(m.S,sc,{mode:'plan'});Object.assign(m.PL,pl);m.PL.mods=mods;const r=await m.buildPlan(7,.03);
+  Object.assign(m.S,sc,{mode:'plan'});Object.assign(m.PL,{fill:true,manual:false},pl);m.PL.mods=mods;const r=await m.buildPlan(7,.03);
   return['mn '+c.W+'x'+c.D+' ok='+r.sol.ok+' '+r.sol.msgs.map(x=>x.join('|')).join(';'),...r.parts.map(q=>{let a=[1e9,1e9,1e9],z=[-1e9,-1e9,-1e9];for(let i=0;i<q.tris.length;i+=3)for(let k=0;k<3;k++){a[k]=Math.min(a[k],q.tris[i+k]);z[k]=Math.max(z[k],q.tris[i+k])}
    return'  '+q.name+' n'+(q.qty||1)+' '+z.map((v,k)=>(v-a[k]).toFixed(1)).join('x')+' vol'+Math.round(m.volume(q.tris)/10)*10+' open'+m.openEdges(q.tris)})]},c));
  out.push('mn fittest '+(await p.evaluate(async()=>(await window.__mn.fitTestTris(7,.03)).map(t=>t.length/9>0).join(','))));await p.close()}

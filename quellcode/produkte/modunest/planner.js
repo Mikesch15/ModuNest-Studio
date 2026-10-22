@@ -1,9 +1,9 @@
 /* ================= Planer: Platzierung, Prüfung, Verbinder ================= */
 const SEAM=.2,KEYSPAN=70;
 const MODDEF={box:{w:80,d:60,h:50,min:[30,30,20]},tall:{w:45,d:45,h:140,min:[25,25,60]},drawer:{w:100,d:100,h:45,min:[60,70,35]}};
-let PL={one:{type:'box',div:0,lid:'plug',cols:2,rows:2,tray:false,trayH:22,label:''},W:280,D:180,H:160,fill:true,mods:[
- {type:'box',w:90,d:80,h:60,div:0,lid:'plug'},{type:'box',w:70,d:80,h:60,div:1,lid:'none'},{type:'box',w:100,d:80,h:60,div:0,lid:'none'},
- {type:'tall',w:45,d:45,h:140,div:0,lid:'none'}]};
+let PL={one:{type:'box',div:0,lid:'plug',cols:2,rows:2,tray:false,trayH:22,label:''},W:280,D:180,H:160,fill:false,mods:[
+ {type:'box',w:100,d:90,h:60,div:0,lid:'plug',cols:2,rows:2},{type:'box',w:100,d:90,h:60,div:0,lid:'plug'},{type:'tall',w:80,d:90,h:140,div:0,lid:'none'},
+ {type:'box',w:280,d:90,h:60,div:0,lid:'none',cols:3,rows:1}]};
 
 /* Rückgabe {ok, msgs:[[key,...args]], items:[{i,x,y,w,d,h,mod}], seams:[...], keys:[...]} (Zellen exakt aneinander) */
 const zlo=it=>it.mod.type==='drawer'?3.9:(S.stack?FOOT:0)+S.wall+1.5;
