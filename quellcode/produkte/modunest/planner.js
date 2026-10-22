@@ -25,6 +25,16 @@ function planSolve(P){
  const area=ms.reduce((s,m)=>s+m.w*m.d,0);
  if(area>P.W*P.D){msgs.push(['eArea',Math.round(area/100),Math.round(P.W*P.D/100)]);bad=true}
  if(bad)return{ok:false,msgs,items:[],keys:[]};
+ // Eigene Anordnung (in der Draufsicht verschoben): Positionen px/py (+ Drehung prot) je Kiste; nur pruefen, nicht packen
+ let items=[],nRows=0;
+ if(P.manual&&ms.every(m=>m.px!=null)){
+  for(const m of ms){const r=!!m.prot;items.push({i:m.i,x:m.px,y:m.py,w:r?m.d:m.w,d:r?m.w:m.d,h:m.h,mod:m,rot:r})}
+  for(const t of items){if(t.x<-1e-6||t.y<-1e-6||t.x+t.w>P.W+1e-6||t.y+t.d>P.D+1e-6){msgs.push(['eOut',t.mod.name]);bad=true}
+   if(t.mod.type==='drawer'&&t.y>1e-6&&!msgs.some(x=>x[0]==='eDrawer')){msgs.push(['eDrawer']);bad=true}}
+  for(let a=0;a<items.length;a++)for(let b=a+1;b<items.length;b++){const A=items[a],B=items[b];
+   if(A.x<B.x+B.w-1e-6&&B.x<A.x+A.w-1e-6&&A.y<B.y+B.d-1e-6&&B.y<A.y+A.d-1e-6){msgs.push(['eOverlap',A.mod.name,B.mod.name]);bad=true}}
+  if(bad)return{ok:false,msgs,items:[],keys:[]};
+ }else{
  const orders=[(a,b)=>b.d-a.d||b.w-a.w,(a,b)=>b.w-a.w||b.d-a.d,(a,b)=>b.w*b.d-a.w*a.d,(a,b)=>a.i-b.i,(a,b)=>Math.max(b.w,b.d)-Math.max(a.w,a.d)];
  let best=null,dfail=false;
  for(const cmp of orders)for(const pref of[0,1]){
@@ -39,7 +49,7 @@ function planSolve(P){
   if(!fail&&rows.slice(1).some(r=>r.items.some(t=>t.m.type==='drawer')))fail=true,dfail=true;
   if(!fail){const used=rows.reduce((s,r)=>s+r.d,0);if(!best||used<best.used)best={rows,used}}}
  if(!best){msgs.push([dfail?'eDrawer':'eNoFit']);return{ok:false,msgs,items:[],keys:[]}}
- const rows=best.rows,items=[];
+ const rows=best.rows;nRows=rows.length;
  const extraD=P.fill?P.D-best.used:0;let y=0;
  rows.forEach((rw,ri)=>{const rd=rw.d+(P.fill?(ri===rows.length-1?P.D-y-rw.d:Math.round(extraD*rw.d/best.used)):0);
   const sw=rw.items.reduce((s,t)=>s+t.w,0),ex=P.fill?P.W-sw:0;let x=0,acc=0;
@@ -47,6 +57,7 @@ function planSolve(P){
    items.push({i:t.m.i,x,y,w,d:P.fill?rd:t.d,h:t.m.h,mod:t.m,rot:t.rot});x+=w});
   y+=rd});
  items.sort((a,b)=>a.i-b.i);
+ }
  const free=P.W*P.D-items.reduce((s,t)=>s+t.w*t.d,0);
  if(!P.fill&&free>0.25*P.W*P.D)msgs.push(['iFree',Math.round(free/100)]);
  /* Kontaktflächen → Verbinder */
@@ -66,7 +77,7 @@ function planSolve(P){
      keys.push({F:F.i,G:G.i,ax,seam:pf,s,...keyZ(F,G)})}}}}
  for(const it of items){const l=it.mod.lid;if(l==='slide'&&keys.some(k=>k.G===it.i&&k.ax===1))msgs.push(['iSlide',it.mod.name]);
   if(l==='hinge'&&keys.some(k=>k.F===it.i&&k.ax===1&&items[k.G].h>it.h))msgs.push(['iHinge',it.mod.name])}
- return{ok:true,msgs,items,keys,rows:rows.length}}
+ return{ok:true,msgs,items,keys,rows:nRows}}
 
 /* Slots eines Moduls (lokal, Mitte = Modulzentrum): side 'R','L','B'(y+),'T'(y-), s = Position entlang der Seite */
 function slotsFor(it,keys){const o=[],cx=it.x+it.w/2,cy=it.y+it.d/2;

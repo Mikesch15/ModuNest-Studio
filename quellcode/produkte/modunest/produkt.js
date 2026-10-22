@@ -30,7 +30,10 @@ help4:['Öffne die 3MF-Datei in Bambu Studio (oder die STL-Dateien in deinem Sli
  eEmpty:['Füge mindestens ein Modul hinzu.','Add at least one module.'],eTall:['{0}: Höhe {1} mm ist grösser als der Platz ({2} mm). → Verringere die Höhe der Kiste oder erhöhe die Platzhöhe.','{0}: height {1} mm exceeds the space ({2} mm). → Reduce the box height or increase the space height.'],eSmall:['{0}: zu klein (mind. {1}×{2}×{3} mm). → Vergrössere die Kiste.','{0}: too small (min. {1}×{2}×{3} mm). → Make the box larger.'],eBig:['{0} passt nicht in den Platz. → Verkleinere die Kiste oder vergrössere den Platz.','{0} does not fit the space. → Make the box smaller or the space larger.'],eArea:['Die Module brauchen {0} cm² Grundfläche, verfügbar sind {1} cm². → Entferne oder verkleinere Kisten oder vergrössere den Platz.','The modules need {0} cm² of floor area; only {1} cm² available. → Remove or shrink boxes, or enlarge the space.'],eNoFit:['Die Module lassen sich nicht überlappungsfrei anordnen. Verkleinere ein Modul oder vergrössere den Platz.','The modules cannot be arranged without overlap. Shrink a module or enlarge the space.'],iFree:['{0} cm² bleiben frei. „Platz ausfüllen“ streckt die Module.','{0} cm² stay free. “Fill the space” stretches the modules.'],iShort:['{0} und {1} berühren sich nur kurz, dort gibt es keine Steckverbindung.','{0} and {1} touch only briefly; no connector there.'],okFit:['Alles passt: {0} Module, {1} Verbinder.','Everything fits: {0} modules, {1} connectors.'],
  cartMods:['Plan, {0} Kisten','Plan, {0} boxes'],cartOne:['Einzelbox','Single box'],
  tplT:['Oder starte mit einer Vorlage:','Or start from a template:'],tp_besteck:['Besteckschublade','Cutlery drawer'],tp_gewuerz:['Gewürzschublade','Spice drawer'],tp_bastel:['Bastelkiste','Craft box'],tp_desk:['Schreibtisch','Desk drawer'],
- topT:['Draufsicht (vorne unten) – Kiste antippen zum Bearbeiten','Top view (front at bottom) – tap a box to edit'],
+ topT:['Draufsicht (vorne unten) – antippen zum Bearbeiten, ziehen zum Verschieben','Top view (front at bottom) – tap to edit, drag to move'],
+ eOverlap:['{0} und {1} überlappen. → Eine der Kisten verschieben oder verkleinern.','{0} and {1} overlap. → Move or shrink one of the boxes.'],
+ eOut:['{0} ragt über den Platz hinaus. → Kiste verschieben oder verkleinern.','{0} sticks out of the space. → Move or shrink the box.'],
+ autoArr:['Automatisch anordnen','Arrange automatically'],rotBtn:['↻ Ausgewählte Kiste drehen','↻ Rotate selected box'],manualOn:['Eigene Anordnung – Kisten rasten an Rand und Nachbarn ein (dort entstehen Verbinder).','Custom layout – boxes snap to edges and neighbours (connectors are placed there).'],
  perBox:['Schätzung pro Kiste (grob, abhängig von Drucker und Einstellungen):','Estimate per box (rough, depends on printer and settings):'],
  pickHint:['Tipp: Kiste in der 3D-Vorschau antippen, um sie zu bearbeiten.','Tip: tap a box in the 3D preview to edit it.'],
  startQ:['Was möchtest du organisieren?','What would you like to organise?'],startD:['Wähle, womit du beginnen möchtest. Du kannst später wechseln, ohne deine Werte zu verlieren.','Choose how to start. You can switch later without losing your values.'],
@@ -62,7 +65,7 @@ const TPL={besteck:{W:300,D:420,H:60,mods:[B(75,280,55),B(75,280,55),B(75,280,55
  gewuerz:{W:400,D:450,H:90,mods:Array.from({length:12},()=>B(100,150,80))},
  bastel:{W:300,D:200,H:120,mods:[{...B(100,100,110),type:'tall'},{...B(100,100,110),type:'tall'},B(100,200,60,{rows:2}),B(100,100,60,{lid:'plug'}),B(100,100,60,{lid:'plug'})]},
  desk:{W:360,D:300,H:50,mods:[B(120,150,45,{cols:2,rows:2}),B(120,150,45),B(120,150,45,{cols:3}),B(60,150,45),B(60,150,45),B(120,150,45),B(120,150,45,{rows:2})]}};
-function applyTpl(id){const t=TPL[id];if(S.mode!=='plan'){S.mode='plan';PRODUCT.onChange()}Object.assign(PL,{W:t.W,D:t.D,H:t.H,fill:true});PL.mods=JSON.parse(JSON.stringify(t.mods));FRESH=false;S.step=2;changed();buildUI()}
+function applyTpl(id){const t=TPL[id];if(S.mode!=='plan'){S.mode='plan';PRODUCT.onChange()}Object.assign(PL,{W:t.W,D:t.D,H:t.H,fill:true,manual:false});PL.mods=JSON.parse(JSON.stringify(t.mods));FRESH=false;S.step=2;changed();buildUI()}
 let SEL=null; // angetippte Kiste (Index im Plan)
 function selectMod(ix){SEL=ix;if(S.step!==2)goStep(2);renderMods();present(false);const r=document.querySelectorAll('#modlist .mrow')[S.mode==='single'?0:ix];if(r)r.scrollIntoView({behavior:'smooth',block:'center'})}
 
@@ -149,15 +152,34 @@ function renderMods(){const list=document.getElementById('modlist');list.innerHT
 function buildPlanUI(){let c=tag(card(S.mode==='plan'?'spacePlan':'spaceOne'),'1');c._t=PL;if(S.mode==='plan')para(c,'measureTip');
  rng(c,'W','width',50,600,5,'mm');rng(c,'D','depth',50,400,5,'mm');rng(c,'H','height',25,250,5,'mm');chk(c,'fill','fill');c.lastChild.classList.add('pfill');
  c=tag(card('plmods'),'2');const add=document.createElement('div');add.className='addrow';
- ['box','tall','drawer'].filter(featOn).forEach(ty=>{const b=document.createElement('button');b.className='btn';b.dataset.k='add_'+ty;b.onclick=()=>{const d=MODDEF[ty];PL.mods.push({type:ty,w:d.w,d:d.d,h:Math.min(d.h,PL.H),div:0,lid:'none'});renderMods();changed()};add.append(b)});
+ ['box','tall','drawer'].filter(featOn).forEach(ty=>{const b=document.createElement('button');b.className='btn';b.dataset.k='add_'+ty;b.onclick=()=>{const d=MODDEF[ty];PL.mods.push({type:ty,w:d.w,d:d.d,h:Math.min(d.h,PL.H),div:0,lid:'none'});if(PL.manual){const m=PL.mods[PL.mods.length-1];[m.px,m.py]=spotFor(m)}renderMods();changed()};add.append(b)});
  const list=document.createElement('div');list.id='modlist';const tv=document.createElement('div');tv.id='topv';const ph=document.createElement('p');ph.className='note';ph.dataset.k='pickHint';c.append(tv,add,ph,list);
  c=tag(card('plset'),'2',1);seg(c,'wall','wall',[[1.6,'1.6 mm'],[2,'2.0 mm'],[2.4,'2.4 mm'],[3,'3.0 mm']]);rng(c,'r','corners',0,12,1,'mm');chk(c,'stack','stack');chk(c,'sharpSeam','sharpSeam');chk(c,'filler','filler');if(featOn('tex'))seg(c,'tex','tex',[['none','tx_none'],['ribs','tx_ribs'],['waves','tx_waves'],['facets','tx_facets']]);
  c=tag(card('plmsg'),'2 3');const sm=document.createElement('p');sm.id='plsum';sm.className='plsum';const pb=document.createElement('div');pb.id='perbox';pb.dataset.st='3';c.append(sm,pb);const ul=document.createElement('ul');ul.id='plmsgs';c.append(ul);renderMods()}
-function topView(sol){const e=document.getElementById('topv');if(!e)return;if(S.mode!=='plan'||!sol.ok){e.innerHTML='';return}
- const W=PL.W,D=PL.D,sw=Math.max(W,D)/150;
- e.innerHTML=`<p class="note">${tr('topT')}</p><svg viewBox="${-sw} ${-sw} ${W+2*sw} ${D+2*sw}" style="width:100%;max-height:260px"><rect x="0" y="0" width="${W}" height="${D}" fill="none" stroke="currentColor" stroke-dasharray="${3*sw}" stroke-width="${sw}" opacity=".5"/>`+
-  sol.items.map(it=>`<g data-i="${it.i}" style="cursor:pointer"><rect x="${it.x}" y="${D-it.y-it.d}" width="${it.w}" height="${it.d}" rx="${2*sw}" fill="${S.cBox}" fill-opacity="${SEL===it.i?1:.65}" stroke="${SEL===it.i?'#c46546':'#1e1a17'}" stroke-width="${(SEL===it.i?3:1)*sw}"/><text x="${it.x+it.w/2}" y="${D-it.y-it.d/2}" text-anchor="middle" dominant-baseline="middle" font-size="${Math.min(it.w,it.d)/4.2}" font-weight="700">${it.i+1}</text></g>`).join('')+'</svg>';
- e.querySelectorAll('g[data-i]').forEach(g=>g.onclick=()=>selectMod(+g.dataset.i))}
+function topView(sol){const e=document.getElementById('topv');if(!e)return;if(S.mode!=='plan'||!sol.items.length&&!PL.manual){e.innerHTML='';return}
+ const W=PL.W,D=PL.D,sw=Math.max(W,D)/150,its=sol.items.length?sol.items:PL.mods.map((m,i)=>m.px==null?null:{i,x:m.px,y:m.py,w:m.prot?m.d:m.w,d:m.prot?m.w:m.d,mod:m}).filter(Boolean);
+ e.innerHTML=`<p class="note">${tr('topT')}</p><svg viewBox="${-sw} ${-sw} ${W+2*sw} ${D+2*sw}" style="width:100%;max-height:300px;touch-action:none"><rect x="0" y="0" width="${W}" height="${D}" fill="none" stroke="currentColor" stroke-dasharray="${3*sw}" stroke-width="${sw}" opacity=".5"/>`+
+  its.map(it=>`<g data-i="${it.i}" style="cursor:grab"><rect x="${it.x}" y="${D-it.y-it.d}" width="${it.w}" height="${it.d}" rx="${2*sw}" fill="${S.cBox}" fill-opacity="${SEL===it.i?1:.65}" stroke="${SEL===it.i?'#c46546':'#1e1a17'}" stroke-width="${(SEL===it.i?3:1)*sw}"/><text x="${it.x+it.w/2}" y="${D-it.y-it.d/2}" text-anchor="middle" dominant-baseline="middle" font-size="${Math.min(it.w,it.d)/4.2}" font-weight="700" style="pointer-events:none">${it.i+1}</text></g>`).join('')+'</svg>'+
+  `<div class="acts">${SEL!=null?`<button class="mini" id="trot" data-k="rotBtn"></button>`:''}${PL.manual?`<button class="mini" id="tauto" data-k="autoArr"></button>`:''}</div>${PL.manual?`<p class="note" data-k="manualOn"></p>`:''}`;
+ e.querySelectorAll('[data-k]').forEach(x=>x.textContent=tr(x.dataset.k));
+ const svg=e.querySelector('svg');
+ // Ziehen: beim ersten Verschieben werden die aktuellen Positionen aller Kisten uebernommen (eigene Anordnung)
+ const freeze=()=>{if(PL.manual)return;sol.items.forEach(it=>{const m=PL.mods[it.i];m.px=it.x;m.py=it.y;m.prot=!!it.rot;m.w=it.rot?it.d:it.w;m.d=it.rot?it.w:it.d});PL.manual=true;renderMods()}; // gestreckte Masse uebernehmen = was man sieht
+ e.querySelectorAll('g[data-i]').forEach(g=>{const i=+g.dataset.i,r=g.querySelector('rect'),tx=g.querySelector('text');
+  g.onpointerdown=ev=>{ev.preventDefault();g.setPointerCapture(ev.pointerId);const pt=q=>{const P=svg.createSVGPoint();P.x=q.clientX;P.y=q.clientY;return P.matrixTransform(svg.getScreenCTM().inverse())};
+   const it=its.find(t=>t.i===i),p0=pt(ev),x0=it.x,y0=it.y;let moved=false,nx=x0,ny=y0;
+   g.onpointermove=mv=>{const p=pt(mv),dx=p.x-p0.x,dy=-(p.y-p0.y);if(!moved&&Math.hypot(dx,dy)<3)return;moved=true;
+    nx=Math.max(0,Math.min(W-it.w,x0+dx));ny=Math.max(0,Math.min(D-it.d,y0+dy));
+    // einrasten an Rand und Nachbarn (6 mm), sonst auf ganze mm
+    const sn=(v,c)=>{let b=Math.round(v),bd=6;for(const q of c)if(Math.abs(q-v)<bd){bd=Math.abs(q-v);b=q}return b};
+    const o=its.filter(t=>t.i!==i);nx=sn(nx,[0,W-it.w,...o.flatMap(t=>[t.x+t.w,t.x-it.w,t.x])]);ny=sn(ny,[0,D-it.d,...o.flatMap(t=>[t.y+t.d,t.y-it.d,t.y])]);
+    r.setAttribute('x',nx);r.setAttribute('y',D-ny-it.d);tx.setAttribute('x',nx+it.w/2);tx.setAttribute('y',D-ny-it.d/2)};
+   g.onpointerup=()=>{g.onpointermove=g.onpointerup=null;if(!moved){selectMod(i);return}freeze();const m=PL.mods[i];m.px=nx;m.py=ny;SEL=i;renderMods();changed()}}});
+ const ro=e.querySelector('#trot');if(ro)ro.onclick=()=>{freeze();const m=PL.mods[SEL];if(!m)return;m.prot=!m.prot;const w=m.prot?m.d:m.w,d=m.prot?m.w:m.d;m.px=Math.min(m.px,PL.W-w);m.py=Math.min(m.py,PL.D-d);changed()};
+ const au=e.querySelector('#tauto');if(au)au.onclick=()=>{PL.manual=false;PL.mods.forEach(m=>{delete m.px;delete m.py;delete m.prot});changed()}}
+// Neue Kiste in eigener Anordnung: erste freie Stelle (5-mm-Raster), sonst links vorne (Fehler zeigt Ueberlappung)
+function spotFor(m){const os=PL.mods.filter(q=>q!==m&&q.px!=null).map(q=>({x:q.px,y:q.py,w:q.prot?q.d:q.w,d:q.prot?q.w:q.d}));
+ for(let y=0;y+m.d<=PL.D;y+=5)for(let x=0;x+m.w<=PL.W;x+=5)if(!os.some(t=>x<t.x+t.w&&t.x<x+m.w&&y<t.y+t.d&&t.y<y+m.d))return[x,y];return[0,0]}
 function perBox(sol){const e=document.getElementById('perbox');if(!e)return;if(!sol.ok){e.innerHTML='';return}
  e.innerHTML=`<p class="note">${tr('perBox')}</p><ul>`+sol.items.map(it=>{const g=built.parts.filter(p=>p.mod===it.i).reduce((a,p)=>a+Math.abs(volume(p.tris))*(p.qty||1),0)/1000*1.24;
   return`<li><b>${tr('t_'+it.mod.type)}${S.mode==='plan'?' '+(it.i+1):''}</b> · ${Math.round(it.w)}×${Math.round(it.d)}×${Math.round(it.h)} mm · ≈ ${Math.round(g)} g · ≈ ${(g/30).toFixed(1).replace('.',',')} h</li>`}).join('')+'</ul>'}
