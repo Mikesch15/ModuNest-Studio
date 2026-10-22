@@ -20,7 +20,13 @@ gEl('gx').onclick=()=>{gEl('gate').style.display='none'};
 let CART=[];try{CART=JSON.parse(localStorage.getItem(PRODUCT.store+'-cart')||'[]')}catch(e){}
 const saveCart=()=>{try{localStorage.setItem(PRODUCT.store+'-cart',JSON.stringify(CART))}catch(e){}};
 function addCart(){const s=PRODUCT.snap();s.name=PRODUCT.snapName(s);CART.push(s);saveCart();renderCart()}
-function cartCard(){const c=card('cart');c.id='cartcard';para(c,'cartHint');const ci=document.createElement('p');ci.id='creditinfo';c.append(ci);const cl=document.createElement('div');cl.id='cartlist';c.append(cl);btn(c,'addCart',addCart);const cx=document.createElement('button');cx.id='cartexp';cx.className='btn pri';cx.onclick=exportCart;c.append(cx);renderCart();creditInfo();refreshLeft();return c}
+function cartCard(){const c=card('cart');c.id='cartcard';para(c,'cartHint');const ci=document.createElement('p');ci.id='creditinfo';c.append(ci);const cl=document.createElement('div');cl.id='cartlist';c.append(cl);btn(c,'addCart',addCart);const cx=document.createElement('button');cx.id='cartexp';cx.className='btn pri';cx.onclick=exportCart;c.append(cx);renderCart();creditInfo();refreshLeft();btn(c,'shareBtn',shareLink);return c}
+// Konfiguration als Link (steht ganz im Link, kein Server noetig)
+async function shareLink(e){const d=btoa(unescape(encodeURIComponent(JSON.stringify(PRODUCT.snap())))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''),url=location.href.split('#')[0]+'#c='+d,b=e&&e.target;
+ if(navigator.share){try{await navigator.share({title:document.title,url});return}catch(x){}}try{await navigator.clipboard.writeText(url);if(b){b.textContent=tr('shareDone');setTimeout(()=>b.textContent=tr('shareBtn'),1800)}}catch(x){prompt(tr('shareBtn'),url)}}
+// Nach dem Download: so geht es weiter (Texte nextT/next1..3, je Produkt anpassbar)
+function showNext(){let w=document.getElementById('nextw');if(!w){w=document.createElement('div');w.id='nextw';document.body.append(w)}
+ w.innerHTML=`<div class="hbox"><h2>${tr('nextT')}</h2><ol><li>${tr('next1')}</li><li>${tr('next2')}</li><li>${tr('next3')}</li></ol><button>${tr('nextOk')}</button></div>`;w.style.display='grid';w.querySelector('button').onclick=()=>w.style.display='none'}
 function renderCart(){const e=gEl('cartlist'),x=gEl('cartexp');if(!e)return;e.innerHTML='';
  CART.forEach((it,i)=>{const r=document.createElement('div');r.className='crow';
   const no=document.createElement('span');no.className='cno';no.textContent=i+1;
@@ -39,6 +45,6 @@ async function exportCart(){if(!unlockedNow())return;let msg='';const keep=PRODU
    files.push({name:dir+list[i].name+'.3mf',data:new Uint8Array(await threeMF(arr.map(p=>({...p,color:PRODUCT.color?PRODUCT.color(p):S[p.key]}))).arrayBuffer())});
    r.parts.forEach((p,k)=>files.push({name:dir+'stl/'+(k+1)+'-'+p.name+(p.qty>1?'_x'+p.qty:'')+'.stl',data:stlOf(p.pf?xf(p.tris,p.pf):p.tris)}))}
   PRODUCT.applySnap(keep);
-  const c=await charge(cfgs);if(c){download(zip(files),CART.length?PRODUCT.file+'-Warenkorb.zip':PRODUCT.file+'-'+keep.name.normalize('NFD').replace(/[^\w\- ]/g,'').trim().replace(/ +/g,'-')+'.zip');if(CONFIG.requireCode)msg=[c.n?trf('charged',c.n):'',c.free?trf('chargedFree',c.free):''].filter(Boolean).join(' ')}}
+  const c=await charge(cfgs);if(c){setTimeout(showNext,400);download(zip(files),CART.length?PRODUCT.file+'-Warenkorb.zip':PRODUCT.file+'-'+keep.name.normalize('NFD').replace(/[^\w\- ]/g,'').trim().replace(/ +/g,'-')+'.zip');if(CONFIG.requireCode)msg=[c.n?trf('charged',c.n):'',c.free?trf('chargedFree',c.free):''].filter(Boolean).join(' ')}}
  catch(e){st.textContent=e.message}
  finally{PRODUCT.applySnap(keep);buildUI();present(false);renderCart();if(msg)st.innerHTML+='<br><b>'+msg+'</b>'}}

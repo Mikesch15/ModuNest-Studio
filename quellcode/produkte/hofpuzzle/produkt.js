@@ -22,7 +22,7 @@ function ui(){if(!featOn('gravur'))S.sub='';
  PZ_SHAPE_IDS.forEach(id=>{const b=document.createElement('button');b.dataset.k='sh_'+id;const upd=()=>{const n=S.shapes.indexOf(id);b.classList.toggle('on',n>=0);b.dataset.n=n>=0?n+1:''};upd();
   b.onclick=()=>{const n=S.shapes.indexOf(id);if(n>=0)S.shapes.splice(n,1);else if(S.shapes.length<S.maxShapes)S.shapes.push(id);sg.querySelectorAll('button').forEach(x=>x._u());changed()};b._u=upd;sg.append(b)});c.append(sg);
  if(featOn('gravur')){c=card('hpText');tInput(c,'sub','hpTitle')}
- c=card('pzSize');rng(c,'Hs','hpH',35,80,5,'mm');seg(c,'perRow','hpPer',[[2,'2'],[3,'3'],[4,'4'],[5,'5']]);rng(c,'T','pzT',8,20,1,'mm');chk(c,'knob','pzKnob');
+ c=card('pzSize');rng(c,'Hs','hpH',35,80,5,'mm');seg(c,'perRow','hpPer',[[2,'2'],[3,'3'],[4,'4'],[5,'5']]);rng(c,'T','pzT',8,20,1,'mm');c.lastChild.classList.add('xp');chk(c,'knob','pzKnob');
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
  ['cBoard','cL0','cL1','cL2','cL3','cL4','cL5'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
  cartCard();
@@ -31,7 +31,7 @@ function ui(){if(!featOn('gravur'))S.sub='';
 
 /* ================= Hofpuzzle: Produktbeschreibung fuer den Kern ================= */
 const HP_KEYS=['sub','shapes','perRow','Hs','T','knob','fit','cBoard','cL0','cL1','cL2','cL3','cL4','cL5'];
-const PRODUCT={id:'hofpuzzle',name:'Hofpuzzle',file:'Hofpuzzle',store:'hp',
+const PRODUCT={dimKeys:['cBoard'],id:'hofpuzzle',name:'Hofpuzzle',file:'Hofpuzzle',store:'hp',
  unit:{one:['Puzzle','puzzle'],n:['Puzzle','puzzle(s)'],many:['Puzzles','puzzles']},
  build:(res,tol)=>buildPuzzle(res,tol),
  snap(){const o={};HP_KEYS.forEach(k=>o[k]=k==='shapes'?S.shapes.slice():S[k]);return{S:o}},

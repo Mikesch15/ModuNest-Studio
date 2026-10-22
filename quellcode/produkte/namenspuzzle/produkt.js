@@ -9,7 +9,7 @@ function ui(){if(!featOn('figuren'))S.shapes=[];if(!featOn('gravur'))S.sub='';
  if(featOn('figuren')){c=card('pzShapes');const sg=document.createElement('div');sg.className='seg shp';
  PZ_SHAPE_IDS.forEach(id=>{const b=document.createElement('button');b.dataset.k='sh_'+id;const upd=()=>{const n=S.shapes.indexOf(id);b.classList.toggle('on',n>=0);b.dataset.n=n>=0?n+1:''};upd();
   b.onclick=()=>{const n=S.shapes.indexOf(id);if(n>=0)S.shapes.splice(n,1);else if(S.shapes.length<6)S.shapes.push(id);sg.querySelectorAll('button').forEach(x=>x._u());changed()};b._u=upd;sg.append(b)});c.append(sg)}
- c=card('pzSize');rng(c,'H','pzH',30,80,5,'mm');rng(c,'T','pzT',8,20,1,'mm');chk(c,'knob','pzKnob');
+ c=card('pzSize');rng(c,'H','pzH',30,80,5,'mm');rng(c,'T','pzT',8,20,1,'mm');c.lastChild.classList.add('xp');chk(c,'knob','pzKnob');
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
  ['cBoard','cL0','cL1','cL2','cL3','cL4','cL5'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
  cartCard();
@@ -18,7 +18,7 @@ function ui(){if(!featOn('figuren'))S.shapes=[];if(!featOn('gravur'))S.sub='';
 
 /* ================= Namenspuzzle: Produktbeschreibung fuer den Kern ================= */
 const PZ_KEYS=['name','lines','sub','shapes','H','T','knob','fit','cBoard','cL0','cL1','cL2','cL3','cL4','cL5'];
-const PRODUCT={id:'namenspuzzle',name:'Namenspuzzle',file:'Namenspuzzle',store:'np',
+const PRODUCT={dimKeys:['cBoard'],id:'namenspuzzle',name:'Namenspuzzle',file:'Namenspuzzle',store:'np',
  unit:{one:['Puzzle','puzzle'],n:['Puzzle','puzzle(s)'],many:['Puzzles','puzzles']},
  // units: Brettmasse + Kennzahl des Namens -> Gratis-Korrektur nur fuer denselben Namen (Groesse/Farben)
  build:(res,tol)=>buildPuzzle(res,tol),

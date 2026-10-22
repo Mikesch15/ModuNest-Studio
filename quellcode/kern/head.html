@@ -68,6 +68,11 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 .uibar{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.uibar .steps{grid-column:1/-1}.uibar .info{grid-column:1/-1;margin:0}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.steps button{min-height:46px;padding:8px 6px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;line-height:1.2}.steps button.on{background:var(--acc);border-color:var(--acc);color:var(--on)}
 .uimode{justify-self:start}
+.tpls{display:flex;flex-wrap:wrap;gap:8px}.mrow.sel{outline:3px solid var(--warm)}#topv svg{display:block;color:var(--ink)}#perbox ul{margin:4px 0 0;padding-left:18px;font-size:13px}#perbox li{margin:2px 0}
+#dims{position:absolute;inset:0;pointer-events:none;overflow:hidden}#dims span{position:absolute;transform:translate(-50%,-50%);padding:2px 7px;border-radius:999px;background:rgba(253,250,242,.88);color:#1e1a17;font:600 12px/1.3 system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,.15);white-space:nowrap}
+#undobtn{font-size:18px;line-height:1}#undobtn:disabled{opacity:.35}
+#nextw{position:fixed;inset:0;z-index:45;background:rgba(30,26,23,.45);display:none;place-items:center;padding:16px}#nextw ol{margin:0;padding-left:20px;display:grid;gap:6px;text-align:left}#nextw button{padding:12px 22px;border-radius:999px;border:0;background:var(--acc);color:var(--on);font:inherit;font-weight:600;cursor:pointer}
+.rnum{display:inline-flex;align-items:center;gap:4px}.rnum input{width:76px;padding:6px 8px;text-align:right;font:inherit;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}.rnum small{color:var(--mut)}
 @media(max-width:420px){header{flex-wrap:wrap;gap:6px}.lang{flex-wrap:wrap;justify-content:flex-end;margin-left:auto}.brand .logo{width:44px;height:44px}}
 .panel[data-step=start] #stats{display:none}@media(max-width:899px){main:has(.panel[data-step=start]) .view{display:none}}
 .panel[data-step="1"] [data-st]:not([data-st~="1"]),.panel[data-step="2"] [data-st]:not([data-st~="2"]),.panel[data-step="3"] [data-st]:not([data-st~="3"]){display:none}
@@ -92,12 +97,12 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 </style>
 </head>
 <body>
-<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><span id="testtag" hidden></span><a id="adminbtn" href="../../admin/" hidden>Admin</a><a id="homebtn" href="../" hidden>⌂</a><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
+<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><span id="testtag" hidden></span><button id="undobtn" disabled title="Rückgängig / Undo" aria-label="Rückgängig / Undo">↶</button><a id="adminbtn" href="../../admin/" hidden>Admin</a><a id="homebtn" href="../" hidden>⌂</a><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
 <div id="closed"><div class="hbox"><img class="logo hlogo" src="data:," alt="Art vom Hof"><h2 data-k="closedT"></h2><p data-k="closedD"></p><a href="../" data-k="toProducts"></a></div></div>
 <div id="help"><div class="hbox"><img class="logo hlogo" src="data:," alt="Art vom Hof"><h2 data-k="helpT"></h2><ol><li data-k="help1"></li><li data-k="help2"></li><li data-k="help3"></li><li data-k="help4"></li></ol><p data-k="helpTip"></p><button id="helpgo" data-k="helpGo"></button></div></div>
 <div id="gate"><div><img class="logo glogo" src="data:," alt="Art vom Hof"><h2 id="gt"></h2><p id="gd"></p><input type="text" id="gcode" placeholder="XXXX-XXXX-XXXX" autocomplete="off"><p class="ghelp" data-k="gateHelp"></p><div id="gmsg"></div><button id="gok"></button><button id="gx" class="gx">×</button></div></div>
 <main>
- <section class="view"><div class="stage"><canvas id="gl"></canvas><div class="vhint" data-k="viewHint"></div><div class="vt"><button data-v="asm"></button><button data-v="print"></button></div></div><div id="status"></div></section>
+ <section class="view"><div class="stage"><canvas id="gl"></canvas><div id="dims"></div><div class="vhint" data-k="viewHint"></div><div class="vt"><button data-v="asm"></button><button data-v="print"></button></div></div><div id="status"></div></section>
  <section class="panel" id="panel"><div class="stats" id="stats"></div></section>
 </main>
 <script src="../../config.js"></script>

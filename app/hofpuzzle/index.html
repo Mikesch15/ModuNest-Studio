@@ -111,6 +111,11 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 .uibar{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.uibar .steps{grid-column:1/-1}.uibar .info{grid-column:1/-1;margin:0}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.steps button{min-height:46px;padding:8px 6px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;line-height:1.2}.steps button.on{background:var(--acc);border-color:var(--acc);color:var(--on)}
 .uimode{justify-self:start}
+.tpls{display:flex;flex-wrap:wrap;gap:8px}.mrow.sel{outline:3px solid var(--warm)}#topv svg{display:block;color:var(--ink)}#perbox ul{margin:4px 0 0;padding-left:18px;font-size:13px}#perbox li{margin:2px 0}
+#dims{position:absolute;inset:0;pointer-events:none;overflow:hidden}#dims span{position:absolute;transform:translate(-50%,-50%);padding:2px 7px;border-radius:999px;background:rgba(253,250,242,.88);color:#1e1a17;font:600 12px/1.3 system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,.15);white-space:nowrap}
+#undobtn{font-size:18px;line-height:1}#undobtn:disabled{opacity:.35}
+#nextw{position:fixed;inset:0;z-index:45;background:rgba(30,26,23,.45);display:none;place-items:center;padding:16px}#nextw ol{margin:0;padding-left:20px;display:grid;gap:6px;text-align:left}#nextw button{padding:12px 22px;border-radius:999px;border:0;background:var(--acc);color:var(--on);font:inherit;font-weight:600;cursor:pointer}
+.rnum{display:inline-flex;align-items:center;gap:4px}.rnum input{width:76px;padding:6px 8px;text-align:right;font:inherit;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}.rnum small{color:var(--mut)}
 @media(max-width:420px){header{flex-wrap:wrap;gap:6px}.lang{flex-wrap:wrap;justify-content:flex-end;margin-left:auto}.brand .logo{width:44px;height:44px}}
 .panel[data-step=start] #stats{display:none}@media(max-width:899px){main:has(.panel[data-step=start]) .view{display:none}}
 .panel[data-step="1"] [data-st]:not([data-st~="1"]),.panel[data-step="2"] [data-st]:not([data-st~="2"]),.panel[data-step="3"] [data-st]:not([data-st~="3"]){display:none}
@@ -135,12 +140,12 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 </style>
 </head>
 <body>
-<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><span id="testtag" hidden></span><a id="adminbtn" href="../../admin/" hidden>Admin</a><a id="homebtn" href="../" hidden>⌂</a><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
+<header><div class="brand"><img class="logo" src="data:," alt="Art vom Hof"><div><h1>ModuNest Studio</h1><p id="tag"></p></div></div><div class="lang"><span id="testtag" hidden></span><button id="undobtn" disabled title="Rückgängig / Undo" aria-label="Rückgängig / Undo">↶</button><a id="adminbtn" href="../../admin/" hidden>Admin</a><a id="homebtn" href="../" hidden>⌂</a><button id="helpbtn">?</button><button id="langbtn"></button></div></header>
 <div id="closed"><div class="hbox"><img class="logo hlogo" src="data:," alt="Art vom Hof"><h2 data-k="closedT"></h2><p data-k="closedD"></p><a href="../" data-k="toProducts"></a></div></div>
 <div id="help"><div class="hbox"><img class="logo hlogo" src="data:," alt="Art vom Hof"><h2 data-k="helpT"></h2><ol><li data-k="help1"></li><li data-k="help2"></li><li data-k="help3"></li><li data-k="help4"></li></ol><p data-k="helpTip"></p><button id="helpgo" data-k="helpGo"></button></div></div>
 <div id="gate"><div><img class="logo glogo" src="data:," alt="Art vom Hof"><h2 id="gt"></h2><p id="gd"></p><input type="text" id="gcode" placeholder="XXXX-XXXX-XXXX" autocomplete="off"><p class="ghelp" data-k="gateHelp"></p><div id="gmsg"></div><button id="gok"></button><button id="gx" class="gx">×</button></div></div>
 <main>
- <section class="view"><div class="stage"><canvas id="gl"></canvas><div class="vhint" data-k="viewHint"></div><div class="vt"><button data-v="asm"></button><button data-v="print"></button></div></div><div id="status"></div></section>
+ <section class="view"><div class="stage"><canvas id="gl"></canvas><div id="dims"></div><div class="vhint" data-k="viewHint"></div><div class="vt"><button data-v="asm"></button><button data-v="print"></button></div></div><div id="status"></div></section>
  <section class="panel" id="panel"><div class="stats" id="stats"></div></section>
 </main>
 <script src="../../config.js"></script>
@@ -278,7 +283,7 @@ function zip(files){const enc=new TextEncoder(),ch=[],cd=[];let off=0;const N=ne
 function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
 const cv=document.getElementById('gl');
 const gl=cv.getContext('webgl',{antialias:true});
-const cam={az:-Math.PI/2,el:1.05,dist:260,tx:0,ty:0,tz:0};let meshes=[];
+const cam={az:-Math.PI/2,el:1.05,dist:260,tx:0,ty:0,tz:0};let meshes=[],VIEW=null;
 const m4={
  persp(f,a,n,r){const t=1/Math.tan(f/2);return[t/a,0,0,0,0,t,0,0,0,0,(r+n)/(n-r),-1,0,0,2*r*n/(n-r),0]},
  look(e,c,u){let z=[e[0]-c[0],e[1]-c[1],e[2]-c[2]];let l=Math.hypot(...z);z=z.map(v=>v/l);let x=[u[1]*z[2]-u[2]*z[1],u[2]*z[0]-u[0]*z[2],u[0]*z[1]-u[1]*z[0]];l=Math.hypot(...x);x=x.map(v=>v/l);
@@ -297,14 +302,14 @@ function setMeshes(parts){meshes.forEach(m=>{gl.deleteBuffer(m.pb);gl.deleteBuff
   for(let i=0;i<t.length;i+=9){const ux=t[i+3]-t[i],uy=t[i+4]-t[i+1],uz=t[i+5]-t[i+2],vx=t[i+6]-t[i],vy=t[i+7]-t[i+1],vz=t[i+8]-t[i+2];
    let x=uy*vz-uz*vy,y=uz*vx-ux*vz,z=ux*vy-uy*vx;const l=Math.hypot(x,y,z)||1;x/=l;y/=l;z/=l;for(let k=0;k<3;k++){n[i+k*3]=x;n[i+k*3+1]=y;n[i+k*3+2]=z}}
   const pb=gl.createBuffer(),nb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,t,gl.STATIC_DRAW);gl.bindBuffer(gl.ARRAY_BUFFER,nb);gl.bufferData(gl.ARRAY_BUFFER,n,gl.STATIC_DRAW);
-  return{pb,nb,n:t.length/3,key:p.key}});draw()}
+  return{pb,nb,n:t.length/3,key:p.key,hl:p.hl}});draw()}
 const rgb=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16)/255);
 function draw(){const dpr=Math.min(devicePixelRatio||1,2),w=Math.round(cv.clientWidth*dpr),h=Math.round(cv.clientHeight*dpr);
  if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}gl.viewport(0,0,w,h);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
  const e=[cam.tx+cam.dist*Math.cos(cam.el)*Math.cos(cam.az),cam.ty+cam.dist*Math.cos(cam.el)*Math.sin(cam.az),cam.tz+cam.dist*Math.sin(cam.el)];
- const M=m4.mul(m4.persp(.6,w/h,5,2000),m4.look(e,[cam.tx,cam.ty,cam.tz],[0,0,1]));gl.uniformMatrix4fv(uM,false,M);
- for(const m of meshes){gl.uniform3fv(uC,rgb(S[m.key]));gl.bindBuffer(gl.ARRAY_BUFFER,m.pb);gl.enableVertexAttribArray(aP);gl.vertexAttribPointer(aP,3,gl.FLOAT,false,0,0);
-  gl.bindBuffer(gl.ARRAY_BUFFER,m.nb);gl.enableVertexAttribArray(aN);gl.vertexAttribPointer(aN,3,gl.FLOAT,false,0,0);gl.drawArrays(gl.TRIANGLES,0,m.n)}}
+ const M=m4.mul(m4.persp(.6,w/h,5,2000),m4.look(e,[cam.tx,cam.ty,cam.tz],[0,0,1]));gl.uniformMatrix4fv(uM,false,M);VIEW={M,w:cv.clientWidth,h:cv.clientHeight};
+ for(const m of meshes){gl.uniform3fv(uC,m.hl?rgb(S[m.key]).map(v=>Math.min(1,v*.55+.5)):rgb(S[m.key]));gl.bindBuffer(gl.ARRAY_BUFFER,m.pb);gl.enableVertexAttribArray(aP);gl.vertexAttribPointer(aP,3,gl.FLOAT,false,0,0);
+  gl.bindBuffer(gl.ARRAY_BUFFER,m.nb);gl.enableVertexAttribArray(aN);gl.vertexAttribPointer(aN,3,gl.FLOAT,false,0,0);gl.drawArrays(gl.TRIANGLES,0,m.n)}if(window.onDraw)onDraw()}
 let fit=()=>{};
 const ptrs=new Map();let pinch=0;
 cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.clientX,e.clientY]);pinch=0});
@@ -328,6 +333,12 @@ const L={
  help4:['Öffne die 3MF-Datei in Bambu Studio (oder die STL-Dateien in deinem Slicer).','Open the 3MF file in Bambu Studio (or the STL files in your slicer).'],
  helpTip:['Bei jedem Abschnitt erklärt dir das ⓘ, was die Einstellungen bewirken.','In every section, the ⓘ explains what the settings do.'],
  home:['Alle Produkte','All products'],
+ mEasy:['Einfach','Simple'],mExpert:['Experte','Expert'],undo:['Rückgängig','Undo'],
+ shareBtn:['🔗 Link zu dieser Konfiguration teilen','🔗 Share a link to this configuration'],shareDone:['✓ Link kopiert','✓ Link copied'],
+ nextT:['So geht’s weiter','What’s next'],nextOk:['Alles klar','Got it'],
+ next1:['ZIP entpacken und die 3MF-Datei in Bambu Studio öffnen (oder die STL-Dateien in deinem Slicer).','Unzip and open the 3MF file in Bambu Studio (or the STL files in your slicer).'],
+ next2:['Passen nicht alle Teile auf eine Platte: «Anordnen» bzw. weitere Platten verwenden.','If not everything fits one plate: use «Arrange» or add plates.'],
+ next3:['Ohne Stützen drucken – fertig!','Print without supports – done!'],
  privacy:['Datenschutz','Privacy policy'],imprint:['Impressum','Legal notice'],
  etsyNote:['Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.','The term “Etsy” is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.'],
  helpBtn:['Anleitung','Help'],
@@ -686,7 +697,7 @@ function ui(){if(!featOn('gravur'))S.sub='';
  PZ_SHAPE_IDS.forEach(id=>{const b=document.createElement('button');b.dataset.k='sh_'+id;const upd=()=>{const n=S.shapes.indexOf(id);b.classList.toggle('on',n>=0);b.dataset.n=n>=0?n+1:''};upd();
   b.onclick=()=>{const n=S.shapes.indexOf(id);if(n>=0)S.shapes.splice(n,1);else if(S.shapes.length<S.maxShapes)S.shapes.push(id);sg.querySelectorAll('button').forEach(x=>x._u());changed()};b._u=upd;sg.append(b)});c.append(sg);
  if(featOn('gravur')){c=card('hpText');tInput(c,'sub','hpTitle')}
- c=card('pzSize');rng(c,'Hs','hpH',35,80,5,'mm');seg(c,'perRow','hpPer',[[2,'2'],[3,'3'],[4,'4'],[5,'5']]);rng(c,'T','pzT',8,20,1,'mm');chk(c,'knob','pzKnob');
+ c=card('pzSize');rng(c,'Hs','hpH',35,80,5,'mm');seg(c,'perRow','hpPer',[[2,'2'],[3,'3'],[4,'4'],[5,'5']]);rng(c,'T','pzT',8,20,1,'mm');c.lastChild.classList.add('xp');chk(c,'knob','pzKnob');
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
  ['cBoard','cL0','cL1','cL2','cL3','cL4','cL5'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
  cartCard();
@@ -695,7 +706,7 @@ function ui(){if(!featOn('gravur'))S.sub='';
 
 /* ================= Hofpuzzle: Produktbeschreibung fuer den Kern ================= */
 const HP_KEYS=['sub','shapes','perRow','Hs','T','knob','fit','cBoard','cL0','cL1','cL2','cL3','cL4','cL5'];
-const PRODUCT={id:'hofpuzzle',name:'Hofpuzzle',file:'Hofpuzzle',store:'hp',
+const PRODUCT={dimKeys:['cBoard'],id:'hofpuzzle',name:'Hofpuzzle',file:'Hofpuzzle',store:'hp',
  unit:{one:['Puzzle','puzzle'],n:['Puzzle','puzzle(s)'],many:['Puzzles','puzzles']},
  build:(res,tol)=>buildPuzzle(res,tol),
  snap(){const o={};HP_KEYS.forEach(k=>o[k]=k==='shapes'?S.shapes.slice():S[k]);return{S:o}},
@@ -735,9 +746,11 @@ function sel(c,key,lk,opts){const l=document.createElement('label'),s=document.c
 function seg(c,key,lk,opts){const l=document.createElement('label'),s=document.createElement('span');if(lk)s.dataset.k=lk;const d=document.createElement('div');d.className='seg';
  const bs=opts.map(o=>{const b=document.createElement('button');b.dataset.k=o[1];b.onclick=()=>{(c._t||S)[key]=o[0];bs.forEach((x,i)=>x.classList.toggle('on',opts[i][0]===(c._t||S)[key]));changed()};d.append(b);return b});
  bs.forEach((x,i)=>x.classList.toggle('on',opts[i][0]===(c._t||S)[key]));l.append(s,d);c.append(l)}
-function rng(c,key,lk,mn,mx,st,unit){const l=document.createElement('label'),r=document.createElement('div');r.className='row';const s=document.createElement('span');s.dataset.k=lk;const o=document.createElement('output');
- const i=document.createElement('input');i.type='range';i.min=mn;i.max=mx;i.step=st;i.value=(c._t||S)[key];const sh=()=>o.textContent=(+i.value).toString().replace('.',',')+' '+unit;sh();
- i.oninput=()=>{(c._t||S)[key]=+i.value;sh();changed()};r.append(s,o);l.append(r,i);c.append(l)}
+// Regler + Zahlenfeld (Wert direkt eintippen; ausserhalb des Bereichs wird begrenzt)
+function rng(c,key,lk,mn,mx,st,unit){const l=document.createElement('label'),r=document.createElement('div');r.className='row';const s=document.createElement('span');s.dataset.k=lk;const o=document.createElement('span');o.className='rnum';
+ const n=document.createElement('input');n.type='number';n.min=mn;n.max=mx;n.step=st;n.inputMode='decimal';const u=document.createElement('small');u.textContent=unit;o.append(n,u);
+ const i=document.createElement('input');i.type='range';i.min=mn;i.max=mx;i.step=st;i.value=(c._t||S)[key];const sh=()=>n.value=+i.value;sh();
+ i.oninput=()=>{(c._t||S)[key]=+i.value;sh();changed()};n.onchange=()=>{const v=Math.max(mn,Math.min(mx,+String(n.value).replace(',','.')||mn));(c._t||S)[key]=v;i.value=v;n.value=v;changed()};r.append(s,o);l.append(r,i);c.append(l)}
 function chk(c,key,lk){const l=document.createElement('label');l.className='chk';const i=document.createElement('input');i.type='checkbox';i.checked=(c._t||S)[key];i.onchange=()=>{(c._t||S)[key]=i.checked;changed()};const s=document.createElement('span');s.dataset.k=lk;l.append(i,s);c.append(l)}
 
 function btn(c,lk,fn){const b=document.createElement('button');b.className='btn';b.dataset.k=lk;b.onclick=fn;c.append(b)}
@@ -747,7 +760,12 @@ function addInfo(){panel.querySelectorAll('.card>h2').forEach(h=>{const k='i_'+h
  const b=document.createElement('button');b.className='ib';b.textContent='i';b.setAttribute('aria-expanded','false');const p=document.createElement('p');p.className='info';p.dataset.k=k;p.hidden=true;
  b.onclick=()=>{p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden);b.setAttribute('aria-expanded',String(!p.hidden))};w.append(h,b);w.after(p)})}
 /* Fussnote (Etsy-Hinweis; spaeter Links zu Datenschutz/Impressum) */
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p></footer>');applyLang()}
+// Einfach/Experte fuer alle Produkte: Felder mit Klasse .xp sind im Einfachmodus nur ausgeblendet (Werte bleiben)
+function expertBar(){panel.dataset.expert=S.expert?'1':'0';if(panel.querySelector('.uimode')||!panel.querySelector('.xp'))return;
+ const bar=document.createElement('div');bar.className='uibar';const md=document.createElement('div');md.className='seg uimode';
+ [[false,'mEasy'],[true,'mExpert']].forEach(([v,k])=>{const b=document.createElement('button');b.dataset.k=k;b.classList.toggle('on',!!S.expert===v);b.onclick=()=>{S.expert=v;md.querySelectorAll('button').forEach((x,n)=>x.classList.toggle('on',n===(v?1:0)));panel.dataset.expert=v?'1':'0';save()};md.append(b)});
+ bar.append(md);document.getElementById('stats').after(bar)}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');
@@ -760,7 +778,10 @@ let timer=0,seq=0,built=null;
 function changed(){panel.dataset.mode=S.mode||'';if(PRODUCT.onChange)PRODUCT.onChange();save();clearTimeout(timer);status.innerHTML='<b>'+tr('busy')+'</b>';timer=setTimeout(refresh,180)}
 function clean(t){const o=[];for(let i=0;i<t.length;i+=9){const ux=t[i+3]-t[i],uy=t[i+4]-t[i+1],uz=t[i+5]-t[i+2],vx=t[i+6]-t[i],vy=t[i+7]-t[i+1],vz=t[i+8]-t[i+2];
  if(Math.hypot(uy*vz-uz*vy,uz*vx-ux*vz,ux*vy-uy*vx)>1e-6)for(let k=0;k<9;k++)o.push(t[i+k])}return Float32Array.from(o)}
-async function refresh(){const my=++seq;const r=await PRODUCT.build(5,.05);if(my!==seq)return;r.mode=S.mode;const first=!built||built.mode!==S.mode;built=r;present(first)}
+const HIST=[];let lastSnap=null;
+function recordHist(){const cur=JSON.stringify(PRODUCT.snap());if(lastSnap!==null&&cur!==lastSnap){HIST.push(lastSnap);if(HIST.length>40)HIST.shift()}lastSnap=cur;document.getElementById('undobtn').disabled=!HIST.length}
+function undo(){if(!HIST.length)return;const s=HIST.pop();lastSnap=s;PRODUCT.applySnap(JSON.parse(s));save();buildUI();clearTimeout(timer);refresh()}
+async function refresh(){recordHist();const my=++seq;const r=await PRODUCT.build(5,.05);if(my!==seq)return;r.mode=S.mode;const first=!built||built.mode!==S.mode;built=r;present(first)}
 function threeMF(parts){const hex=h=>h.replace('#','').toUpperCase(),f=v=>v.toFixed(4);let objs='',mats='',items='';
  parts.forEach((p,i)=>{const{V,I}=weld(p.tris),id=i+2;mats+=`<base name="${p.name}" displaycolor="#${hex(p.color)}"/>`;
   let vs='',ts='';for(let k=0;k<V.length;k+=3)vs+=`<vertex x="${f(V[k])}" y="${f(V[k+1])}" z="${f(V[k+2])}"/>`;for(let k=0;k<I.length;k+=3)ts+=`<triangle v1="${I[k]}" v2="${I[k+1]}" v3="${I[k+2]}"/>`;
@@ -792,7 +813,13 @@ gEl('gx').onclick=()=>{gEl('gate').style.display='none'};
 let CART=[];try{CART=JSON.parse(localStorage.getItem(PRODUCT.store+'-cart')||'[]')}catch(e){}
 const saveCart=()=>{try{localStorage.setItem(PRODUCT.store+'-cart',JSON.stringify(CART))}catch(e){}};
 function addCart(){const s=PRODUCT.snap();s.name=PRODUCT.snapName(s);CART.push(s);saveCart();renderCart()}
-function cartCard(){const c=card('cart');c.id='cartcard';para(c,'cartHint');const ci=document.createElement('p');ci.id='creditinfo';c.append(ci);const cl=document.createElement('div');cl.id='cartlist';c.append(cl);btn(c,'addCart',addCart);const cx=document.createElement('button');cx.id='cartexp';cx.className='btn pri';cx.onclick=exportCart;c.append(cx);renderCart();creditInfo();refreshLeft();return c}
+function cartCard(){const c=card('cart');c.id='cartcard';para(c,'cartHint');const ci=document.createElement('p');ci.id='creditinfo';c.append(ci);const cl=document.createElement('div');cl.id='cartlist';c.append(cl);btn(c,'addCart',addCart);const cx=document.createElement('button');cx.id='cartexp';cx.className='btn pri';cx.onclick=exportCart;c.append(cx);renderCart();creditInfo();refreshLeft();btn(c,'shareBtn',shareLink);return c}
+// Konfiguration als Link (steht ganz im Link, kein Server noetig)
+async function shareLink(e){const d=btoa(unescape(encodeURIComponent(JSON.stringify(PRODUCT.snap())))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''),url=location.href.split('#')[0]+'#c='+d,b=e&&e.target;
+ if(navigator.share){try{await navigator.share({title:document.title,url});return}catch(x){}}try{await navigator.clipboard.writeText(url);if(b){b.textContent=tr('shareDone');setTimeout(()=>b.textContent=tr('shareBtn'),1800)}}catch(x){prompt(tr('shareBtn'),url)}}
+// Nach dem Download: so geht es weiter (Texte nextT/next1..3, je Produkt anpassbar)
+function showNext(){let w=document.getElementById('nextw');if(!w){w=document.createElement('div');w.id='nextw';document.body.append(w)}
+ w.innerHTML=`<div class="hbox"><h2>${tr('nextT')}</h2><ol><li>${tr('next1')}</li><li>${tr('next2')}</li><li>${tr('next3')}</li></ol><button>${tr('nextOk')}</button></div>`;w.style.display='grid';w.querySelector('button').onclick=()=>w.style.display='none'}
 function renderCart(){const e=gEl('cartlist'),x=gEl('cartexp');if(!e)return;e.innerHTML='';
  CART.forEach((it,i)=>{const r=document.createElement('div');r.className='crow';
   const no=document.createElement('span');no.className='cno';no.textContent=i+1;
@@ -811,7 +838,7 @@ async function exportCart(){if(!unlockedNow())return;let msg='';const keep=PRODU
    files.push({name:dir+list[i].name+'.3mf',data:new Uint8Array(await threeMF(arr.map(p=>({...p,color:PRODUCT.color?PRODUCT.color(p):S[p.key]}))).arrayBuffer())});
    r.parts.forEach((p,k)=>files.push({name:dir+'stl/'+(k+1)+'-'+p.name+(p.qty>1?'_x'+p.qty:'')+'.stl',data:stlOf(p.pf?xf(p.tris,p.pf):p.tris)}))}
   PRODUCT.applySnap(keep);
-  const c=await charge(cfgs);if(c){download(zip(files),CART.length?PRODUCT.file+'-Warenkorb.zip':PRODUCT.file+'-'+keep.name.normalize('NFD').replace(/[^\w\- ]/g,'').trim().replace(/ +/g,'-')+'.zip');if(CONFIG.requireCode)msg=[c.n?trf('charged',c.n):'',c.free?trf('chargedFree',c.free):''].filter(Boolean).join(' ')}}
+  const c=await charge(cfgs);if(c){setTimeout(showNext,400);download(zip(files),CART.length?PRODUCT.file+'-Warenkorb.zip':PRODUCT.file+'-'+keep.name.normalize('NFD').replace(/[^\w\- ]/g,'').trim().replace(/ +/g,'-')+'.zip');if(CONFIG.requireCode)msg=[c.n?trf('charged',c.n):'',c.free?trf('chargedFree',c.free):''].filter(Boolean).join(' ')}}
  catch(e){st.textContent=e.message}
  finally{PRODUCT.applySnap(keep);buildUI();present(false);renderCart();if(msg)st.innerHTML+='<br><b>'+msg+'</b>'}}
 
@@ -819,6 +846,19 @@ const help=document.getElementById('help');document.getElementById('helpbtn').on
 document.getElementById('helpgo').onclick=()=>{help.style.display='none';try{localStorage.setItem('mn-help','1')}catch(e){}};
 try{if(!localStorage.getItem('mn-help'))help.style.display='grid'}catch(e){}
 document.getElementById('gl').addEventListener('pointerdown',()=>document.querySelector('.vhint').classList.add('gone'),{once:true});
+/* Vorschau: Masse an der Form (Ansicht «zusammengebaut») und Antippen einzelner Teile (PRODUCT.pick, Teile mit .mod) */
+let SHOWN=[];{const sm=setMeshes;setMeshes=parts=>{SHOWN=parts.map(p=>{const q=bbox(p.tris);return{key:p.key,mod:p.mod,a:q.a,b:q.b}});sm(parts)}}
+function proj(p){if(!VIEW)return null;const M=VIEW.M,c=[0,1,2,3].map(j=>M[j]*p[0]+M[4+j]*p[1]+M[8+j]*p[2]+M[12+j]);if(c[3]<=0)return null;return[(c[0]/c[3]+1)/2*VIEW.w,(1-c[1]/c[3])/2*VIEW.h]}
+function onDraw(){const d=document.getElementById('dims');if(!d)return;const ks=PRODUCT.dimKeys,P=SHOWN.filter(p=>!ks||ks.includes(p.key));
+ if(S.view!=='asm'||!P.length){d.innerHTML='';return}const a=[0,1,2].map(k=>Math.min(...P.map(p=>p.a[k]))),b=[0,1,2].map(k=>Math.max(...P.map(p=>p.b[k])));
+ d.innerHTML=[[[(a[0]+b[0])/2,a[1],a[2]],b[0]-a[0]],[[b[0],(a[1]+b[1])/2,a[2]],b[1]-a[1]],[[b[0],a[1],(a[2]+b[2])/2],b[2]-a[2]]].map(([p,v])=>{const q=proj(p);return q?`<span style="left:${q[0]}px;top:${q[1]}px">${Math.round(v)} mm</span>`:''}).join('')}
+{const cv=document.getElementById('gl');let dn=null;cv.addEventListener('pointerdown',e=>{dn=[e.clientX,e.clientY]});
+ cv.addEventListener('pointerup',e=>{if(!dn||!PRODUCT.pick||Math.hypot(e.clientX-dn[0],e.clientY-dn[1])>6)return;const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,bd=70;
+  for(const p of SHOWN){if(p.mod==null)continue;const q=proj([(p.a[0]+p.b[0])/2,(p.a[1]+p.b[1])/2,(p.a[2]+p.b[2])/2]);if(!q)continue;const dd=Math.hypot(q[0]-x,q[1]-y);if(dd<bd){bd=dd;best=p}}
+  if(best)PRODUCT.pick(best.mod)})}
+/* Geteilter Link (#c=...): Konfiguration uebernehmen */
+{const m=location.hash.match(/[#&]c=([^&]+)/);if(m){try{PRODUCT.applySnap(JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g,'+').replace(/_/g,'/'))))));if(PRODUCT.onShared)PRODUCT.onShared();save()}catch(e){}history.replaceState(null,'',location.pathname+location.search)}}
+document.getElementById('undobtn').onclick=undo;
 panel.dataset.mode=S.mode||'';buildUI();refresh();
 /* Produkt gesperrt («aus») oder in Entwicklung («test», nur mit Admin-Schluessel) -> Hinweis statt Konfigurator.
    Geaenderte Optionen -> Oberflaeche neu aufbauen (ui() raeumt gesperrte Optionen aus dem Zustand). */

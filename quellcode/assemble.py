@@ -19,7 +19,8 @@ mk=cut("function mk(","function drawShape(")
 exp=cut("function weld(","function threeMF(")
 dl=re.search(r"function download\(blob,name\)\{.*?\n",s).group(0)
 rend=cut("const cv=document.getElementById('gl');","/* ================= UI")
-rend=rend.replace("const fit=()=>{cam.dist=Math.max(S.W*1.9,S.H*2.5)};","let fit=()=>{};").replace("[cam.tx,cam.ty,0]","[cam.tx,cam.ty,cam.tz]").replace("cam.dist*Math.sin(cam.el)]","cam.tz+cam.dist*Math.sin(cam.el)]").replace("tx:0,ty:0}","tx:0,ty:0,tz:0}")
+rend=rend.replace("const fit=()=>{cam.dist=Math.max(S.W*1.9,S.H*2.5)};","let fit=()=>{};").replace("gl.uniformMatrix4fv(uM,false,M);","gl.uniformMatrix4fv(uM,false,M);VIEW={M,w:cv.clientWidth,h:cv.clientHeight};").replace("return{pb,nb,n:t.length/3,key:p.key}","return{pb,nb,n:t.length/3,key:p.key,hl:p.hl}").replace("gl.uniform3fv(uC,rgb(S[m.key]));","gl.uniform3fv(uC,m.hl?rgb(S[m.key]).map(v=>Math.min(1,v*.55+.5)):rgb(S[m.key]));").replace("gl.drawArrays(gl.TRIANGLES,0,m.n)}}","gl.drawArrays(gl.TRIANGLES,0,m.n)}if(window.onDraw)onDraw()}").replace("[cam.tx,cam.ty,0]","[cam.tx,cam.ty,cam.tz]").replace("cam.dist*Math.sin(cam.el)]","cam.tz+cam.dist*Math.sin(cam.el)]").replace("tx:0,ty:0}","tx:0,ty:0,tz:0}")
+assert "VIEW={M" in rend and "m.hl?" in rend and "onDraw()" in rend and "hl:p.hl" in rend
 assert "cam.tz+cam.dist" in rend and "tz:0" in rend and "let fit" in rend
 ub=cut("const panel=document.getElementById('panel')","(function ui(){")
 ub=ub.replace("S[key]","(c._t||S)[key]")

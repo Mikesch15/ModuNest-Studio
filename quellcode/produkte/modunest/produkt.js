@@ -29,11 +29,15 @@ help4:['Öffne die 3MF-Datei in Bambu Studio (oder die STL-Dateien in deinem Sli
  mW:['Breite','Width'],mD:['Tiefe','Depth'],mH:['Höhe','Height'],divN:['Trennwände','Dividers'],lidPlug:['Deckel','Lid'],typeSel:['Art','Type'],lidSel:['Deckel','Lid'],filler:['Füllstücke für eingeschlossene Ecken (optional)','Filler pieces for enclosed corners (optional)'],sharpSeam:['Ecken an Nähten scharf bis zur Nachbarhöhe (kein Schmutz in den Fugen)','Sharp corners at seams up to the neighbour height (no dirt in the gaps)'],_old:['Ecken an Nähten scharf (kein Schmutz in den Fugen)','Sharp corners at seams (no dirt in the gaps)'],sbtype:['Art der Box','Box type'],tBox:['Box mit Fächern','Box with compartments'],tDrawer:['Schubladenbox','Drawer box'],nDrawers:['Schubladen','Drawers'],nDr:['Schubladen übereinander','Drawers stacked'],iDrw:['{0}: zu niedrig für mehr Schubladen, es sind {1}.','{0}: too low for more drawers; using {1}.'],tex:['Oberfläche (freie Aussenseiten)','Surface (free outer sides)'],tx_none:['glatt','smooth'],tx_ribs:['Rillen','Ribs'],tx_waves:['Wellen','Waves'],tx_facets:['Facetten','Facets'],lid_none:['ohne Deckel','no lid'],lid_plug:['Steckdeckel','Plug lid'],lid_slide:['Schiebedeckel','Sliding lid'],lid_hinge:['Klappdeckel','Hinged lid'],iPin:['{0}: Scharnierstift mitdrucken oder ein Stück 1,75-mm-Filament ({1} mm) einfädeln.','{0}: print the hinge pin or thread a piece of 1.75 mm filament ({1} mm).'],eDrawer:['Schubladen müssen in der vordersten Reihe liegen (Vorderseite frei). Verkleinere die Schubladen oder vergrössere die Breite.','Drawers must sit in the front row (front side free). Make the drawers narrower or the space wider.'],drawerBtn:['+ Schublade','+ Drawer'],iPlates:['Dieser Plan braucht ca. {0} Druckplatten. In Bambu Studio die Teile mit «Anordnen» auf Platten verteilen.','This plan needs about {0} build plates. In Bambu Studio use “Arrange” to spread the parts.'],eLidH:['{0}: für diesen Deckel ist die Höhe zu klein (mind. 35 mm). → Erhöhe die Kiste oder wähle einen anderen Deckel.','{0}: too low for this lid (min. 35 mm). → Make the box taller or choose another lid.'],iSlide:['{0}: Schiebedeckel braucht eine freie Vorderseite (unten im Plan), sonst lässt er sich nicht herausziehen.','{0}: the sliding lid needs a free front side, otherwise it cannot be pulled out.'],iHinge:['{0}: Klappdeckel braucht oben freien Platz zum Aufklappen.','{0}: the hinged lid needs free space above to swing open.'],del:['Entfernen','Remove'],t_box:['Box','Box'],t_tall:['Hoher Behälter','Tall container'],t_drawer:['Schublade','Drawer'],sMods:['Module','Modules'],
  eEmpty:['Füge mindestens ein Modul hinzu.','Add at least one module.'],eTall:['{0}: Höhe {1} mm ist grösser als der Platz ({2} mm). → Verringere die Höhe der Kiste oder erhöhe die Platzhöhe.','{0}: height {1} mm exceeds the space ({2} mm). → Reduce the box height or increase the space height.'],eSmall:['{0}: zu klein (mind. {1}×{2}×{3} mm). → Vergrössere die Kiste.','{0}: too small (min. {1}×{2}×{3} mm). → Make the box larger.'],eBig:['{0} passt nicht in den Platz. → Verkleinere die Kiste oder vergrössere den Platz.','{0} does not fit the space. → Make the box smaller or the space larger.'],eArea:['Die Module brauchen {0} cm² Grundfläche, verfügbar sind {1} cm². → Entferne oder verkleinere Kisten oder vergrössere den Platz.','The modules need {0} cm² of floor area; only {1} cm² available. → Remove or shrink boxes, or enlarge the space.'],eNoFit:['Die Module lassen sich nicht überlappungsfrei anordnen. Verkleinere ein Modul oder vergrössere den Platz.','The modules cannot be arranged without overlap. Shrink a module or enlarge the space.'],iFree:['{0} cm² bleiben frei. „Platz ausfüllen“ streckt die Module.','{0} cm² stay free. “Fill the space” stretches the modules.'],iShort:['{0} und {1} berühren sich nur kurz, dort gibt es keine Steckverbindung.','{0} and {1} touch only briefly; no connector there.'],okFit:['Alles passt: {0} Module, {1} Verbinder.','Everything fits: {0} modules, {1} connectors.'],
  cartMods:['Plan, {0} Kisten','Plan, {0} boxes'],cartOne:['Einzelbox','Single box'],
+ tplT:['Oder starte mit einer Vorlage:','Or start from a template:'],tp_besteck:['Besteckschublade','Cutlery drawer'],tp_gewuerz:['Gewürzschublade','Spice drawer'],tp_bastel:['Bastelkiste','Craft box'],tp_desk:['Schreibtisch','Desk drawer'],
+ topT:['Draufsicht (vorne unten) – Kiste antippen zum Bearbeiten','Top view (front at bottom) – tap a box to edit'],
+ perBox:['Schätzung pro Kiste (grob, abhängig von Drucker und Einstellungen):','Estimate per box (rough, depends on printer and settings):'],
+ pickHint:['Tipp: Kiste in der 3D-Vorschau antippen, um sie zu bearbeiten.','Tip: tap a box in the 3D preview to edit it.'],
  startQ:['Was möchtest du organisieren?','What would you like to organise?'],startD:['Wähle, womit du beginnen möchtest. Du kannst später wechseln, ohne deine Werte zu verlieren.','Choose how to start. You can switch later without losing your values.'],
  pickPlan:['Schublade','Drawer'],pickPlanD:['Plane mehrere Boxen passend zu deiner Schublade oder deinem Regalfach.','Plan several boxes to fit your drawer or shelf.'],
  pickOne:['Einzelbox','Single box'],pickOneD:['Erstelle eine einzelne Box mit deinen Wunschmassen und deiner gewünschten Aufteilung.','Create a single box with your dimensions and compartments.'],
  step1:['1 Auswählen','1 Choose'],step2:['2 Konfigurieren','2 Configure'],step3:['3 Prüfen & exportieren','3 Check & export'],
- mEasy:['Einfach','Simple'],mExpert:['Experte','Expert'],next:['Weiter →','Next →'],back:['← Zurück','← Back'],change:['Auswahl ändern','Change'],
+ next:['Weiter →','Next →'],back:['← Zurück','← Back'],change:['Auswahl ändern','Change'],
  youPlan:['Du planst: {0}','You are planning: {0}'],
  spacePlan:['Innenmasse der Schublade / des Fachs','Inside size of the drawer / shelf'],spaceOne:['Aussenmasse der Box','Outer size of the box'],
  i_spacePlan:['Miss innen von Wand zu Wand (Breite und Tiefe) und die nutzbare Höhe bis zur Unterkante darüber. Ziehe 1–2 mm Luft ab, damit die Kisten nicht klemmen. «Platz ausfüllen» streckt die Kisten, bis kein Spalt bleibt.','Measure inside from wall to wall (width and depth) and the usable height. Subtract 1–2 mm so the boxes do not jam. «Fill the space» stretches the boxes so no gap is left.'],
@@ -53,6 +57,14 @@ let FRESH=true;try{const st=localStorage.getItem('mn-state');FRESH=!st;Object.as
 if(FRESH)S.step='start';else if(!S.step)S.step=1;S.expert=!!S.expert;
 S.mode=S.mode||'single';if(S.plan)PL=S.plan;else S.plan=PL;PL.one=PL.one||{type:'box',div:0,lid:'plug',cols:2,rows:2,tray:false,trayH:22,label:''};if(S.mode==='single'&&!PL.alt){PL.alt={W:PL.W,D:PL.D,H:PL.H};PL.W=140;PL.D=110;PL.H=65}
 const FONTS={modern:'KFModern'};
+const B=(w,d,h,o={})=>({type:'box',w,d,h,div:0,lid:'none',cols:1,rows:1,...o});
+const TPL={besteck:{W:300,D:420,H:60,mods:[B(75,280,55),B(75,280,55),B(75,280,55),B(75,280,55),B(300,130,55,{cols:3})]},
+ gewuerz:{W:400,D:450,H:90,mods:Array.from({length:12},()=>B(100,150,80))},
+ bastel:{W:300,D:200,H:120,mods:[{...B(100,100,110),type:'tall'},{...B(100,100,110),type:'tall'},B(100,200,60,{rows:2}),B(100,100,60,{lid:'plug'}),B(100,100,60,{lid:'plug'})]},
+ desk:{W:360,D:300,H:50,mods:[B(120,150,45,{cols:2,rows:2}),B(120,150,45),B(120,150,45,{cols:3}),B(60,150,45),B(60,150,45),B(120,150,45),B(120,150,45,{rows:2})]}};
+function applyTpl(id){const t=TPL[id];if(S.mode!=='plan'){S.mode='plan';PRODUCT.onChange()}Object.assign(PL,{W:t.W,D:t.D,H:t.H,fill:true});PL.mods=JSON.parse(JSON.stringify(t.mods));FRESH=false;S.step=2;changed();buildUI()}
+let SEL=null; // angetippte Kiste (Index im Plan)
+function selectMod(ix){SEL=ix;if(S.step!==2)goStep(2);renderMods();present(false);const r=document.querySelectorAll('#modlist .mrow')[S.mode==='single'?0:ix];if(r)r.scrollIntoView({behavior:'smooth',block:'center'})}
 
 /* ================= ModuNest: Oberflaeche, Vorschau, Anordnung ================= */
 function arrange(parts,mode){
@@ -72,7 +84,8 @@ function ui(){cleanFeat();if(S.step==='start'&&!featOn('plan')){S.mode='single';
  // Startbildschirm: Schublade oder Einzelbox (setzt nur S.mode; Masse je Modus bleiben ueber onChange erhalten)
  if(S.step==='start'){const c=card('startQ');c.classList.add('startc');para(c,'startD');const g=document.createElement('div');g.className='picks';
   [['plan','pickPlan','pickPlanD','▦'],['single','pickOne','pickOneD','▢']].forEach(([md,t,d,ic])=>{const b=document.createElement('button');b.className='pick'+(S.mode===md&&!FRESH?' on':'');
-   b.innerHTML=`<i>${ic}</i><b data-k="${t}"></b><span data-k="${d}"></span>`;b.onclick=()=>{FRESH=false;S.step=1;const same=S.mode===md;S.mode=md;changed();if(same)buildUI()};g.append(b)});c.append(g);return}
+   b.innerHTML=`<i>${ic}</i><b data-k="${t}"></b><span data-k="${d}"></span>`;b.onclick=()=>{FRESH=false;S.step=1;const same=S.mode===md;S.mode=md;changed();if(same)buildUI()};g.append(b)});c.append(g);
+  if(featOn('plan')){para(c,'tplT');const tg=document.createElement('div');tg.className='tpls';Object.keys(TPL).forEach(id=>{const b=document.createElement('button');b.className='mini';b.dataset.k='tp_'+id;b.onclick=()=>applyTpl(id);tg.append(b)});c.append(tg)}return}
  const bar=document.createElement('div');bar.className='uibar';const st=document.createElement('div');st.className='steps';
  [1,2,3].forEach(n=>{const b=document.createElement('button');b.dataset.k='step'+n;b.dataset.n=n;b.classList.toggle('on',S.step===n);b.onclick=()=>goStep(n);st.append(b)});
  const md=document.createElement('div');md.className='seg uimode';[[false,'mEasy'],[true,'mExpert']].forEach(([v,k])=>{const b=document.createElement('button');b.dataset.k=k;b.classList.toggle('on',S.expert===v);
@@ -91,7 +104,7 @@ function ui(){cleanFeat();if(S.step==='start'&&!featOn('plan')){S.mode='single';
  // Schritt-Navigation unten
  [[1,null,2],[2,1,3],[3,2,null]].forEach(([n,b,f])=>{const d=document.createElement('div');d.className='stepnav';d.dataset.st=String(n);
   for(const[t,k]of[[b,'back'],[f,'next']])if(t){const x=document.createElement('button');x.className='btn'+(k==='next'?' pri':'');x.dataset.k=k;x.onclick=()=>goStep(t);d.append(x)}panel.append(d)})}
-function present(reframe){if(!built)return;if(true){presentPlan(reframe);return}document.getElementById('plmsgs').innerHTML='';const arr=arrange(built.parts,S.view);setMeshes(arr.map(p=>({...p,tris:clean(p.tris)})));if(reframe){frame(arr);draw()}
+function present(reframe){if(!built)return;if(true){presentPlan(reframe);return}document.getElementById('plmsgs').innerHTML='';const arr=arrange(built.parts,S.view);setMeshes(arr.map(p=>({...p,tris:clean(p.tris),hl:SEL!=null&&p.mod===SEL})));if(reframe){frame(arr);draw()}
  document.querySelectorAll('.vt button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
  const i=built.info,mass=built.parts.reduce((s,p)=>s+Math.abs(volume(p.tris)),0)/1000*1.24,span=arrange(built.parts,'print').span;
  const f1=v=>v.toFixed(1);
@@ -100,12 +113,12 @@ function present(reframe){if(!built)return;if(true){presentPlan(reframe);return}
  status.innerHTML=`${S.W} × ${S.D} × ${S.H} mm`+(w?`<br><b>${w}</b>`:'')}
 async function downloadFit(){const t=await fitTestTris(9,.02);const all=Float32Array.from([...t[0],...t[1]]);download(new Blob([stlOf(all)],{type:'model/stl'}),'ModuNest-Passungstest.stl')}
 function presentPlan(reframe){const sol=built.sol,arr0=sol.ok?arrange(built.parts,S.view):[],arr=arr0.filter(p=>!(S.hide&&S.hide[p.key]));
- setMeshes(arr.map(p=>({...p,tris:clean(p.tris)})));if(reframe&&arr.length){frame(arr)}draw();
+ setMeshes(arr.map(p=>({...p,tris:clean(p.tris),hl:SEL!=null&&p.mod===SEL})));if(reframe&&arr.length){frame(arr)}draw();
  document.querySelectorAll('.vt button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
  const msgs=sol.msgs.slice();if(sol.ok)msgs.push(['okFit',sol.items.length,built.info.keys]);
  const WARN=['iSlide','iHinge','iShort','iDrw','iPlates'],lv=k=>k[0]==='e'?'e':k[0]==='o'?'o':WARN.includes(k)?'w':'i';
  const pm=document.getElementById('plmsgs');if(pm)pm.innerHTML=msgs.map(m=>{const l=lv(m[0]);return`<li class="${l}"><b>${tr('lv'+l.toUpperCase())}:</b> ${trf(...m)}</li>`}).join('');
- const ps=document.getElementById('plsum');if(ps)ps.innerHTML=!sol.ok?'<b>'+tr('blocked')+'</b>':S.mode==='single'?trf('sumOne',PL.W,PL.D,PL.H):trf('sumPlan',sol.items.length,Math.round(sol.items.reduce((a,it)=>a+it.w*it.d,0)/100),Math.round(PL.W*PL.D/100));
+ topView(sol);perBox(sol);const ps=document.getElementById('plsum');if(ps)ps.innerHTML=!sol.ok?'<b>'+tr('blocked')+'</b>':S.mode==='single'?trf('sumOne',PL.W,PL.D,PL.H):trf('sumPlan',sol.items.length,Math.round(sol.items.reduce((a,it)=>a+it.w*it.d,0)/100),Math.round(PL.W*PL.D/100));
  const i=built.info,mass=sol.ok?built.parts.reduce((s,p)=>s+Math.abs(volume(p.tris))*(p.qty||1),0)/1000*1.24:0,span=sol.ok?arrange(built.parts,'print').span:[0,0];
  document.getElementById('stats').innerHTML=sol.ok?[[tr('sVol'),i.vol.toFixed(1)+' L'],[tr('sMods'),sol.items.length],[tr('sMat'),'≈ '+Math.round(mass)+' g'],[tr('sParts'),built.parts.reduce((s,p)=>s+(p.qty||1),0)]].map(a=>`<div class="stat"><span>${a[0]}</span><strong>${a[1]}</strong></div>`).join(''):'';
  let wmsg='';if(sol.ok){let big=false,fa=0;built.parts.forEach(p=>{const q=bbox(p.tris);const w=q.b[0]-q.a[0],d=q.b[1]-q.a[1];if(Math.min(w,d)>250||Math.max(w,d)>256&&Math.min(w,d)>256||q.b[2]>256)big=true;fa+=(w+8)*(d+8)*(p.qty||1)});
@@ -115,7 +128,7 @@ function presentPlan(reframe){const sol=built.sol,arr0=sol.ok?arrange(built.part
 function numIn(m,k,mn,mx){const i=document.createElement('input');i.type='number';i.min=mn;i.max=mx;i.step=5;i.value=m[k];i.onchange=()=>{m[k]=Math.max(mn,Math.min(mx,+i.value||mn));i.value=m[k];changed()};return i}
 function mkSel(m,key,lk,vals,lab){const l=document.createElement('label'),s=document.createElement('span'),sel=document.createElement('select');s.textContent=tr(lk);vals.forEach(v=>{const op=document.createElement('option');op.value=v;op.textContent=lab?tr(lab+v):v;sel.append(op)});sel.value=m[key]??vals[0];sel.onchange=()=>{m[key]=typeof vals[0]==='number'?+sel.value:sel.value;changed()};l.append(s,sel);return l}
 function renderMods(){const list=document.getElementById('modlist');list.innerHTML='';const single=S.mode==='single',ms=single?[PL.one]:PL.mods;
- ms.forEach((m,ix)=>{const row=document.createElement('div');row.className='mrow';
+ ms.forEach((m,ix)=>{const row=document.createElement('div');row.className='mrow'+(SEL===ix&&!single?' sel':'');
   const h=document.createElement('div');h.className='mh';const b=document.createElement('b');b.textContent=tr('t_'+m.type)+(single?'':' '+(ix+1));const x=document.createElement('button');x.textContent='✕';x.title=tr('del');x.onclick=()=>{PL.mods.splice(ix,1);renderMods();changed()};h.append(b,x);row.append(h);
   if(single){const o=document.createElement('div');o.className='mo';o.append(mkSel(m,'type','typeSel',['box','drawer'].filter(featOn),'t_'));const sl=o.querySelector('select');sl.onchange=()=>{m.type=sl.value;renderMods();changed()};row.append(o)}
   const g=document.createElement('div');g.className='mg';
@@ -135,21 +148,29 @@ function buildPlanUI(){let c=tag(card(S.mode==='plan'?'spacePlan':'spaceOne'),'1
  rng(c,'W','width',50,600,5,'mm');rng(c,'D','depth',50,400,5,'mm');rng(c,'H','height',25,250,5,'mm');chk(c,'fill','fill');c.lastChild.classList.add('pfill');
  c=tag(card('plmods'),'2');const add=document.createElement('div');add.className='addrow';
  ['box','tall','drawer'].filter(featOn).forEach(ty=>{const b=document.createElement('button');b.className='btn';b.dataset.k='add_'+ty;b.onclick=()=>{const d=MODDEF[ty];PL.mods.push({type:ty,w:d.w,d:d.d,h:Math.min(d.h,PL.H),div:0,lid:'none'});renderMods();changed()};add.append(b)});
- const list=document.createElement('div');list.id='modlist';c.append(add,list);
+ const list=document.createElement('div');list.id='modlist';const tv=document.createElement('div');tv.id='topv';const ph=document.createElement('p');ph.className='note';ph.dataset.k='pickHint';c.append(tv,add,ph,list);
  c=tag(card('plset'),'2',1);seg(c,'wall','wall',[[1.6,'1.6 mm'],[2,'2.0 mm'],[2.4,'2.4 mm'],[3,'3.0 mm']]);rng(c,'r','corners',0,12,1,'mm');chk(c,'stack','stack');chk(c,'sharpSeam','sharpSeam');chk(c,'filler','filler');if(featOn('tex'))seg(c,'tex','tex',[['none','tx_none'],['ribs','tx_ribs'],['waves','tx_waves'],['facets','tx_facets']]);
- c=tag(card('plmsg'),'2 3');const sm=document.createElement('p');sm.id='plsum';sm.className='plsum';c.append(sm);const ul=document.createElement('ul');ul.id='plmsgs';c.append(ul);renderMods()}
+ c=tag(card('plmsg'),'2 3');const sm=document.createElement('p');sm.id='plsum';sm.className='plsum';const pb=document.createElement('div');pb.id='perbox';pb.dataset.st='3';c.append(sm,pb);const ul=document.createElement('ul');ul.id='plmsgs';c.append(ul);renderMods()}
+function topView(sol){const e=document.getElementById('topv');if(!e)return;if(S.mode!=='plan'||!sol.ok){e.innerHTML='';return}
+ const W=PL.W,D=PL.D,sw=Math.max(W,D)/150;
+ e.innerHTML=`<p class="note">${tr('topT')}</p><svg viewBox="${-sw} ${-sw} ${W+2*sw} ${D+2*sw}" style="width:100%;max-height:260px"><rect x="0" y="0" width="${W}" height="${D}" fill="none" stroke="currentColor" stroke-dasharray="${3*sw}" stroke-width="${sw}" opacity=".5"/>`+
+  sol.items.map(it=>`<g data-i="${it.i}" style="cursor:pointer"><rect x="${it.x}" y="${D-it.y-it.d}" width="${it.w}" height="${it.d}" rx="${2*sw}" fill="${S.cBox}" fill-opacity="${SEL===it.i?1:.65}" stroke="${SEL===it.i?'#c46546':'#1e1a17'}" stroke-width="${(SEL===it.i?3:1)*sw}"/><text x="${it.x+it.w/2}" y="${D-it.y-it.d/2}" text-anchor="middle" dominant-baseline="middle" font-size="${Math.min(it.w,it.d)/4.2}" font-weight="700">${it.i+1}</text></g>`).join('')+'</svg>';
+ e.querySelectorAll('g[data-i]').forEach(g=>g.onclick=()=>selectMod(+g.dataset.i))}
+function perBox(sol){const e=document.getElementById('perbox');if(!e)return;if(!sol.ok){e.innerHTML='';return}
+ e.innerHTML=`<p class="note">${tr('perBox')}</p><ul>`+sol.items.map(it=>{const g=built.parts.filter(p=>p.mod===it.i).reduce((a,p)=>a+Math.abs(volume(p.tris))*(p.qty||1),0)/1000*1.24;
+  return`<li><b>${tr('t_'+it.mod.type)}${S.mode==='plan'?' '+(it.i+1):''}</b> · ${Math.round(it.w)}×${Math.round(it.d)}×${Math.round(it.h)} mm · ≈ ${Math.round(g)} g · ≈ ${(g/30).toFixed(1).replace('.',',')} h</li>`}).join('')+'</ul>'}
 window.__mn={slotsFor,S,PL,buildPlan,planSolve,renderMods,buildAll,openEdges,get volume(){return volume},fitTestTris,arrange,get built(){return built}};
 
 /* ================= ModuNest: Produktbeschreibung fuer den Kern ================= */
 const SKEYS=['wall','r','stack','conn','sharpSeam','filler','tex','fit','mode','cBox','cLid','cTray','cKey'];
 let lastMode=S.mode;
-const PRODUCT={id:'modunest',name:'ModuNest',file:'ModuNest',store:'mn',
+const PRODUCT={dimKeys:['cBox'],pick:ix=>selectMod(ix),onShared(){S.step=2;lastMode=S.mode},id:'modunest',name:'ModuNest',file:'ModuNest',store:'mn',
  unit:{one:['Kiste (Modul)','box (module)'],n:['Kiste(n)','box(es)'],many:['Kisten','boxes']},
  // Ergebnis fuer den Kern: ok/err, Teile und je Kiste die Masse [lang,kurz,hoch] (Abrechnung + Gratis-Korrektur)
  async build(res,tol){const r=await buildPlan(res,tol);r.ok=r.sol.ok;r.err=r.sol.msgs.map(m=>trf(...m)).join('; ');
   r.units=r.sol.ok?r.sol.items.map(it=>[Math.max(it.w,it.d),Math.min(it.w,it.d),it.h].map(v=>Math.round(v*10)/10)):[];return r},
  snap(){const o={};SKEYS.forEach(k=>o[k]=S[k]);return{S:o,PL:JSON.parse(JSON.stringify(PL))}},
- applySnap(s){Object.assign(S,s.S);for(const k in PL)delete PL[k];Object.assign(PL,JSON.parse(JSON.stringify(s.PL)))},
+ applySnap(s){Object.assign(S,s.S);lastMode=S.mode;for(const k in PL)delete PL[k];Object.assign(PL,JSON.parse(JSON.stringify(s.PL)))},
  snapName:s=>(s.S.mode==='plan'?'Plan':'Box')+' '+s.PL.W+'x'+s.PL.D+'x'+s.PL.H,
  snapCount:s=>s.S.mode==='plan'?(s.PL.mods||[]).length:1,
  snapInfo:s=>(s.S.mode==='plan'?trf('cartMods',(s.PL.mods||[]).length):tr('cartOne'))+' · '+s.PL.W+' × '+s.PL.D+' × '+s.PL.H+' mm',

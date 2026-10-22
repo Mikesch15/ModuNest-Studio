@@ -17,6 +17,7 @@ Object.assign(L,{
  i_stSym:['Das Symbol steht links neben dem Namen, auf allen Steckern gleich.','The symbol sits left of the name, the same on all markers.'],
  i_stSize:['Schrifthöhe: Grösse der Namen. Länge: wie tief der Stecker in die Erde geht. Dicke 3 mm ist stabil genug; Relief = erhabene Schrift.','Letter height: size of the names. Length: how deep the marker goes into the soil. 3 mm thickness is sturdy enough; relief = raised letters.'],
  i_colors:['Die Farben sind für die Vorschau. Jeder Stecker ist ein Teil: für zwei Farben in Bambu Studio einen Farbwechsel auf der angezeigten Höhe einfügen.','Colours are for the preview. Each marker is one part: for two colours add a colour change at the shown height in Bambu Studio.'],
+ next2:['Für zwei Farben: in Bambu Studio auf der in der App angezeigten Höhe einen Farbwechsel einfügen (Rechtsklick auf den Höhenregler).','For two colours: add a colour change in Bambu Studio at the height shown in the app (right-click the layer slider).'],
  cartOne:['Stecker-Set','Marker set']
 });
 const S={names:'Tomate, Basilikum, Salat, Kürbis',font:'KFModern',sym:'blatt',H:14,Lg:120,T:3,h:1.2,view:'asm',hide:{},cBase:'#7aa35a',cText:'#fdfaf2'};
@@ -48,7 +49,7 @@ function ui(){if(!featOn('symbol'))S.sym='';if(!featOn('script'))S.font='KFModer
  if(featOn('symbol')){c=card('stSym');const sg=document.createElement('div');sg.className='seg shp';
   ['',...PZ_SHAPE_IDS].forEach(id=>{const b=document.createElement('button');b.dataset.k='sh_'+(id||'none');const upd=()=>{const on=(S.sym||'')===id;b.classList.toggle('on',on);b.dataset.n=on?'✓':''};upd();b._u=upd;
    b.onclick=()=>{S.sym=id;sg.querySelectorAll('button').forEach(x=>x._u());changed()};sg.append(b)});c.append(sg)}
- c=card('stSize');rng(c,'H','stH',8,20,1,'mm');rng(c,'Lg','stL',60,200,10,'mm');rng(c,'T','scT',2,5,.5,'mm');rng(c,'h','scRel',.6,2,.2,'mm');
+ c=card('stSize');rng(c,'H','stH',8,20,1,'mm');rng(c,'Lg','stL',60,200,10,'mm');rng(c,'T','scT',2,5,.5,'mm');c.lastChild.classList.add('xp');rng(c,'h','scRel',.6,2,.2,'mm');c.lastChild.classList.add('xp');
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
  ['cBase','cText'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
  cartCard()}

@@ -28,7 +28,12 @@ function addInfo(){panel.querySelectorAll('.card>h2').forEach(h=>{const k='i_'+h
  const b=document.createElement('button');b.className='ib';b.textContent='i';b.setAttribute('aria-expanded','false');const p=document.createElement('p');p.className='info';p.dataset.k=k;p.hidden=true;
  b.onclick=()=>{p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden);b.setAttribute('aria-expanded',String(!p.hidden))};w.append(h,b);w.after(p)})}
 /* Fussnote (Etsy-Hinweis; spaeter Links zu Datenschutz/Impressum) */
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p></footer>');applyLang()}
+// Einfach/Experte fuer alle Produkte: Felder mit Klasse .xp sind im Einfachmodus nur ausgeblendet (Werte bleiben)
+function expertBar(){panel.dataset.expert=S.expert?'1':'0';if(panel.querySelector('.uimode')||!panel.querySelector('.xp'))return;
+ const bar=document.createElement('div');bar.className='uibar';const md=document.createElement('div');md.className='seg uimode';
+ [[false,'mEasy'],[true,'mExpert']].forEach(([v,k])=>{const b=document.createElement('button');b.dataset.k=k;b.classList.toggle('on',!!S.expert===v);b.onclick=()=>{S.expert=v;md.querySelectorAll('button').forEach((x,n)=>x.classList.toggle('on',n===(v?1:0)));panel.dataset.expert=v?'1':'0';save()};md.append(b)});
+ bar.append(md);document.getElementById('stats').after(bar)}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');
@@ -41,7 +46,10 @@ let timer=0,seq=0,built=null;
 function changed(){panel.dataset.mode=S.mode||'';if(PRODUCT.onChange)PRODUCT.onChange();save();clearTimeout(timer);status.innerHTML='<b>'+tr('busy')+'</b>';timer=setTimeout(refresh,180)}
 function clean(t){const o=[];for(let i=0;i<t.length;i+=9){const ux=t[i+3]-t[i],uy=t[i+4]-t[i+1],uz=t[i+5]-t[i+2],vx=t[i+6]-t[i],vy=t[i+7]-t[i+1],vz=t[i+8]-t[i+2];
  if(Math.hypot(uy*vz-uz*vy,uz*vx-ux*vz,ux*vy-uy*vx)>1e-6)for(let k=0;k<9;k++)o.push(t[i+k])}return Float32Array.from(o)}
-async function refresh(){const my=++seq;const r=await PRODUCT.build(5,.05);if(my!==seq)return;r.mode=S.mode;const first=!built||built.mode!==S.mode;built=r;present(first)}
+const HIST=[];let lastSnap=null;
+function recordHist(){const cur=JSON.stringify(PRODUCT.snap());if(lastSnap!==null&&cur!==lastSnap){HIST.push(lastSnap);if(HIST.length>40)HIST.shift()}lastSnap=cur;document.getElementById('undobtn').disabled=!HIST.length}
+function undo(){if(!HIST.length)return;const s=HIST.pop();lastSnap=s;PRODUCT.applySnap(JSON.parse(s));save();buildUI();clearTimeout(timer);refresh()}
+async function refresh(){recordHist();const my=++seq;const r=await PRODUCT.build(5,.05);if(my!==seq)return;r.mode=S.mode;const first=!built||built.mode!==S.mode;built=r;present(first)}
 function threeMF(parts){const hex=h=>h.replace('#','').toUpperCase(),f=v=>v.toFixed(4);let objs='',mats='',items='';
  parts.forEach((p,i)=>{const{V,I}=weld(p.tris),id=i+2;mats+=`<base name="${p.name}" displaycolor="#${hex(p.color)}"/>`;
   let vs='',ts='';for(let k=0;k<V.length;k+=3)vs+=`<vertex x="${f(V[k])}" y="${f(V[k+1])}" z="${f(V[k+2])}"/>`;for(let k=0;k<I.length;k+=3)ts+=`<triangle v1="${I[k]}" v2="${I[k+1]}" v3="${I[k+2]}"/>`;
@@ -56,6 +64,19 @@ const help=document.getElementById('help');document.getElementById('helpbtn').on
 document.getElementById('helpgo').onclick=()=>{help.style.display='none';try{localStorage.setItem('mn-help','1')}catch(e){}};
 try{if(!localStorage.getItem('mn-help'))help.style.display='grid'}catch(e){}
 document.getElementById('gl').addEventListener('pointerdown',()=>document.querySelector('.vhint').classList.add('gone'),{once:true});
+/* Vorschau: Masse an der Form (Ansicht «zusammengebaut») und Antippen einzelner Teile (PRODUCT.pick, Teile mit .mod) */
+let SHOWN=[];{const sm=setMeshes;setMeshes=parts=>{SHOWN=parts.map(p=>{const q=bbox(p.tris);return{key:p.key,mod:p.mod,a:q.a,b:q.b}});sm(parts)}}
+function proj(p){if(!VIEW)return null;const M=VIEW.M,c=[0,1,2,3].map(j=>M[j]*p[0]+M[4+j]*p[1]+M[8+j]*p[2]+M[12+j]);if(c[3]<=0)return null;return[(c[0]/c[3]+1)/2*VIEW.w,(1-c[1]/c[3])/2*VIEW.h]}
+function onDraw(){const d=document.getElementById('dims');if(!d)return;const ks=PRODUCT.dimKeys,P=SHOWN.filter(p=>!ks||ks.includes(p.key));
+ if(S.view!=='asm'||!P.length){d.innerHTML='';return}const a=[0,1,2].map(k=>Math.min(...P.map(p=>p.a[k]))),b=[0,1,2].map(k=>Math.max(...P.map(p=>p.b[k])));
+ d.innerHTML=[[[(a[0]+b[0])/2,a[1],a[2]],b[0]-a[0]],[[b[0],(a[1]+b[1])/2,a[2]],b[1]-a[1]],[[b[0],a[1],(a[2]+b[2])/2],b[2]-a[2]]].map(([p,v])=>{const q=proj(p);return q?`<span style="left:${q[0]}px;top:${q[1]}px">${Math.round(v)} mm</span>`:''}).join('')}
+{const cv=document.getElementById('gl');let dn=null;cv.addEventListener('pointerdown',e=>{dn=[e.clientX,e.clientY]});
+ cv.addEventListener('pointerup',e=>{if(!dn||!PRODUCT.pick||Math.hypot(e.clientX-dn[0],e.clientY-dn[1])>6)return;const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,bd=70;
+  for(const p of SHOWN){if(p.mod==null)continue;const q=proj([(p.a[0]+p.b[0])/2,(p.a[1]+p.b[1])/2,(p.a[2]+p.b[2])/2]);if(!q)continue;const dd=Math.hypot(q[0]-x,q[1]-y);if(dd<bd){bd=dd;best=p}}
+  if(best)PRODUCT.pick(best.mod)})}
+/* Geteilter Link (#c=...): Konfiguration uebernehmen */
+{const m=location.hash.match(/[#&]c=([^&]+)/);if(m){try{PRODUCT.applySnap(JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g,'+').replace(/_/g,'/'))))));if(PRODUCT.onShared)PRODUCT.onShared();save()}catch(e){}history.replaceState(null,'',location.pathname+location.search)}}
+document.getElementById('undobtn').onclick=undo;
 panel.dataset.mode=S.mode||'';buildUI();refresh();
 /* Produkt gesperrt («aus») oder in Entwicklung («test», nur mit Admin-Schluessel) -> Hinweis statt Konfigurator.
    Geaenderte Optionen -> Oberflaeche neu aufbauen (ui() raeumt gesperrte Optionen aus dem Zustand). */

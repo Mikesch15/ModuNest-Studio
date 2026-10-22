@@ -19,6 +19,7 @@ Object.assign(L,{
  i_scFig:['Die Figur steht links neben dem Text und ist erhaben wie die Schrift; ihre Linien sind vertieft.','The figure sits left of the text and is raised like the letters; its lines are recessed.'],
  i_scShape:['Breite: Schildbreite (Höhe ergibt sich aus dem Inhalt). Schrifthöhe: Grösse der Hauptschrift – wird verkleinert, falls zu breit. Rand: erhabener Rahmen. Löcher: zum Anschrauben (ca. 4 mm Schrauben).','Width: sign width (height follows the content). Letter height: main text size – reduced if too wide. Border: raised frame. Holes: for screws (about 4 mm).'],
  i_colors:['Die Farben sind für die Vorschau. Das Schild ist ein Teil: für zwei Farben in Bambu Studio einen Farbwechsel auf der angezeigten Höhe einfügen.','Colours are for the preview. The sign is one part: for two colours add a colour change at the shown height in Bambu Studio.'],
+ next2:['Für zwei Farben: in Bambu Studio auf der in der App angezeigten Höhe einen Farbwechsel einfügen (Rechtsklick auf den Höhenregler).','For two colours: add a colour change in Bambu Studio at the height shown in the app (right-click the layer slider).'],
  cartOne:['Schild','Sign']
 });
 const S={t1:'BELLA',t2:'Hof Sonnenberg',font:'KFModern',fig:'pferd',form:'rect',W:180,H1:30,T:4,h:2,rim:true,holes:true,view:'asm',hide:{},cBase:'#ead9bd',cText:'#1e1a17'};
@@ -59,7 +60,7 @@ function ui(){if(!featOn('figur'))S.fig='';if(!featOn('script'))S.font='KFModern
   ['',...PZ_SHAPE_IDS].forEach(id=>{const b=document.createElement('button');b.dataset.k='sh_'+(id||'none');const upd=()=>{const on=(S.fig||'')===id;b.classList.toggle('on',on);b.dataset.n=on?'✓':''};upd();b._u=upd;
    b.onclick=()=>{S.fig=id;sg.querySelectorAll('button').forEach(x=>x._u());changed()};sg.append(b)});c.append(sg)}
  c=card('scShape');if(featOn('formen'))seg(c,'form','scForm',[['rect','fo_rect'],['oval','fo_oval'],['arch','fo_arch']]);
- rng(c,'W','scW',100,250,5,'mm');rng(c,'H1','scH1',12,60,1,'mm');rng(c,'T','scT',3,8,.5,'mm');rng(c,'h','scRel',1,4,.5,'mm');chk(c,'rim','scRim');chk(c,'holes','scHoles');
+ rng(c,'W','scW',100,250,5,'mm');rng(c,'H1','scH1',12,60,1,'mm');rng(c,'T','scT',3,8,.5,'mm');c.lastChild.classList.add('xp');rng(c,'h','scRel',1,4,.5,'mm');c.lastChild.classList.add('xp');chk(c,'rim','scRim');chk(c,'holes','scHoles');
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
  ['cBase','cText'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
  cartCard()}

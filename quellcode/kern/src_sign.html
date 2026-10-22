@@ -320,7 +320,7 @@ function download(blob,name){const a=document.createElement('a');a.href=URL.crea
 /* ================= 3D-Vorschau (WebGL, ohne Bibliothek) ================= */
 const cv=document.getElementById('gl');
 const gl=cv.getContext('webgl',{antialias:true});
-const cam={az:-Math.PI/2,el:1.05,dist:260,tx:0,ty:0};let meshes=[];
+const cam={az:-Math.PI/2,el:1.05,dist:260,tx:0,ty:0};let meshes=[],VIEW=null;
 const m4={
  persp(f,a,n,r){const t=1/Math.tan(f/2);return[t/a,0,0,0,0,t,0,0,0,0,(r+n)/(n-r),-1,0,0,2*r*n/(n-r),0]},
  look(e,c,u){let z=[e[0]-c[0],e[1]-c[1],e[2]-c[2]];let l=Math.hypot(...z);z=z.map(v=>v/l);let x=[u[1]*z[2]-u[2]*z[1],u[2]*z[0]-u[0]*z[2],u[0]*z[1]-u[1]*z[0]];l=Math.hypot(...x);x=x.map(v=>v/l);
@@ -370,9 +370,11 @@ function sel(c,key,lk,opts){const l=document.createElement('label'),s=document.c
 function seg(c,key,lk,opts){const l=document.createElement('label'),s=document.createElement('span');if(lk)s.dataset.k=lk;const d=document.createElement('div');d.className='seg';
  const bs=opts.map(o=>{const b=document.createElement('button');b.dataset.k=o[1];b.onclick=()=>{S[key]=o[0];bs.forEach((x,i)=>x.classList.toggle('on',opts[i][0]===S[key]));changed()};d.append(b);return b});
  bs.forEach((x,i)=>x.classList.toggle('on',opts[i][0]===S[key]));l.append(s,d);c.append(l)}
-function rng(c,key,lk,mn,mx,st,unit){const l=document.createElement('label'),r=document.createElement('div');r.className='row';const s=document.createElement('span');s.dataset.k=lk;const o=document.createElement('output');
- const i=document.createElement('input');i.type='range';i.min=mn;i.max=mx;i.step=st;i.value=S[key];const sh=()=>o.textContent=(+i.value).toString().replace('.',',')+' '+unit;sh();
- i.oninput=()=>{S[key]=+i.value;sh();changed()};r.append(s,o);l.append(r,i);c.append(l)}
+// Regler + Zahlenfeld (Wert direkt eintippen; ausserhalb des Bereichs wird begrenzt)
+function rng(c,key,lk,mn,mx,st,unit){const l=document.createElement('label'),r=document.createElement('div');r.className='row';const s=document.createElement('span');s.dataset.k=lk;const o=document.createElement('span');o.className='rnum';
+ const n=document.createElement('input');n.type='number';n.min=mn;n.max=mx;n.step=st;n.inputMode='decimal';const u=document.createElement('small');u.textContent=unit;o.append(n,u);
+ const i=document.createElement('input');i.type='range';i.min=mn;i.max=mx;i.step=st;i.value=S[key];const sh=()=>n.value=+i.value;sh();
+ i.oninput=()=>{S[key]=+i.value;sh();changed()};n.onchange=()=>{const v=Math.max(mn,Math.min(mx,+String(n.value).replace(',','.')||mn));S[key]=v;i.value=v;n.value=v;changed()};r.append(s,o);l.append(r,i);c.append(l)}
 function chk(c,key,lk){const l=document.createElement('label');l.className='chk';const i=document.createElement('input');i.type='checkbox';i.checked=S[key];i.onchange=()=>{S[key]=i.checked;changed()};const s=document.createElement('span');s.dataset.k=lk;l.append(i,s);c.append(l)}
 (function ui(){
  let c=card('text');tInput(c,'l1','line1');tInput(c,'l2','line2');tInput(c,'l3','line3');
