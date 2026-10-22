@@ -93,12 +93,12 @@ async function buildMod(m,it,slots,res,tol){
   for(const p of pl){if(alongX){for(const[y0,y1]of[[cav[1],cav[1]+RIBD],[cav[3]-RIBD,cav[3]]]){x.fillRect(p-hw-RIBW,y0,RIBW,y1-y0);x.fillRect(p+hw,y0,RIBW,y1-y0)}}
    else{for(const[x0,x1]of[[cav[0],cav[0]+RIBD],[cav[2]-RIBD,cav[2]]]){x.fillRect(x0,p-hw-RIBW,x1-x0,RIBW);x.fillRect(x0,p+hw,x1-x0,RIBW)}}}}};
  const RC=ring(x=>drawRC(x,0));if(FR>.3)FIL=[0,1,2,3].map(k=>ring(x=>drawRC(x,fin(k*FR/FN))));
- {const okT=m.type!=='drawer'&&lid!=='slide'&&lid!=='hinge',zf=fl+t,Htop=H,cw=cav[2]-cav[0],zs=[],NS=8;
+ {const okT=m.type!=='drawer'&&lid!=='slide'&&lid!=='hinge',zf=fl+t,Htop=H,cw=cav[2]-cav[0],zs=[],NS=20,RF2=3; // 20 Schritte: Rundungen glatt statt stufig
   // Griffmulde: halbrund, oben offen (Unterseite rund -> stuetzenfrei)
   const gr=okT&&m.grip?Math.min(15,cw/2-3,(H-zf)/3):0,nb=Htop-gr-Math.min(6,(H-zf)/4);
-  if(gr>=5){for(let k=0;k<=NS;k++)zs.push(nb+k*gr/NS)}
+  if(gr>=5){for(let k=0;k<=NS;k++)zs.push(nb+k*gr/NS);for(let k=1;k<6;k++)zs.push(Htop-RF2+k*RF2/6)}
   // Schaufel: innen Rundung Boden -> Vorderwand (Rampe, stuetzenfrei)
-  const sr=okT&&m.scoop?Math.min(25,(cav[3]-cav[1])/2,(H-zf)/2):0;if(sr>=5)for(let k=0;k<=NS;k++)zs.push(zf+k*sr/NS);
+  const sr=okT&&m.scoop&&!m.tray?Math.min(25,(cav[3]-cav[1])/2,(H-zf)/2):0;if(sr>=5)for(let k=0;k<=NS;k++)zs.push(zf+k*sr/NS);
   // Gravur vorne: Text 0.6 mm tief, Zeilen in 0.4-mm-Baendern
   const lt=okT?String(m.flabel||'').trim().slice(0,30):'',LD=.6;let lab=null;
   if(lt){const Ht=Math.min(10,(H-zf)*.3),zTopL=(gr>=5?nb-2:Htop-(stack?POCK:0)-3),zc=zTopL-Ht/2,cv2=document.createElement('canvas'),q=cv2.getContext('2d'),PX=10;
@@ -112,7 +112,8 @@ async function buildMod(m,it,slots,res,tol){
    fcAt=z=>{let key='',fns=[];
     if(sr>=5&&z<zf+sr){const u=Math.floor((z-zf)/(sr/NS))+.5,zz=u*sr/NS,dd=sr-Math.sqrt(Math.max(0,sr*sr-(sr-zz)*(sr-zz)));key+='s'+dd.toFixed(2);
      fns.push(x=>{x.globalCompositeOperation='source-over';x.fillRect(cav[0]-.01,cav[1]-.01,cw+.02,dd+.01);x.globalCompositeOperation='destination-out'})}
-    if(gr>=5&&z>nb){const u=Math.min(NS,Math.floor((z-nb)/(gr/NS))+.5),zz=u*gr/NS,hw=zz>=gr?gr:Math.sqrt(Math.max(0,gr*gr-(gr-zz)*(gr-zz)));key+='g'+hw.toFixed(2);
+    if(gr>=5&&z>nb){const u=Math.min(NS,Math.floor((z-nb)/(gr/NS))+.5),zz=u*gr/NS;let hw=zz>=gr?gr:Math.sqrt(Math.max(0,gr*gr-(gr-zz)*(gr-zz)));
+     if(z>Htop-RF2){const zq=(Math.floor((z-(Htop-RF2))/(RF2/6))+.5)*RF2/6;hw+=RF2-Math.sqrt(Math.max(0,RF2*RF2-zq*zq))} /* Oberkante gerundet (Schnitt wird nach oben breiter -> stuetzenfrei) */key+='g'+hw.toFixed(2);
      fns.push(x=>x.fillRect(-hw,-D/2-3,2*hw,cav[1]+D/2+3.5))}
     if(lab&&z<lab.ztop&&z>lab.ztop-lab.rows.length*lab.dz){const k=Math.floor((lab.ztop-z)/lab.dz),iv=lab.rows[k]||[];if(iv.length){key+='l'+k;fns.push(x=>iv.forEach(([a,b])=>x.fillRect(a,-D/2-1,b-a,1+LD)))}}
     return fns.length?{key,draw:x=>fns.forEach(f=>f(x))}:null}}}
