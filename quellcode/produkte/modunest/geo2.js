@@ -22,8 +22,9 @@ async function buildMod(m,it,slots,res,tol){
   for(const q of list){const R=q.side==='R',L=q.side==='L',B=q.side==='B';
    if(R||L)keyShape(x,R?W/2:-W/2,q.s,RK+c,0);else keyShape(x,q.s,B?D/2:-D/2,RK+c,1)}};
  const actAt=z=>slots.filter(q=>q.zs.some(a=>a[0]<z&&z<a[1])),omemo=new Map();
- const outline=(list,extra,tag,z)=>{z=z==null?H-.01:z;const k=list.map(q=>slots.indexOf(q)).join()+'|'+mkey(z)+'|'+(tag||'');if(!omemo.has(k))omemo.set(k,ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RADz(z));cutSlots2(x,list);texCut(x,extra||m.type==='drawer');if(extra){x.globalCompositeOperation='destination-out';extra(x)}}));return omemo.get(k)};
- const cutsIn=(z0,z1)=>{const cuts=[z0,z1];slots.forEach(q=>q.zs.forEach(a=>a.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)})));hcuts.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});return cuts.sort((a,b)=>a-b)};
+ const outline=(list,extra,tag,z)=>{z=z==null?H-.01:z;const k=list.map(q=>slots.indexOf(q)).join()+'|'+mkey(z)+'|'+(tag||'');if(!omemo.has(k))omemo.set(k,ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RADz(z));cutSlots2(x,list);texCut(x,(extra&&!extra.keepTex)||m.type==='drawer');if(extra){x.globalCompositeOperation='destination-out';extra(x)}}));return omemo.get(k)};
+ let zfc=[],fcAt=null; // Front-Merkmale (Griffmulde, Gravur, Schaufel): Schnitthoehen und Querschnitt je Hoehe
+ const cutsIn=(z0,z1)=>{const cuts=[z0,z1];zfc.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});slots.forEach(q=>q.zs.forEach(a=>a.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)})));hcuts.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});return cuts.sort((a,b)=>a-b)};
  const bands=(z0,z1,fn)=>{const cuts=cutsIn(z0,z1);
   let o=[];for(let i=0;i<cuts.length-1;i++)if(cuts[i+1]-cuts[i]>1e-6){const mid=(cuts[i]+cuts[i+1])/2;o=o.concat(fn(outline(actAt(mid),null,'',mid),cuts[i],cuts[i+1]))}return o};
  const tx=S.tex||'none',Dpt=Math.max(.3,Math.min(.8,t/2-.3)),touch=it.touch||{};
@@ -37,9 +38,12 @@ async function buildMod(m,it,slots,res,tol){
  const cutOuter=(x,skipT)=>{texCut(x,skipT)};
  const O=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD);cutOuter(x,m.type==='drawer')});
  const FR=Math.max(0,Math.min(2,t-.6)),FN=4,fin=h=>FR-Math.sqrt(Math.max(0,FR*FR-(FR-h)*(FR-h)));let FIL=[];
+ const cutR=(x,Rr)=>{x.beginPath();for(const r of Rr){r.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.closePath()}x.fill('evenodd')};
+ const band=(Ob,a,b,Rc,tag)=>{const mid=(a+b)/2,f=fcAt&&fcAt(mid);if(!f)return extrude(Ob.concat(rev(Rc)),a,b);
+  const ex=x=>{cutR(x,Rc);f.draw(x)};ex.keepTex=true;return extrude(outline(actAt(mid),ex,'fc'+f.key+'|'+tag,mid),a,b)};
  const shell=(zTop,RCh)=>{let o=[];if(stack)o=o.concat(extrude(RF,0,fl));o=o.concat(bands(fl,fl+t,(Ob,a,b)=>extrude(Ob,a,b)));
-  if(FIL.length)for(let k=0;k<FN;k++)o=o.concat(bands(fl+t+k*FR/FN,fl+t+(k+1)*FR/FN,(Ob,a,b)=>extrude(Ob.concat(rev(FIL[k])),a,b)));
-  return o.concat(bands(fl+t+(FIL.length?FR:0),zTop,(Ob,a,b)=>extrude(Ob.concat(rev(RCh)),a,b)))};
+  if(FIL.length)for(let k=0;k<FN;k++)o=o.concat(bands(fl+t+k*FR/FN,fl+t+(k+1)*FR/FN,(Ob,a,b)=>band(Ob,a,b,FIL[k],'f'+k)));
+  return o.concat(bands(fl+t+(FIL.length?FR:0),zTop,(Ob,a,b)=>band(Ob,a,b,RCh,'c')))};
  if(m.type==='drawer'){
   /* Offenes Gehaeuse (Boden, Waende, Schienen mit 45°-Schraege) ohne Stuetzen; separater Deckel; Schubladen mit Front flach druckbar */
   const cxs=q=>has(q)?6.6:Math.max(t,2.4),cL=cxs('L'),cR=cxs('R'),tbk=has('B')?6.6:Math.max(t,2.4),fb=2.4,CT=4.2,GRV=2.4,TGH=2.2,zb=fb,zc=H-CT,crd=Math.max(1,r-t);
@@ -89,6 +93,29 @@ async function buildMod(m,it,slots,res,tol){
   for(const p of pl){if(alongX){for(const[y0,y1]of[[cav[1],cav[1]+RIBD],[cav[3]-RIBD,cav[3]]]){x.fillRect(p-hw-RIBW,y0,RIBW,y1-y0);x.fillRect(p+hw,y0,RIBW,y1-y0)}}
    else{for(const[x0,x1]of[[cav[0],cav[0]+RIBD],[cav[2]-RIBD,cav[2]]]){x.fillRect(x0,p-hw-RIBW,x1-x0,RIBW);x.fillRect(x0,p+hw,x1-x0,RIBW)}}}}};
  const RC=ring(x=>drawRC(x,0));if(FR>.3)FIL=[0,1,2,3].map(k=>ring(x=>drawRC(x,fin(k*FR/FN))));
+ {const okT=m.type!=='drawer'&&lid!=='slide'&&lid!=='hinge',zf=fl+t,Htop=H,cw=cav[2]-cav[0],zs=[],NS=8;
+  // Griffmulde: halbrund, oben offen (Unterseite rund -> stuetzenfrei)
+  const gr=okT&&m.grip?Math.min(15,cw/2-3,(H-zf)/3):0,nb=Htop-gr-Math.min(6,(H-zf)/4);
+  if(gr>=5){for(let k=0;k<=NS;k++)zs.push(nb+k*gr/NS)}
+  // Schaufel: innen Rundung Boden -> Vorderwand (Rampe, stuetzenfrei)
+  const sr=okT&&m.scoop?Math.min(25,(cav[3]-cav[1])/2,(H-zf)/2):0;if(sr>=5)for(let k=0;k<=NS;k++)zs.push(zf+k*sr/NS);
+  // Gravur vorne: Text 0.6 mm tief, Zeilen in 0.4-mm-Baendern
+  const lt=okT?String(m.flabel||'').trim().slice(0,30):'',LD=.6;let lab=null;
+  if(lt){const Ht=Math.min(10,(H-zf)*.3),zTopL=(gr>=5?nb-2:Htop-(stack?POCK:0)-3),zc=zTopL-Ht/2,cv2=document.createElement('canvas'),q=cv2.getContext('2d'),PX=10;
+   q.font='100px KFModern';const cr0=q.measureText('H').actualBoundingBoxAscent/100||.7;let fs=Ht/cr0;const tw0=q.measureText(lt).width/100;fs=Math.min(fs,(cw-2*r-6)/tw0);
+   const wmm=tw0*fs+2,hmm=fs*1.3;cv2.width=Math.ceil(wmm*PX);cv2.height=Math.ceil(hmm*PX);q.font=fs*PX+'px KFModern';q.textAlign='center';q.textBaseline='middle';q.fillText(lt,cv2.width/2,cv2.height/2);
+   const d=q.getImageData(0,0,cv2.width,cv2.height).data,rows=[];
+   for(let y0=0;y0<cv2.height;y0+=4){const iv=[];let on=-1;for(let xx=0;xx<=cv2.width;xx++){let a=false;if(xx<cv2.width)for(let y=y0;y<Math.min(y0+4,cv2.height);y++)if(d[(y*cv2.width+xx)*4+3]>110){a=true;break}
+     if(a&&on<0)on=xx;if(!a&&on>=0){iv.push([on/PX-wmm/2,xx/PX-wmm/2]);on=-1}}rows.push(iv)}
+   const ztop=zc+hmm/2,dz=4/PX;lab={rows,ztop,dz};if(zc-hmm/2>zf+1)for(let k=0;k<=rows.length;k++)zs.push(ztop-k*dz);else lab=null}
+  if(zs.length){zfc=zs;
+   fcAt=z=>{let key='',fns=[];
+    if(sr>=5&&z<zf+sr){const u=Math.floor((z-zf)/(sr/NS))+.5,zz=u*sr/NS,dd=sr-Math.sqrt(Math.max(0,sr*sr-(sr-zz)*(sr-zz)));key+='s'+dd.toFixed(2);
+     fns.push(x=>{x.globalCompositeOperation='source-over';x.fillRect(cav[0]-.01,cav[1]-.01,cw+.02,dd+.01);x.globalCompositeOperation='destination-out'})}
+    if(gr>=5&&z>nb){const u=Math.min(NS,Math.floor((z-nb)/(gr/NS))+.5),zz=u*gr/NS,hw=zz>=gr?gr:Math.sqrt(Math.max(0,gr*gr-(gr-zz)*(gr-zz)));key+='g'+hw.toFixed(2);
+     fns.push(x=>x.fillRect(-hw,-D/2-3,2*hw,cav[1]+D/2+3.5))}
+    if(lab&&z<lab.ztop&&z>lab.ztop-lab.rows.length*lab.dz){const k=Math.floor((lab.ztop-z)/lab.dz),iv=lab.rows[k]||[];if(iv.length){key+='l'+k;fns.push(x=>iv.forEach(([a,b])=>x.fillRect(a,-D/2-1,b-a,1+LD)))}}
+    return fns.length?{key,draw:x=>fns.forEach(f=>f(x))}:null}}}
  const cx=it.x+it.w/2-PL.W/2,cy=it.y+it.d/2-PL.D/2,parts=[],notes=[];
  const gap=2*c,Gh=LTS+gap,zg1=H-LH,zg0=zg1-Gh;
  let body;const extra=[];
@@ -106,7 +133,7 @@ async function buildMod(m,it,slots,res,tol){
   for(const sx of[-1,1]){const x0=sx>0?Wk/2+gx:-(Wk/2+gx+LUGW);body=body.concat(perm(extrude(prof,0,LUGW),(u,v,w)=>[w+x0,u+ya,v+H]))}
   extra.push({Wk,ya,prof});
  }
- if(!flat)body=shell(stack?H-POCK:H,RC).concat(stack?extrude(outline(actAt(H-.1)).concat(rev(RP)),H-POCK,H):[]);
+ if(!flat){const fr=fcAt&&fcAt(H-.1);const exr=x=>{cutR(x,RP);fr&&fr.draw(x)};exr.keepTex=true;body=shell(stack?H-POCK:H,RC).concat(stack?extrude(fr?outline(actAt(H-.1),exr,'fcr'+fr.key,H-.1):outline(actAt(H-.1)).concat(rev(RP)),H-POCK,H):[])}
  parts.push({key:'cBox',name:m.name,tris:body,asm:[(X,Y,Z)=>[X+cx,Y+cy,Z]],mod:it.i});
  const txt=(m.label||'').trim(),RT=(lid==='plug'&&txt)?ring(x=>{x.save();x.scale(1,-1);x.font='100px KFModern';x.textAlign='center';x.textBaseline='middle';const wd=x.measureText(txt).width/100;
   x.font=Math.min(16,(W-24)/wd,D*.5)+'px KFModern';x.fillText(txt,0,0);x.restore()}):[];
