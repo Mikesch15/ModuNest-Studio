@@ -13,7 +13,7 @@ async function page(f,state,w=1000,h=800){const p=await b.newPage({viewport:{wid
  await p.goto('file://'+(f==='admin'?ROOT+'/admin/index.html':Q+'/dist/'+f+'.html'));await p.waitForTimeout(2500);return{p,errs}}
 const mode=process.argv[2];
 if(mode==='shot'){const f=process.argv[3]||'modunest',st=process.argv[4]?JSON.parse(process.argv[4]):null,w=+process.argv[5]||900;
- const ST={modunest:'mn',namenspuzzle:'np',hofpuzzle:'hp',schild:'sc',stecker:'st'},s={'mna-key':'x',...(st&&st.S?{[ST[f]+'-state']:st.S}:st||{})};const{p,errs}=await page(f,s,w,900);await p.screenshot({path:'/tmp/mn-shot.png',fullPage:f==='admin'});
+ const ST={modunest:'mn',namenspuzzle:'np',hofpuzzle:'hp',schild:'sc',stecker:'st'},s={'mna-key':'x',...(st&&st.S?{[ST[f]+'-state']:st.S}:st||{})};const{p,errs}=await page(f,s,w,900);await p.screenshot({path:'/tmp/mn-shot.png',fullPage:f==='admin'||process.argv[6]==='full'});
  console.log('/tmp/mn-shot.png',errs.length?'FEHLER '+errs.join(' | '):'');await b.close();process.exit(0)}
 const out=[],errs=[];
 // ModuNest: Planer-Konfigurationen

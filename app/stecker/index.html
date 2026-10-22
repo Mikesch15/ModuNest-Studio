@@ -108,6 +108,20 @@ input[type=text],select,.mrow input[type=number],.mrow select{border-radius:12px
 .vhint{position:absolute;left:10px;bottom:10px;right:10px;width:max-content;max-width:calc(100% - 20px);font-size:11px;color:var(--mut);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px;pointer-events:none;transition:opacity .6s}
 .vhint.gone{opacity:0}
 #help{position:fixed;inset:0;z-index:40;background:rgba(30,26,23,.45);display:none;place-items:center;padding:16px;overflow:auto}
+.uibar{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.uibar .steps{grid-column:1/-1}.uibar .info{grid-column:1/-1;margin:0}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.steps button{min-height:46px;padding:8px 6px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;line-height:1.2}.steps button.on{background:var(--acc);border-color:var(--acc);color:var(--on)}
+.uimode{justify-self:start}
+@media(max-width:420px){header{flex-wrap:wrap;gap:6px}.lang{flex-wrap:wrap;justify-content:flex-end;margin-left:auto}.brand .logo{width:44px;height:44px}}
+.panel[data-step=start] #stats{display:none}@media(max-width:899px){main:has(.panel[data-step=start]) .view{display:none}}
+.panel[data-step="1"] [data-st]:not([data-st~="1"]),.panel[data-step="2"] [data-st]:not([data-st~="2"]),.panel[data-step="3"] [data-st]:not([data-st~="3"]){display:none}
+.panel[data-expert="0"] .xp{display:none!important}
+.picks{display:grid;gap:12px}@media(min-width:560px){.picks{grid-template-columns:1fr 1fr}}
+.pick{display:grid;gap:6px;align-content:start;text-align:left;padding:18px;min-height:132px;border-radius:18px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;cursor:pointer}.pick i{font-style:normal;font-size:30px;line-height:1;color:var(--warm)}.pick b{font-family:Script,cursive;font-size:27px;line-height:1.1}.pick span{color:var(--mut);font-size:14px}.pick:hover,.pick:focus-visible,.pick.on{border-color:var(--warm)}
+.stepnav{display:flex;gap:8px}.stepnav .btn{flex:1;min-height:46px}
+.youplan{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-weight:600}
+.mini{padding:6px 12px;min-height:34px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}.mini.on{background:var(--acc);border-color:var(--acc);color:var(--on)}
+.presets{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--mut);grid-column:1/-1}
+#plmsgs li{margin:3px 0}#plmsgs li.w{color:#9a6a00}#plmsgs li.o{color:#3f7a4a}.plsum{margin:0;font-size:14px;font-weight:600}
 #closed{position:fixed;inset:0;z-index:60;background:var(--bg);display:none;place-items:center;padding:16px}#closed a{padding:11px 18px;border-radius:999px;background:var(--acc);color:var(--on);text-decoration:none;font-weight:600}
 #testtag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:#d9a21b;color:#1e1a17;align-self:center}
 .hbox{background:var(--card);border-radius:22px;max-width:440px;width:100%;padding:22px 20px;display:grid;gap:10px;justify-items:center;box-shadow:0 10px 40px rgba(0,0,0,.25)}
