@@ -1,0 +1,8 @@
+{
+ "id": "stecker",
+ "name": {"de": "Pflanzenstecker-Set", "en": "Plant marker set"},
+ "text": {"de": "Beetschilder mit deinen Pflanzennamen – ein ganzes Set auf einmal, mit Symbol und Spitze zum Einstecken.", "en": "Garden markers with your plant names – a whole set at once, with symbol and spike."},
+ "standard": "test",
+ "dateien": ["../../kern/figuren.js", "produkt.js"],
+ "features": [{"id": "symbol", "name": "Symbol auf dem Stecker"}, {"id": "script", "name": "Schreibschrift"}]
+}

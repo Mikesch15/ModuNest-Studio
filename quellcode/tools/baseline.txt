@@ -46,4 +46,9 @@ np HANNAH 180x206 H50 n9 open0 vol405
 np LEA SOPHIE 240x154 H38 n15 open34 vol392
 np EMMA 247x198 H50 n10 open0 vol517
 np fittest open0
+hp 202x150 n6 open0
+sc 180x60 H19 open0 vol48200
+sc 180x51 H14 open0 vol32300
+sc 180x68 H29 open0 vol48900
+st 4 open0 vol54900
 admin geladen=true

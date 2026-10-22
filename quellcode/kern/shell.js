@@ -13,7 +13,9 @@ function arrangePrint(parts){const gap=10,maxW=246;let cx=0,cy=0,rowH=0;const ou
 /* Volumen eines Dreiecksnetzes (mm^3) */
 const volume=t=>{let v=0;for(let i=0;i<t.length;i+=9)v+=t[i]*(t[i+4]*t[i+8]-t[i+5]*t[i+7])-t[i+1]*(t[i+3]*t[i+8]-t[i+5]*t[i+6])+t[i+2]*(t[i+3]*t[i+7]-t[i+4]*t[i+6]);return v/6};
 function frame(parts){let a=[1e9,1e9,1e9],b=[-1e9,-1e9,-1e9];parts.forEach(p=>{const q=bbox(p.tris);for(let k=0;k<3;k++){a[k]=Math.min(a[k],q.a[k]);b[k]=Math.max(b[k],q.b[k])}});
- const s=[b[0]-a[0],b[1]-a[1],b[2]-a[2]];cam.tx=(a[0]+b[0])/2;cam.ty=(a[1]+b[1])/2;cam.tz=(a[2]+b[2])/2;cam.el=.85;cam.dist=Math.max(s[0]*2.2,s[1]*2.6,s[2]*3.4,140)}
+ const s=[b[0]-a[0],b[1]-a[1],b[2]-a[2]];cam.tx=(a[0]+b[0])/2;cam.ty=(a[1]+b[1])/2;cam.tz=(a[2]+b[2])/2;cam.el=.85;
+ /* schmale (hochkant) Vorschau: Breite staerker gewichten, damit breite Teile nicht abgeschnitten werden */
+ const asp=Math.max(.5,Math.min(1.4,(cv.clientWidth/cv.clientHeight)||1));cam.dist=Math.max(s[0]*2.2/asp,s[1]*2.6,s[2]*3.4,140)}
 fit=()=>{if(built)frame(arrange(built.parts,S.view))};
 
 /* ================= UI ================= */
@@ -57,7 +59,7 @@ document.getElementById('gl').addEventListener('pointerdown',()=>document.queryS
 panel.dataset.mode=S.mode||'';buildUI();refresh();
 /* Produkt gesperrt («aus») oder in Entwicklung («test», nur mit Admin-Schluessel) -> Hinweis statt Konfigurator.
    Geaenderte Optionen -> Oberflaeche neu aufbauen (ui() raeumt gesperrte Optionen aus dem Zustand). */
-function siteGate(){const st=prodCfg().status||'live',t=document.getElementById('testtag');
+function siteGate(){const st=prodCfg().status||PRODUCT_START,t=document.getElementById('testtag');
  document.getElementById('closed').style.display=st==='aus'||(st==='test'&&!ADMIN_DEV)?'grid':'none';
  t.hidden=st==='live';t.textContent=st==='aus'?'AUS':'TEST'}
 siteGate();

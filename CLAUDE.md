@@ -13,7 +13,9 @@ Details/Geschichte: `quellcode/NOTIZEN.md` – **nur gezielt** lesen (grep), nic
 - `kern/`: `src_sign.html` (Geometrie-Kern: marching, extrude, cap/walls, plateWithPocket, zip, 3MF, Renderer), `head.html` (CSS, CONFIG, SITE/featOn), `texte.js`, `shell.js` (Rahmen, Produkt-Freigabe), `gate.js` (Freischaltung, Warenkorb), `start.html`, `admin.html`, `datenschutz.html`, `impressum.html`, `sw.js`.
 - `produkte/<id>/`: `produkt.json` (name, text, dateien, features), JS. Vertrag: globale `S`, `PRODUCT={id,name,file,store,unit,build(res,tol)->{ok,err,parts,units},snap…}`, `ui()`, `present()`, `arrange()`. Texte `Object.assign(L,{…})`, Karten-Info `i_<key>`.
 - modunest: `planner.js` (planSolve), `geo2.js` (buildMod, buildPlan), `geo.js` (Konstanten, keyShape, keyTris Klemmband, fitTestTris), `produkt.js` (UI). Optionen: plan, drawer, tall, slide, hinge, tex.
-- namenspuzzle: `produkt.js` (pzLetter, pzShape/PZ_SHAPES in 0..100 SVG-Koordinaten mit Gravur, pzDeep Greifknopf, buildPuzzle, buildPzTest). Optionen: figuren, gravur. Status «test».
+- Gemeinsam: `kern/figuren.js` (pzLetter, PZ_SHAPES 23 Figuren in 0..100 SVG-Koordinaten mit Gravur, pzShape, pzDeep Greifknopf, reliefBody, fitFont, pzText), `kern/puzzle.js` (Puzzle-Texte, buildPuzzle mit Figuren-Reihen S.perRow/S.maxShapes/S.Hs, buildPzTest, arrange/present). Einbinden per `dateien: ["../../kern/…"]`.
+- namenspuzzle (Optionen figuren, gravur), hofpuzzle (nur Figuren, Titel-Gravur; Option gravur), schild (Platte+Relief als 1 Körper, Vorschau 2-farbig über `prev`, Farbwechsel-Hinweis; Optionen figur, script, formen), stecker (Set bis 12 Namen, je Stecker 1 Körper; Optionen symbol, script).
+- Neue Produkte: `produkt.json` «standard»: "test" = Status, solange im Admin nichts gespeichert ist (kein Supabase nötig). Namenspuzzle in settings auf test; hofpuzzle/schild/stecker per standard test.
 - Geometrie: Aussenringe CCW, Löcher CW; alles ohne Stützen druckbar; Bett 256 mm (Brett ≤ 250).
 
 ## Server (Supabase «ModuNest Studio», ref sfoscpgsumukhihkdutw – andere Projekte nie anfassen)

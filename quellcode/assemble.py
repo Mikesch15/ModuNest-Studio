@@ -63,7 +63,7 @@ redirect=lambda to:'<!doctype html><meta charset="utf-8"><meta name="robots" con
 # ---- Produktseiten ----
 for P in prods:
     d='produkte/%s/'%P['id']
-    head=open(K+'head.html').read().replace("/*CSS*/",css).replace('PRODUCT_TITLE',P['name']['de'])
+    head=open(K+'head.html').read().replace("/*CSS*/",css).replace('PRODUCT_TITLE',P['name']['de']).replace('PRODUCT_START_VAL',P.get('standard','live'))
     shell=open(K+'shell.js').read().replace("/*UIBUILDERS*/",ub).replace("/*GATE*/",open(K+'gate.js').read())
     src=''.join(open(d+f).read() for f in P['dateien'])
     out=head+core+mk+exp+dl+rend+open(K+'texte.js').read()+src+'const PRODUCT_COUNT=%d;\n'%len(prods)+shell
@@ -74,7 +74,7 @@ for P in prods:
     print(P['id'],len(out)//1024,'KB')
 
 # ---- Startseite (Produktauswahl) ----
-lst=[{'id':P['id'],'name':P['name'],'text':P['text'],'bild':('data:image/webp;base64,'+b64('produkte/%s/bild.webp'%P['id'])) if os.path.exists('produkte/%s/bild.webp'%P['id']) else ''} for P in prods]
+lst=[{'id':P['id'],'name':P['name'],'text':P['text'],'standard':P.get('standard','live'),'bild':('data:image/webp;base64,'+b64('produkte/%s/bild.webp'%P['id'])) if os.path.exists('produkte/%s/bild.webp'%P['id']) else ''} for P in prods]
 st=open(K+'start.html').read().replace('PRODUCTS_JSON',json.dumps(lst,ensure_ascii=False)).replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT)
 write('app/index.html',man_link(st))
 write('index.html',redirect('app/'))
@@ -83,7 +83,7 @@ write('index.html',redirect('app/'))
 for n in ('datenschutz','impressum'):write('app/%s/index.html'%n,open(K+n+'.html').read().replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT))
 
 # ---- Admin ----
-write('admin/index.html',man_link(open(K+'admin.html').read().replace('PRODUCTS_JSON',json.dumps([{'id':P['id'],'name':P['name'],'features':P.get('features',[])} for P in prods],ensure_ascii=False))
+write('admin/index.html',man_link(open(K+'admin.html').read().replace('PRODUCTS_JSON',json.dumps([{'id':P['id'],'name':P['name'],'features':P.get('features',[]),'standard':P.get('standard','live')} for P in prods],ensure_ascii=False))
   .replace('LOGO_DATA',LOGO).replace('FONT_DATA',FONT)))
 write('app/manifest.webmanifest',MAN_ROOT);write('admin/manifest.webmanifest',MAN_ADMIN)
 

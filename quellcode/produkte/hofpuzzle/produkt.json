@@ -1,0 +1,8 @@
+{
+ "id": "hofpuzzle",
+ "name": {"de": "Hofpuzzle", "en": "Farm puzzle"},
+ "text": {"de": "Steckpuzzle mit Hoftieren, Traktor und Scheune – du wählst die Teile.", "en": "Peg puzzle with farm animals, tractor and barn – you choose the pieces."},
+ "standard": "test",
+ "dateien": ["../../kern/figuren.js", "../../kern/puzzle.js", "produkt.js"],
+ "features": [{"id": "gravur", "name": "Gravierter Titel"}]
+}

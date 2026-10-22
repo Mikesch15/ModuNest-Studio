@@ -15,7 +15,7 @@
    Ist nur eines sichtbar, geht es direkt weiter (alte Links bleiben gueltig). */
 const ALL=PRODUCTS_JSON;let SITE={};try{SITE=JSON.parse(localStorage.getItem('mn-site')||'{}')}catch(e){}
 const ADMIN_DEV=(()=>{try{return!!(localStorage.getItem('mna-key')||sessionStorage.getItem('mna-key'))}catch(e){return false}})();
-const stOf=id=>((SITE.products||{})[id]||{}).status||'live';
+const stOf=id=>((SITE.products||{})[id]||{}).status||(ALL.find(p=>p.id===id)||{}).standard||'live';
 const visible=()=>ALL.filter(p=>stOf(p.id)==='live'||(ADMIN_DEV&&stOf(p.id)!=='aus'));
 let PRODUCTS=visible();
 if(PRODUCTS.length===1&&!ADMIN_DEV)location.replace(PRODUCTS[0].id+'/'+location.search+location.hash);

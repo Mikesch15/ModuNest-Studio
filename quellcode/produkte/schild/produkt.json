@@ -1,0 +1,8 @@
+{
+ "id": "schild",
+ "name": {"de": "Stall- & Türschild", "en": "Stable & door sign"},
+ "text": {"de": "Schild mit Name, zweiter Zeile und Hof-Figur – für Pferdebox, Stall, Hundehütte oder Kinderzimmer.", "en": "Sign with name, second line and farm figure – for stable, coop, kennel or kids' room."},
+ "standard": "test",
+ "dateien": ["../../kern/figuren.js", "produkt.js"],
+ "features": [{"id": "figur", "name": "Figur auf dem Schild"}, {"id": "script", "name": "Schreibschrift"}, {"id": "formen", "name": "Formen Oval/Bogen"}]
+}

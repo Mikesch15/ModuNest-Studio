@@ -95,5 +95,6 @@ const CONFIG=Object.assign({requireCode:false,api:''},window.MN_CONFIG||{});
    Auf Geraeten mit Admin-Schluessel sind auch Produkte im Status «test» nutzbar. */
 let SITE={};try{SITE=JSON.parse(localStorage.getItem('mn-site')||'{}')}catch(e){}
 const ADMIN_DEV=(()=>{try{return!!(localStorage.getItem('mna-key')||sessionStorage.getItem('mna-key'))}catch(e){return false}})();
+const PRODUCT_START='PRODUCT_START_VAL'; // Status, solange im Admin nichts gespeichert ist (produkt.json «standard»)
 const prodCfg=()=>(SITE.products||{})[PRODUCT.id]||{},featOn=id=>!(prodCfg().off||[]).includes(id);
 const LOGO='LOGO_DATA';document.querySelectorAll('img.logo').forEach(i=>i.src=LOGO);document.querySelector('link[rel=icon]').href=LOGO;

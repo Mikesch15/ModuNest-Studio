@@ -9,6 +9,8 @@
   "en": "Name puzzle for kids – every letter a piece, in your colours."
  },
  "dateien": [
+  "../../kern/figuren.js",
+  "../../kern/puzzle.js",
   "produkt.js"
  ],
  "features": [
