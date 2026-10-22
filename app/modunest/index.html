@@ -862,7 +862,9 @@ function renderMods(){const list=document.getElementById('modlist');list.innerHT
    [[1,1,'pr_1'],[2,2,'pr_4'],[3,2,'pr_6'],[3,3,'pr_9']].forEach(([cc,rr,k])=>{const b=document.createElement('button');b.className='mini'+((m.cols||1)===cc&&(m.rows||1)===rr?' on':'');b.textContent=tr(k);b.onclick=()=>{m.cols=cc;m.rows=rr;renderMods();changed()};pr.append(b)});row.append(pr);
    const dv=mkSel(m,'div','divN',[0,1,2,3]);dv.classList.add('xp');
    o.append(mkSel(m,'cols','cols',[1,2,3,4]),mkSel(m,'rows','rows',[1,2,3,4]),dv,mkSel(m,'lid','lidSel',['none','plug','slide','hinge'].filter(featOn),'lid_'));
-   const l3=document.createElement('label');l3.className='chk xp';const c3=document.createElement('input');c3.type='checkbox';c3.checked=!!m.tray;c3.onchange=()=>{m.tray=c3.checked;changed()};const s3=document.createElement('span');s3.textContent=tr('tray');l3.append(c3,s3);o.append(l3);
+   const l3=document.createElement('label');l3.className='chk';const c3=document.createElement('input');c3.type='checkbox';c3.checked=!!m.tray;c3.onchange=()=>{m.tray=c3.checked;renderMods();changed()};const s3=document.createElement('span');s3.textContent=tr('tray');l3.append(c3,s3);o.append(l3);
+   // Einsatzhoehe (die Geometrie begrenzt sie auf die Boxtiefe)
+   if(m.tray){if(m.trayH==null)m.trayH=22;const l5=document.createElement('label'),s5=document.createElement('span');s5.textContent=tr('trayH')+' (mm)';l5.append(s5,numIn(m,"trayH",8,Math.max(10,(+m.h||PL.H||60)-5)));o.append(l5)}
    const l4=document.createElement('label'),s4=document.createElement('span'),i4=document.createElement('input');l4.className='xp';s4.textContent=tr('label');i4.type='text';i4.maxLength=40;i4.value=m.label||'';i4.oninput=()=>{m.label=i4.value;changed()};l4.append(s4,i4);o.append(l4)}
   row.append(o);list.append(row)})}
 function buildPlanUI(){let c=tag(card(S.mode==='plan'?'spacePlan':'spaceOne'),'1');c._t=PL;if(S.mode==='plan')para(c,'measureTip');
