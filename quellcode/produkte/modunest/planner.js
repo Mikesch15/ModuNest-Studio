@@ -7,10 +7,10 @@ let PL={one:{type:'box',div:0,lid:'plug',cols:2,rows:2,tray:false,trayH:22,label
 
 /* Rückgabe {ok, msgs:[[key,...args]], items:[{i,x,y,w,d,h,mod}], seams:[...], keys:[...]} (Zellen exakt aneinander) */
 const zlo=it=>it.mod.type==='drawer'?3.9:(S.stack?FOOT:0)+S.wall+1.5;
-const zhi=it=>{const h=it.h,l=it.mod.lid;return it.mod.type==='drawer'?h-3.9:l==='slide'?h-1.6-2.4-2*cl2()-1.5:(l==='plug'&&S.stack)||(l!=='hinge'&&l!=='slide'&&S.stack&&it.mod.type!=='drawer')?h-POCK-1.5:h-1.5};
+const zhi=it=>{const h=it.h,l=it.mod.lid;return it.mod.type==='drawer'?h-3.9:l==='slide'?h-1.6-2.4-2*cl2()-1.5:(l==='plug'&&STK())||(l!=='hinge'&&l!=='slide'&&S.stack&&it.mod.type!=='drawer')?h-POCK-1.5:h-1.5};
 /* Schluessel: von unten einstecken. Tasche nach unten offen, oben geschlossen, bei allen Modulen auf gleicher Hoehe (z=0). */
 const keyMarg=()=>Math.max(9,(+S.r||0)+6.8);
-function keyZ(F,G){const Hm=Math.min(F.h,G.h),Lk=Math.min(16,Hm-(S.stack?POCK:0)-S.wall-FOOT-4);if(Lk<6)return{Lk:0,zs:[]};
+function keyZ(F,G){const Hm=Math.min(F.h,G.h),Lk=Math.min(40,Hm-POCK-S.wall-FOOT-4);if(Lk<6)return{Lk:0,zs:[]};
  const L=Math.round(Lk*10)/10;return{Lk:L,zs:[[-1e3,L+.3]]}}
 const effPlan=()=>S.mode==='single'?{...PL,fill:true,mods:[{...PL.one,w:PL.W,d:PL.D,h:PL.H}]}:PL;
 function planSolve(P){

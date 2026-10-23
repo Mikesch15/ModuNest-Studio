@@ -1,7 +1,8 @@
 /* ================= ModuNest-Geometrie ================= */
 const FOOT=2,POCK=2.6,DS=3,WN=6,WH=9,RK=.8,LT=2.4,LD=.8,KEYMAX=30;
 const cl2=()=>[.15,.25,.35,.45,.6][(+S.fit||3)-1]/2;
-const LIDX=.05,SLIDEX=.15; // Zusatz-Spiel je Seite: Steckdeckel, Schiebedeckel (Schublade: +.2 in geo2 dg; Einsatz fest .6)
+const STK=()=>!!S.stack&&S.mode!=='plan'; // im Schubladen-Planer nie stapelbar
+const LIDX=-.025,SLIDEX=.15; // Zusatz-Spiel je Seite: Steckdeckel, Schiebedeckel (Schublade: +.2 in geo2 dg; Einsatz fest .6)
 const poly=(x,p)=>{x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.closePath();x.fill()};
 const rr=(x,x0,y0,x1,y1,r)=>{x.beginPath();x.roundRect(x0,y0,x1-x0,y1-y0,Math.max(0,Math.min(r,(x1-x0)/2,(y1-y0)/2)));x.fill()};
 // Schmetterlings-Verbinder: Fliege mit schmaler Taille, abgerundet. e = Aufweitung (Spiel).
@@ -10,8 +11,9 @@ const dvY=D=>D>130?[-D/6,D/6]:[0];
 // Verbinder mit Klick: knapp ueber der Nut-Oeffnung hat der Schluessel einen Ring (KB hoch, je Seite Spiel + CLK breiter),
 // die Nut dort eine passende Vertiefung. Darunter bleibt eine LIP hohe Kante mit normalem Spiel: der Ring drueckt sich
 // beim Einschieben darueber und rastet ein -> faellt nicht heraus. Druck stehend, Kanten 0.3 mm: keine Stuetzen.
-const KB=2.5,LIP=.4,CLK=.15;
-const clickZ=()=>{const z=(S.stack?FOOT:0)+LIP;return[z,z+KB+.1]}; // Vertiefung in der Nut (z von/bis)
+const KB=2.5,LIP=.4,CLK=.06,FLR=.6; // FLR: ohne Fuss Nut-Oeffnung unten 0.6 mm aufgeweitet (gegen Elefantenfuss)
+const clickZ=()=>{const z=(STK()?FOOT:FLR)+LIP;return[z,z+KB+.1]};
+const inFlare=z=>!STK()&&z<FLR; // Vertiefung in der Nut (z von/bis)
 const inClk=z=>{const[a,b]=clickZ();return z>a&&z<b};
 function keyTris(Lk,res,tol){const R=e=>{const m=mk(WH+4,WH+4,res);keyShape(m.x,0,0,e);return marching(fieldOf(m),m.c.width,m.c.height,res).map(q=>simplify(q,tol))};
  const z0=clickZ()[0]+.05,z1=z0+KB,a=R(RK),b=R(RK+cl2()+CLK),o=[];cap(a,0,false,o);walls(a,0,z0,o);cap(b.concat(rev(a)),z0,false,o);walls(b,z0,z1,o);cap(b.concat(rev(a)),z1,true,o);
@@ -23,7 +25,7 @@ function keyTris(Lk,res,tol){const R=e=>{const m=mk(WH+4,WH+4,res);keyShape(m.x,
   if(Lk-zm>.5&&T.length===3){const out=[T[0]];cap(a1.concat(rev(out)),zm,true,o);walls(out,zm,ze,o);cap(rev(T.slice(1)),ze,true,o);walls(T,ze,Lk,o);cap(T.slice(0,2),Lk,true,o);cap([T[2]],Lk,true,o)}
   else{cap(a1.concat(rev(a2)),zm,true,o);walls(a2,zm,Lk,o);cap(a2,Lk,true,o)}return o}
  walls(a,z1,Lk,o);cap(a,Lk,true,o);return o}
-function singleKeyZ(){const Lk=Math.min(16,S.H-(S.stack?POCK:0)-S.wall-FOOT-4);if(Lk<6)return{Lk:0,zs:[]};const L=Math.round(Lk*10)/10;return{Lk:L,zs:[[-1e3,L+.3]]}}
+function singleKeyZ(){const Lk=Math.min(40,S.H-(STK()?POCK:0)-S.wall-FOOT-4);if(Lk<6)return{Lk:0,zs:[]};const L=Math.round(Lk*10)/10;return{Lk:L,zs:[[-1e3,L+.3]]}}
 function cellRects(x0,y0,x1,y1,cols,rows,td){const cw=(x1-x0-(cols-1)*td)/cols,ch=(y1-y0-(rows-1)*td)/rows,o=[];
  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++)o.push([x0+i*(cw+td),y0+j*(ch+td),x0+i*(cw+td)+cw,y0+j*(ch+td)+ch]);return{o,cw,ch}}
 
