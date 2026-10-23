@@ -143,9 +143,9 @@ async function buildMod(m,it,slots,res,tol){
   const RL=ring(x=>rr(x,-Wl/2,-Ll/2,Wl/2,Ll/2,Math.min(cr,3))),RG=ring(x=>rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2));
   parts.push({key:'cLid',name:m.name+' Slide lid',tris:plateWithPocket(RL,RG,LTS,1),asm:[(X,Y,Z)=>[X+cx,Y+cy-D/2+Ll/2,Z+zg0+cs]],mod:it.i})}
  if(lid==='hinge'){const{Wk,ya}=extra[0],plateRear=ya-RKN-.8,zx=Wk/2+.4+LUGW+.5;
-  const RL=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD.map(v=>Math.min(v,3)));x.globalCompositeOperation='destination-out';x.fillRect(-zx,plateRear,2*zx,D);x.globalCompositeOperation='source-over';x.fillRect(-Wk/2,plateRear-2,Wk,ya-plateRear+2)});
+  const RL=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD.map(v=>Math.min(v,3)));x.globalCompositeOperation='destination-out';x.fillRect(-W,plateRear,2*W,D);x.globalCompositeOperation='source-over';x.fillRect(-Wk/2,plateRear-2,Wk,ya-plateRear+2)}); // nichts hinter der Achse: sonst taucht es beim Aufklappen in die Rueckwand
   let tr=extrude(RL,0,LTS);
-  const kn=ringW(2*RKN+8,2*RKN+8,x=>{x.beginPath();x.arc(0,RKN,RKN,0,6.2832);x.fill();x.globalCompositeOperation='destination-out';x.beginPath();x.arc(0,RKN,PINH,0,6.2832);x.fill()});
+  const kc=RKN-.15,kn=ringW(2*RKN+8,2*RKN+8,x=>{x.beginPath();x.arc(0,kc,RKN-.25,0,6.2832);x.fill();x.globalCompositeOperation='destination-out';x.beginPath();x.arc(0,kc,PINH,0,6.2832);x.fill()}); // Achse genau auf Hoehe der Laschen (H+RKN), 0.25 Luft zur Kistenoberkante
   tr=tr.concat(perm(extrude(kn,0,Wk),(u,v,w)=>[w-Wk/2,u+ya,v]));
   parts.push({key:'cLid',name:m.name+' Hinge lid',tris:tr,asm:[(X,Y,Z)=>[X+cx,Y+cy,Z+H+.15]],mod:it.i});
   const pinL=Wk+2*(LUGW+.4)-.6,pr=ringW(8,8,x=>{x.beginPath();x.arc(0,0,PINH-.25,0,6.2832);x.fill()});
