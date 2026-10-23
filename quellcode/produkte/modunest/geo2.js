@@ -20,7 +20,7 @@ async function buildMod(m,it,slots,res,tol){
  const shp=hc.map(v=>v>=H-1e-6),RADz=z=>hc.map(v=>z<v-1e-6?0:r),mkey=z=>hc.map(v=>z<v-1e-6?1:0).join(''),hcuts=hc.filter(v=>v>0&&v<H-1e-6);
  const RAD=shp.map(s=>s?0:r);
  const RADP=shp.map(s=>s?0:rp),RADF=shp.map(s=>s?0:rf),RADC=shp.map(s=>s?.8:cr);
- const cutSlots2=(x,list,z)=>{x.globalCompositeOperation='destination-out';const e=RK+c+(z!=null&&inClk(z)?CLK+.05:0)+(z!=null&&inFlare(z)?.25:0); // Klick-Vertiefung
+ const cutSlots2=(x,list,z)=>{x.globalCompositeOperation='destination-out';const e=RK+c-SLOTX+(z!=null&&inClk(z)?CLK+.05:0)+(z!=null&&inFlare(z)?.25:0); // Klick-Vertiefung
   for(const q of list){const R=q.side==='R',L=q.side==='L',B=q.side==='B';
    if(R||L)keyShape(x,R?W/2:-W/2,q.s,e,0);else keyShape(x,q.s,B?D/2:-D/2,e,1)}};
  const actAt=z=>slots.filter(q=>q.zs.some(a=>a[0]<z&&z<a[1])),omemo=new Map();

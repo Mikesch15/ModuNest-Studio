@@ -2,7 +2,7 @@
 const FOOT=2,POCK=2.6,DS=3,WN=6,WH=9,RK=.8,LT=2.4,LD=.8,KEYMAX=30;
 const cl2=()=>[.15,.25,.35,.45,.6][(+S.fit||3)-1]/2;
 const STK=()=>!!S.stack&&S.mode!=='plan'; // im Schubladen-Planer nie stapelbar
-const LIDX=-.025,SLIDEX=.15; // Zusatz-Spiel je Seite: Steckdeckel, Schiebedeckel (Schublade: +.2 in geo2 dg; Einsatz fest .6)
+const LIDX=-.025,SLIDEX=.15,SLOTX=.05; // SLOTX: Verbinder-Nut in der Kiste ist halb offen (Aussenkontur) und druckt weiter als das Loch im Teststueck (Mike: wackelt wie Stufe 4) // Zusatz-Spiel je Seite: Steckdeckel, Schiebedeckel (Schublade: +.2 in geo2 dg; Einsatz fest .6)
 const poly=(x,p)=>{x.beginPath();p.forEach((q,i)=>i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]));x.closePath();x.fill()};
 const rr=(x,x0,y0,x1,y1,r)=>{x.beginPath();x.roundRect(x0,y0,x1-x0,y1-y0,Math.max(0,Math.min(r,(x1-x0)/2,(y1-y0)/2)));x.fill()};
 // Schmetterlings-Verbinder: Fliege mit schmaler Taille, abgerundet. e = Aufweitung (Spiel).
