@@ -146,7 +146,7 @@ async function buildMod(m,it,slots,res,tol){
  if(lid==='plug')parts.push({key:'cLid',name:m.name+' Lid',tris:mirY(lidTris({O,F:stack?ring(x=>rr4(x,P[0]+c+LIDX,P[1]+c+LIDX,P[2]-c-LIDX,P[3]-c-LIDX,RADF.map(v=>Math.max(.4,v-LIDX)))):RF},RT,stack)),asm:[(X,Y,Z)=>[X+cx,-Y+cy,-Z+H+LT+10]],mod:it.i});
  if(lid==='slide'){const Wl=cav[2]-cav[0]+2*GD-gap,Ll=cav[3]+D/2-cs;
   const RL=ring(x=>rr(x,-Wl/2,-Ll/2,Wl/2,Ll/2,Math.min(cr,3))),RG=ring(x=>rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2));
-  parts.push({key:'cLid',name:m.name+' Slide lid',tris:plateWithPocket(RL,RG,LTS,1),asm:[(X,Y,Z)=>[X+cx,Y+cy-D/2+Ll/2,Z+zg0+cs]],mod:it.i})}
+  parts.push({key:'cLid',name:m.name+' Slide lid',tris:plateWithPocket(RL,RG,LTS,1),asm:[(X,Y,Z)=>[X+cx+(cav[0]+cav[2])/2,Y+cy-D/2+Ll/2,Z+zg0+cs]],mod:it.i})}
  if(lid==='hinge'){const{Wk,ya}=extra[0],plateRear=ya-RKN-.8,zx=Wk/2+.4+LUGW+.5;
   const RL=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD);x.globalCompositeOperation='destination-out';x.fillRect(-W,plateRear,2*W,D);x.globalCompositeOperation='source-over';x.fillRect(-Wk/2,plateRear-2,Wk,ya-plateRear+2)}); // nichts hinter der Achse: sonst taucht es beim Aufklappen in die Rueckwand
   let tr=extrude(RL,0,LTS);
