@@ -72,6 +72,8 @@ const TPL={besteck:{W:300,D:420,H:60,mods:[B(75,280,55),B(75,280,55),B(75,280,55
  desk:{W:360,D:300,H:50,mods:[B(120,150,45,{cols:2,rows:2}),B(120,150,45),B(120,150,45,{cols:3}),B(60,150,45),B(60,150,45),B(120,150,45),B(120,150,45,{rows:2})]}};
 function applyTpl(id){const t=TPL[id];if(S.mode!=='plan'){S.mode='plan';PRODUCT.onChange()}Object.assign(PL,{W:t.W,D:t.D,H:t.H,fill:true,manual:false});PL.mods=JSON.parse(JSON.stringify(t.mods));FRESH=false;S.step=2;changed();buildUI()}
 let SEL=null; // angetippte Kiste (Index im Plan)
+// Plan: aendern sich Platz oder Kisten (Masse, Art, Anzahl), wird automatisch neu angeordnet; nur Verschieben/Drehen behaelt die eigene Anordnung
+const layoutSig=()=>JSON.stringify([PL.W,PL.D,PL.H,PL.fill,(PL.mods||[]).map(m=>[m.type,m.w,m.d,m.h])]);let lastSig=null,MOVED=false;
 function selectMod(ix){SEL=ix;if(S.step!==2)goStep(2);renderMods();present(false);const r=document.querySelectorAll('#modlist .mrow')[S.mode==='single'?0:ix];if(r)r.scrollIntoView({behavior:'smooth',block:'center'})}
 
 /* ================= ModuNest: Oberflaeche, Vorschau, Anordnung ================= */
@@ -172,7 +174,7 @@ function topView(sol){const e=document.getElementById('topv');if(!e)return;if(S.
  e.querySelectorAll('[data-k]').forEach(x=>x.textContent=tr(x.dataset.k));
  const svg=e.querySelector('svg');
  // Ziehen: beim ersten Verschieben werden die aktuellen Positionen aller Kisten uebernommen (eigene Anordnung)
- const freeze=()=>{if(PL.manual)return;sol.items.forEach(it=>{const m=PL.mods[it.i];m.px=it.x;m.py=it.y;m.prot=!!it.rot;m.w=it.rot?it.d:it.w;m.d=it.rot?it.w:it.d});PL.manual=true;renderMods()}; // gestreckte Masse uebernehmen = was man sieht
+ const freeze=()=>{if(PL.manual)return;sol.items.forEach(it=>{const m=PL.mods[it.i];m.px=it.x;m.py=it.y;m.prot=!!it.rot;m.w=it.rot?it.d:it.w;m.d=it.rot?it.w:it.d});PL.manual=true;lastSig=layoutSig();renderMods()}; // gestreckte Masse uebernehmen = was man sieht
  e.querySelectorAll('g[data-i]').forEach(g=>{const i=+g.dataset.i,r=g.querySelector('rect'),tx=g.querySelector('text');
   g.onpointerdown=ev=>{if(!S.expert){g.onpointerup=()=>{g.onpointerup=null;selectMod(i)};return}ev.preventDefault();g.setPointerCapture(ev.pointerId);const pt=q=>{const P=svg.createSVGPoint();P.x=q.clientX;P.y=q.clientY;return P.matrixTransform(svg.getScreenCTM().inverse())};
    const it=its.find(t=>t.i===i),p0=pt(ev),x0=it.x,y0=it.y;let moved=false,nx=x0,ny=y0;
@@ -182,8 +184,8 @@ function topView(sol){const e=document.getElementById('topv');if(!e)return;if(S.
     const sn=(v,c)=>{let b=Math.round(v),bd=6;for(const q of c)if(Math.abs(q-v)<bd){bd=Math.abs(q-v);b=q}return b};
     const o=its.filter(t=>t.i!==i);nx=sn(nx,[0,W-it.w,...o.flatMap(t=>[t.x+t.w,t.x-it.w,t.x])]);ny=sn(ny,[0,D-it.d,...o.flatMap(t=>[t.y+t.d,t.y-it.d,t.y])]);
     r.setAttribute('x',nx);r.setAttribute('y',D-ny-it.d);tx.setAttribute('x',nx+it.w/2);tx.setAttribute('y',D-ny-it.d/2)};
-   g.onpointerup=()=>{g.onpointermove=g.onpointerup=null;if(!moved){selectMod(i);return}freeze();const m=PL.mods[i];m.px=nx;m.py=ny;SEL=i;renderMods();changed()}}});
- const ro=e.querySelector('#trot');if(ro)ro.onclick=()=>{freeze();const m=PL.mods[SEL];if(!m)return;m.prot=!m.prot;const w=m.prot?m.d:m.w,d=m.prot?m.w:m.d;m.px=Math.min(m.px,PL.W-w);m.py=Math.min(m.py,PL.D-d);changed()};
+   g.onpointerup=()=>{g.onpointermove=g.onpointerup=null;if(!moved){selectMod(i);return}freeze();const m=PL.mods[i];m.px=nx;m.py=ny;SEL=i;MOVED=true;renderMods();changed()}}});
+ const ro=e.querySelector('#trot');if(ro)ro.onclick=()=>{freeze();const m=PL.mods[SEL];if(!m)return;m.prot=!m.prot;const w=m.prot?m.d:m.w,d=m.prot?m.w:m.d;m.px=Math.min(m.px,PL.W-w);m.py=Math.min(m.py,PL.D-d);MOVED=true;changed()};
  const au=e.querySelector('#tauto');if(au)au.onclick=()=>{PL.manual=false;PL.mods.forEach(m=>{delete m.px;delete m.py;delete m.prot});changed()}}
 // Neue Kiste in eigener Anordnung: erste freie Stelle (5-mm-Raster), sonst links vorne (Fehler zeigt Ueberlappung)
 function spotFor(m){const os=PL.mods.filter(q=>q!==m&&q.px!=null).map(q=>({x:q.px,y:q.py,w:q.prot?q.d:q.w,d:q.prot?q.w:q.d}));
@@ -207,4 +209,4 @@ const PRODUCT={dimKeys:['cBox'],pick:ix=>selectMod(ix),onShared(){S.step=2;lastM
  snapCount:s=>s.S.mode==='plan'?(s.PL.mods||[]).length:1,
  snapInfo:s=>(s.S.mode==='plan'?trf('cartMods',(s.PL.mods||[]).length):tr('cartOne'))+' · '+s.PL.W+' × '+s.PL.D+' × '+s.PL.H+' mm',
  // Wechsel Einzelbox <-> Planer: Masse getrennt merken
- onChange(){uiState();if(S.mode!==lastMode){lastMode=S.mode;const o=PL.alt||{W:140,D:110,H:65};PL.alt={W:PL.W,D:PL.D,H:PL.H};PL.W=o.W;PL.D=o.D;PL.H=o.H;buildUI();panel.dataset.mode=S.mode}}};
+ onChange(){uiState();{const sg=layoutSig();if(S.mode==='plan'&&PL.manual&&lastSig!==null&&sg!==lastSig&&!MOVED){PL.manual=false;PL.mods.forEach(m=>{delete m.px;delete m.py;delete m.prot})}MOVED=false;lastSig=layoutSig()}if(S.mode!==lastMode){lastMode=S.mode;const o=PL.alt||{W:140,D:110,H:65};PL.alt={W:PL.W,D:PL.D,H:PL.H};PL.W=o.W;PL.D=o.D;PL.H=o.H;buildUI();panel.dataset.mode=S.mode}}};
