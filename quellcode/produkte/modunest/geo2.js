@@ -118,7 +118,7 @@ async function buildMod(m,it,slots,res,tol){
     if(lab&&z<lab.ztop&&z>lab.ztop-lab.rows.length*lab.dz){const k=Math.floor((lab.ztop-z)/lab.dz),iv=lab.rows[k]||[];if(iv.length){key+='l'+k;fns.push(x=>iv.forEach(([a,b])=>x.fillRect(a,-D/2-1,b-a,1+LD)))}}
     return fns.length?{key,draw:x=>fns.forEach(f=>f(x))}:null}}}
  const cx=it.x+it.w/2-PL.W/2,cy=it.y+it.d/2-PL.D/2,parts=[],notes=[];
- const gap=2*c,Gh=LTS+gap,zg1=H-LH,zg0=zg1-Gh;
+ const cs=c+SLIDEX,gap=2*cs,Gh=LTS+gap,zg1=H-LH,zg0=zg1-Gh;
  let body;const extra=[];
  if(lid==='slide'){
   const lowR={O,F:RF,C:RC};const lowT=shell(zg0,RC);body=lowT;
@@ -138,10 +138,10 @@ async function buildMod(m,it,slots,res,tol){
  parts.push({key:'cBox',name:m.name,tris:body,asm:[(X,Y,Z)=>[X+cx,Y+cy,Z]],mod:it.i});
  const txt=(m.label||'').trim(),RT=(lid==='plug'&&txt)?ring(x=>{x.save();x.scale(1,-1);x.font='100px KFModern';x.textAlign='center';x.textBaseline='middle';const wd=x.measureText(txt).width/100;
   x.font=Math.min(16,(W-24)/wd,D*.5)+'px KFModern';x.fillText(txt,0,0);x.restore()}):[];
- if(lid==='plug')parts.push({key:'cLid',name:m.name+' Lid',tris:lidTris({O,F:RF},RT,stack),asm:[(X,Y,Z)=>[X+cx,-Y+cy,-Z+H+LT+10]],mod:it.i});
- if(lid==='slide'){const Wl=cav[2]-cav[0]+2*GD-gap,Ll=cav[3]+D/2-c;
+ if(lid==='plug')parts.push({key:'cLid',name:m.name+' Lid',tris:lidTris({O,F:stack?ring(x=>rr4(x,P[0]+c+LIDX,P[1]+c+LIDX,P[2]-c-LIDX,P[3]-c-LIDX,RADF.map(v=>Math.max(.4,v-LIDX)))):RF},RT,stack),asm:[(X,Y,Z)=>[X+cx,-Y+cy,-Z+H+LT+10]],mod:it.i});
+ if(lid==='slide'){const Wl=cav[2]-cav[0]+2*GD-gap,Ll=cav[3]+D/2-cs;
   const RL=ring(x=>rr(x,-Wl/2,-Ll/2,Wl/2,Ll/2,Math.min(cr,3))),RG=ring(x=>rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2));
-  parts.push({key:'cLid',name:m.name+' Slide lid',tris:plateWithPocket(RL,RG,LTS,1),asm:[(X,Y,Z)=>[X+cx,Y+cy-D/2+Ll/2,Z+zg0+c]],mod:it.i})}
+  parts.push({key:'cLid',name:m.name+' Slide lid',tris:plateWithPocket(RL,RG,LTS,1),asm:[(X,Y,Z)=>[X+cx,Y+cy-D/2+Ll/2,Z+zg0+cs]],mod:it.i})}
  if(lid==='hinge'){const{Wk,ya}=extra[0],plateRear=ya-RKN-.8,zx=Wk/2+.4+LUGW+.5;
   const RL=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD.map(v=>Math.min(v,3)));x.globalCompositeOperation='destination-out';x.fillRect(-zx,plateRear,2*zx,D);x.globalCompositeOperation='source-over';x.fillRect(-Wk/2,plateRear-2,Wk,ya-plateRear+2)});
   let tr=extrude(RL,0,LTS);
