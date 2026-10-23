@@ -708,7 +708,8 @@ async function buildMod(m,it,slots,res,tol){
   x.font=Math.min(16,(W-24)/wd,D*.5)+'px KFModern';x.fillText(txt,0,0);x.restore()}):[];
  if(lid==='plug')parts.push({key:'cLid',name:m.name+' Lid',tris:mirY(lidTris({O,F:stack?ring(x=>rr4(x,P[0]+c+LIDX,P[1]+c+LIDX,P[2]-c-LIDX,P[3]-c-LIDX,RADF.map(v=>Math.max(.4,v-LIDX)))):RF},RT,stack)),asm:[(X,Y,Z)=>[X+cx,-Y+cy,-Z+H+LT+10]],mod:it.i});
  if(lid==='slide'){const Wl=cav[2]-cav[0]+2*GD-gap,Ll=cav[3]+D/2-cs;
-  const RL=ring(x=>rr(x,-Wl/2,-Ll/2,Wl/2,Ll/2,Math.min(cr,3))),RG=ring(x=>rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2));
+  const ox=(cav[0]+cav[2])/2,oy=-D/2+Ll/2,RL=ring(x=>{x.beginPath();x.roundRect(-Wl/2,-Ll/2,Wl,Ll,[0,0,Math.max(.5,cr-cs),Math.max(.5,cr-cs)]);x.fill(); /* hinten wie die Nut gerundet, vorne exakt der Kistenumriss */
+   x.globalCompositeOperation='destination-in';rr4(x,-W/2-ox,-D/2-oy,W/2-ox,D/2-oy,RAD)}),RG=ring(x=>rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2));
   parts.push({key:'cLid',name:m.name+' Slide lid',tris:plateWithPocket(RL,RG,LTS,1),asm:[(X,Y,Z)=>[X+cx+(cav[0]+cav[2])/2,Y+cy-D/2+Ll/2,Z+zg0+cs]],mod:it.i})}
  if(lid==='hinge'){const{Wk,ya}=extra[0],plateRear=ya-RKN-.8,zx=Wk/2+.4+LUGW+.5;
   const RL=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD);x.globalCompositeOperation='destination-out';x.fillRect(-W,plateRear,2*W,D);x.globalCompositeOperation='source-over';x.fillRect(-Wk/2,plateRear-2,Wk,ya-plateRear+2)}); // nichts hinter der Achse: sonst taucht es beim Aufklappen in die Rueckwand
@@ -1061,7 +1062,7 @@ function expertBar(){panel.dataset.expert=S.expert?'1':'0';if(panel.querySelecto
  const bar=document.createElement('div');bar.className='uibar';const md=document.createElement('div');md.className='seg uimode';
  [[false,'mEasy'],[true,'mExpert']].forEach(([v,k])=>{const b=document.createElement('button');b.dataset.k=k;b.classList.toggle('on',!!S.expert===v);b.onclick=()=>{S.expert=v;md.querySelectorAll('button').forEach((x,n)=>x.classList.toggle('on',n===(v?1:0)));panel.dataset.expert=v?'1':'0';save()};md.append(b)});
  bar.append(md);document.getElementById('stats').after(bar)}
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261023-960c5</p></footer>');applyLang()}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261023-4741b</p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');

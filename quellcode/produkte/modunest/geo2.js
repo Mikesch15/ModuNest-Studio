@@ -145,7 +145,8 @@ async function buildMod(m,it,slots,res,tol){
   x.font=Math.min(16,(W-24)/wd,D*.5)+'px KFModern';x.fillText(txt,0,0);x.restore()}):[];
  if(lid==='plug')parts.push({key:'cLid',name:m.name+' Lid',tris:mirY(lidTris({O,F:stack?ring(x=>rr4(x,P[0]+c+LIDX,P[1]+c+LIDX,P[2]-c-LIDX,P[3]-c-LIDX,RADF.map(v=>Math.max(.4,v-LIDX)))):RF},RT,stack)),asm:[(X,Y,Z)=>[X+cx,-Y+cy,-Z+H+LT+10]],mod:it.i});
  if(lid==='slide'){const Wl=cav[2]-cav[0]+2*GD-gap,Ll=cav[3]+D/2-cs;
-  const RL=ring(x=>rr(x,-Wl/2,-Ll/2,Wl/2,Ll/2,Math.min(cr,3))),RG=ring(x=>rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2));
+  const ox=(cav[0]+cav[2])/2,oy=-D/2+Ll/2,RL=ring(x=>{x.beginPath();x.roundRect(-Wl/2,-Ll/2,Wl,Ll,[0,0,Math.max(.5,cr-cs),Math.max(.5,cr-cs)]);x.fill(); /* hinten wie die Nut gerundet, vorne exakt der Kistenumriss */
+   x.globalCompositeOperation='destination-in';rr4(x,-W/2-ox,-D/2-oy,W/2-ox,D/2-oy,RAD)}),RG=ring(x=>rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2));
   parts.push({key:'cLid',name:m.name+' Slide lid',tris:plateWithPocket(RL,RG,LTS,1),asm:[(X,Y,Z)=>[X+cx+(cav[0]+cav[2])/2,Y+cy-D/2+Ll/2,Z+zg0+cs]],mod:it.i})}
  if(lid==='hinge'){const{Wk,ya}=extra[0],plateRear=ya-RKN-.8,zx=Wk/2+.4+LUGW+.5;
   const RL=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD);x.globalCompositeOperation='destination-out';x.fillRect(-W,plateRear,2*W,D);x.globalCompositeOperation='source-over';x.fillRect(-Wk/2,plateRear-2,Wk,ya-plateRear+2)}); // nichts hinter der Achse: sonst taucht es beim Aufklappen in die Rueckwand
