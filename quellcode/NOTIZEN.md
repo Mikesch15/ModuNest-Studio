@@ -45,6 +45,7 @@ cd quellcode && python3 assemble.py   # baut alles (braucht Pillow für die Icon
 - Spiel je Seite = cl2() (Passungsstufe) für Verbinder, Stapelrand, Gehäusedeckel; Zusatz (23.10., geo.js): Steckdeckel +LIDX .05, Schiebedeckel +SLIDEX .15, Schublade +.2 (dg), Einsatz fest .6 (tw). Ungetestet.
 - Klappdeckel (23.10.): Platte endet überall vor der Achse (plateRear), nur Lasche zum Gelenkauge; Auge-Mitte genau H+RKN, Radius RKN-.25. Vorher ragte die Platte ausserhalb der Laschen hinter die Achse → nicht aufklappbar. Drehprüfung 0–120° ohne Berührung (Rechnung, ungedruckt).
 - Klappdeckel-Kiste: Rückkante ausserhalb der Laschen (|x|>zx) bis Deckel-Oberkante (H+.15+LTS) aufgebaut, mit Rille r=PINH um die Achse (Stift seitlich einsteckbar). Stift liegend, unten 0.25 abgeflacht. Geprüft: Drehung 0–120° frei, Stiftweg frei (Rechnung).
+- Trennwände + Schaufel (23.10.): längs unten vorne der Rundung nach ausgeschnitten, quer (je Wand eigenes Teil) unten angehoben, je 0.4 Luft. Vorher steckten sie in der Rampe (Mikes Testplan).
 - Schubladenbox (2.7): Gehäuse aufrecht, oben offen, Schienen mit 45°-Unterseite je Schublade (>1), separater Deckel (Nut/Feder, Druck mit Aussenseite unten, `pf`), Schubladen flach mit runder Front (Fingermulde mit 45°-Decke). Mind. 26 mm Fachhöhe pro Schublade bei >1.
 - Hohlkehle Wand→Boden (2.8): `FR=min(2,wall-.6)`, 4 Stufen; Einsatz, Trennwände und unterste Schublade sind unten entsprechend angepasst.
 - Teile haben `asm` (Funktionen für Montageansicht), optional `qty`, `pf` (Druckausrichtung).

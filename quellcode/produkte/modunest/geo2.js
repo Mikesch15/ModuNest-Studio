@@ -165,8 +165,16 @@ async function buildMod(m,it,slots,res,tol){
  if(n){const span=alongX?cav[3]-cav[1]:cav[2]-cav[0],Lp=span-2*c,Hp=(stack?H-POCK:H)-(fl+t)-.8-(lid==='slide'?LH+Gh:0);
   const RPl=ring(x=>rr(x,-Lp/2,-PT/2,Lp/2,PT/2,.6));let dvT=null;if(FIL.length){dvT=[];for(let k=0;k<FN;k++){const e=fin(k*FR/FN),Rk=ring(x=>rr(x,-Lp/2+e,-PT/2,Lp/2-e,PT/2,.6));dvT=dvT.concat(extrude(Rk,k*FR/FN,(k+1)*FR/FN))}dvT=dvT.concat(extrude(RPl,FR,Hp))}
   const mid=alongX?(cav[1]+cav[3])/2:(cav[0]+cav[2])/2;
-  parts.push({key:'cTray',name:m.name+' Divider',tris:dvT||extrude(RPl,0,Hp),qty:n,
-   asm:pl.map(p=>alongX?(X,Y,Z)=>[-Y+p+cx,X+mid+cy,Z+fl+t+.1]:(X,Y,Z)=>[X+mid+cx,Y+p+cy,Z+fl+t+.1]),mod:it.i})}
+  const am=p=>alongX?(X,Y,Z)=>[-Y+p+cx,X+mid+cy,Z+fl+t+.1]:(X,Y,Z)=>[X+mid+cx,Y+p+cy,Z+fl+t+.1];
+  /* Mit Schaufel: Trennwaende unten vorne der Rundung folgend ausschneiden (laengs) bzw. unten anheben (quer), 0.4 mm Luft */
+  const zf0=fl+t,sr2=m.type!=='drawer'&&lid!=='slide'&&lid!=='hinge'&&m.scoop&&!m.tray?Math.min(25,(cav[3]-cav[1])/2,(H-zf0)/2):0;
+  if(sr2<5)parts.push({key:'cTray',name:m.name+' Divider',tris:dvT||extrude(RPl,0,Hp),qty:n,asm:pl.map(am),mod:it.i});
+  else{const zb=zf0+.1,rD=Z=>{const u=zf0+sr2-Z;return u>0?sr2-Math.sqrt(Math.max(0,sr2*sr2-u*u)):0},rZ=dd=>dd>=sr2?zf0:zf0+sr2-Math.sqrt(Math.max(0,sr2*sr2-(sr2-dd)*(sr2-dd))),rm=new Map();
+   const dvB=(front,z0)=>{const cs=new Set([z0,Hp]);if(FIL.length)for(let k=0;k<=FN;k++)cs.add(k*FR/FN);if(front)for(let k=0;k<=12;k++)cs.add(k*sr2/12);const zs=[...cs].filter(v=>v>=z0-1e-9&&v<=Hp).sort((a,b)=>a-b);let o=[];
+    for(let i=0;i<zs.length-1;i++){const a=zs[i],b=zs[i+1];if(b-a<1e-6)continue;const e=FIL.length&&a<FR-1e-6?fin(a):0,cf=front?Math.max(0,rD(zb+a)+.4-c):0,k=e.toFixed(3)+'|'+cf.toFixed(3);
+     if(!rm.has(k))rm.set(k,ring(x=>rr(x,-Lp/2+e+cf,-PT/2,Lp/2-e,PT/2,.6)));o=o.concat(extrude(rm.get(k),a,b))}return o};
+   if(alongX)parts.push({key:'cTray',name:m.name+' Divider',tris:dvB(true,0),qty:n,asm:pl.map(am),mod:it.i});
+   else pl.forEach((p,j)=>{const dd=p-PT/2-cav[1],z0=dd<sr2?Math.max(0,rZ(dd)+.4-zb):0;parts.push({key:'cTray',name:m.name+' Divider '+(j+1),tris:dvB(false,z0),qty:1,asm:[am(p)],mod:it.i})})}}
  const cells=trayInfo?trayInfo.cells:useGrid?gc*gr:n+1,iw=cav[2]-cav[0],id=cav[3]-cav[1],vol=trayInfo?trayInfo.vol:iw*id*(H-fl-t)/1e6;
  return{parts,vol,cells,notes}}
 
