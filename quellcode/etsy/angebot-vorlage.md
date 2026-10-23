@@ -34,6 +34,10 @@ Gestalte deine eigenen Aufbewahrungsboxen – genau in deinen Massen – und dru
 • [6] Kisten (Module) als Druckdateien: 3MF für Bambu Studio (mehrfarbig) und einzelne STL-Dateien
 • Ein PDF mit Link und Anleitung (sofort nach dem Kauf als Download)
 
+✦ VOR DEM KAUF AUSPROBIEREN
+Die 3D-Vorschau ist kostenlos: mikesch15.github.io/ModuNest-Studio
+(Adresse in den Browser kopieren. Bezahlt wird nur hier auf Etsy.)
+
 ✦ SO FUNKTIONIERT'S
 1. PDF herunterladen und den Link öffnen
 2. Einzelbox oder ganzen Plan (z. B. für eine Schublade) zusammenstellen – die 3D-Vorschau ist kostenlos
@@ -61,6 +65,8 @@ Nur für den privaten Gebrauch. Nicht erlaubt: Weitergabe oder Verkauf der Datei
 ✦ HINWEIS DIGITALE INHALTE
 Da es sich um einen digitalen Inhalt handelt, der sofort bereitgestellt wird, ist eine Rückgabe nicht möglich. Mit dem Kauf stimmst du zu, dass die Bereitstellung sofort beginnt.
 
+Konfigurator und Druckdateien entstehen mithilfe von KI; Entwurf und Drucktests: Art vom Hof.
+
 Fragen? Schreib mir über Etsy-Nachrichten – ich helfe gern.
 ```
 
@@ -72,6 +78,10 @@ Design your own storage boxes – in exactly your size – and print them yourse
 • Access to the ModuNest configurator (in your browser, also installable as an app)
 • [6] boxes (modules) as print files: 3MF for Bambu Studio (multicolour) and separate STL files
 • A PDF with the link and instructions (instant download after purchase)
+
+✦ TRY BEFORE YOU BUY
+The 3D preview is free: mikesch15.github.io/ModuNest-Studio
+(Copy the address into your browser. Payment only here on Etsy.)
 
 ✦ HOW IT WORKS
 1. Download the PDF and open the link
@@ -99,6 +109,8 @@ Personal use only. Not allowed: sharing or selling the files, selling printed pa
 
 ✦ DIGITAL CONTENT
 As this is digital content delivered immediately, returns are not possible. By purchasing you agree that delivery starts immediately.
+
+The configurator and print files are created with the help of AI; design and test prints: Art vom Hof.
 
 Questions? Message me on Etsy – happy to help.
 ```
@@ -143,6 +155,10 @@ Begründung: Fertige Organizer-STL-Sets kosten auf Etsy oft CHF 5–15, sind abe
 - **Ohne Kauf (Etsy-Abfrage):** Admin → Etsy-Verbindung → «Verbindung testen (ohne Kauf)» mit einer alten Bestellnummer aus deinem Shop.
 - **Ohne Kauf (ganzer Ablauf):** Im Admin einen Code für ModuNest mit 1 Kiste erstellen → im Konfigurator damit herunterladen → Guthaben sinkt auf 0, zweiter Download wird abgelehnt.
 - **Mit echtem Kauf (nur so prüfbar: Webhook):** jemand anderes kauft das günstigste Angebot (eigene Angebote kann man auf Etsy nicht kaufen) → Bestellung erscheint im Admin mit «ok» und richtiger Anzahl.
+
+## Hinweise zu Link und KI (ungeprüft)
+- **Link:** Etsy macht Adressen in der Beschreibung nicht anklickbar. Etsy verbietet, Käufer zum Bezahlen ausserhalb von Etsy zu leiten – darum der Satz «Bezahlt wird nur hier auf Etsy». Ob Etsy einen Vorschau-Link generell duldet, bitte in den Etsy-Regeln (Verkäuferrichtlinien) selbst nachlesen.
+- **KI:** Falls Etsy beim Einstellen nach KI-Nutzung fragt, dort ebenfalls angeben.
 
 ---
 *Erstellt von Claude, nicht von Etsy geprüft. Etsy-Regeln zu digitalen Produkten und externen Links bitte selbst lesen. Feldnamen können je nach Etsy-Version leicht abweichen.*

@@ -34,17 +34,18 @@ LINK = URL if PROD == 'modunest' else URL + 'app/namenspuzzle/'
 TX = {
  'modunest': ('ModuNest Studio', 'Dein Box-Konfigurator von Art vom Hof · Your box configurator', [
     'Öffne den Link oben – am besten am Computer oder Tablet (Chrome, Edge, Firefox oder Safari). Am Handy kannst du die Seite als App installieren.',
-    'Stelle deine Kisten zusammen. Die 3D-Vorschau ist kostenlos; bei jedem Abschnitt erklärt das (i) die Einstellungen.',
+    'Wähle <b>Schublade</b> (Schublade ausmessen, Kisten wählen – die Aufteilung wird automatisch berechnet) oder <b>Einzelbox</b>. Die 3D-Vorschau ist kostenlos; bei jedem Abschnitt erklärt das (i) die Einstellungen.',
     'Tippe auf «Herunterladen» und gib deine <b>Etsy-Bestellnummer</b> ein (Etsy → Käufe, oder in der Bestätigungs-E-Mail).',
     'Jede Kiste (Modul) zählt 1 – deine Bestellung enthält die gekauften Kisten. Mit dem Warenkorb holst du mehrere Konfigurationen in einem ZIP. Korrekturen sind 24 Stunden gratis, wenn jedes Mass höchstens 5 mm abweicht.',
-    'Tipp: Drucke zuerst das kleine Passungs-Teststück und wähle die passende Nummer.',
+    'Drucke zuerst das kleine <b>Passungs-Teststück</b> und wähle die Nummer, bei der der Schlüssel <b>mit etwas Druck</b> hineingeht und nicht wackelt. Sie gilt für Verbinder, Deckel, Schubladen und Einsätze.',
     'Öffne die 3MF-Datei in Bambu Studio (oder die STL-Dateien in deinem Slicer) und drucke ohne Stützen. Optimiert für Bambu Lab P1S (Druckbett 256 mm).'], [
     'Open the link above (computer or tablet recommended). On a phone you can install it as an app.',
-    'Design your boxes – the 3D preview is free; the (i) in each section explains the settings.',
+    'Choose <b>Drawer</b> (measure your drawer, pick boxes – the layout is calculated automatically) or <b>Single box</b>. The 3D preview is free; the (i) in each section explains the settings.',
     'Tap «Download» and enter your <b>Etsy order number</b> (Etsy → Purchases, or your confirmation e-mail).',
     'Each box (module) counts 1 – your order contains the boxes you purchased. Use the cart to get several configurations in one ZIP. Corrections are free for 24 hours if each dimension changes by 5 mm at most.',
-    'Tip: print the small fit test piece first and choose the matching number.',
-    'Open the 3MF file in Bambu Studio (or the STL files in your slicer) and print without supports. Optimised for Bambu Lab P1S (256 mm bed).'], None),
+    'First print the small <b>fit test piece</b> and choose the number where the key goes in <b>with a little pressure</b> and does not wobble. It applies to connectors, lids, drawers and inserts.',
+    'Open the 3MF file in Bambu Studio (or the STL files in your slicer) and print without supports. Optimised for Bambu Lab P1S (256 mm bed).'],
+  ('Zusammenbau / Assembly', 'Kisten umgedreht nebeneinander legen und die Verbinder in die Taschen an den Nähten drücken – schmale Spitze zuerst, bis sie bündig sind. / Place the boxes upside down side by side and press the connectors into the pockets at the seams – narrow tip first, until flush.')),
  'namenspuzzle': ('Namenspuzzle', 'Dein persönliches Steckpuzzle von Art vom Hof · Your personal name puzzle', [
     'Öffne den Link oben – am besten am Computer oder Tablet. Am Handy kannst du die Seite als App installieren.',
     'Gib den Namen ein (bis 16 Zeichen, lange Namen kommen auf 2 Zeilen). Wähle auf Wunsch Figuren (Hof-Tiere, Herz, Stern …), eine gravierte zweite Zeile (z. B. Geburtsdatum), Grösse und Farben. Die 3D-Vorschau ist kostenlos.',
@@ -80,5 +81,5 @@ s.append(Paragraph('Files and printed parts are for <b>personal use only</b>. No
 s.append(Paragraph('Hilfe / Help', H))
 s.append(Paragraph(f'Probleme mit der Bestellnummer? Schreib mir über Etsy-Nachrichten oder an {MAIL} – mit deiner Bestellnummer. / Problems with your order number? Message me on Etsy or at {MAIL} with your order number.', P))
 s += [Spacer(1, 12), Paragraph(f'Mike Ledermann · Art vom Hof · {MAIL}<br/>Impressum: <link href="{IMP}">{IMP}</link> · Datenschutz: <link href="{PRIV}">{PRIV}</link>', S),
-      Paragraph('Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.', S)]
+      Paragraph('Konfigurator und Druckdateien entstehen mithilfe von KI / created with the help of AI. Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.', S)]
 SimpleDocTemplate(sys.argv[1] if len(sys.argv) > 1 else 'dist/ModuNest-Anleitung.pdf', pagesize=A4, leftMargin=50, rightMargin=50, topMargin=42, bottomMargin=36, title=TITLE + ' – Anleitung', author='Art vom Hof').build(s)

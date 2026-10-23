@@ -15,7 +15,7 @@ const L={
  next2:['Passen nicht alle Teile auf eine Platte: «Anordnen» bzw. weitere Platten verwenden.','If not everything fits one plate: use «Arrange» or add plates.'],
  next3:['Ohne Stützen drucken – fertig!','Print without supports – done!'],
  privacy:['Datenschutz','Privacy policy'],imprint:['Impressum','Legal notice'],
- etsyNote:['Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.','The term “Etsy” is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.'],
+ etsyNote:['Konfigurator und Druckdateien entstehen mithilfe von KI. Der Begriff «Etsy» ist eine Marke von Etsy, Inc. Diese Anwendung nutzt die Etsy-API, ist aber nicht von Etsy, Inc. unterstützt oder zertifiziert.','Configurator and print files are created with the help of AI. The term “Etsy” is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.'],
  helpBtn:['Anleitung','Help'],
  helpT:['So funktioniert’s','How it works'],
  helpGo:['Los geht’s','Let’s go'],

@@ -32,6 +32,10 @@ Ein Steckpuzzle mit dem Namen deines Kindes – du gestaltest es online und druc
 • [1] Puzzle als Druckdateien: 3MF für Bambu Studio (Farben vorgeschlagen) und einzelne STL-Dateien
 • Ein PDF mit Link und Anleitung (sofort nach dem Kauf als Download)
 
+✦ VOR DEM KAUF AUSPROBIEREN
+Die 3D-Vorschau ist kostenlos: mikesch15.github.io/ModuNest-Studio/app/namenspuzzle/
+(Adresse in den Browser kopieren. Bezahlt wird nur hier auf Etsy.)
+
 ✦ SO FUNKTIONIERT'S
 1. PDF herunterladen und den Link öffnen
 2. Name eingeben, Figuren und Farben wählen – die 3D-Vorschau ist kostenlos
@@ -57,6 +61,8 @@ Nur für den privaten Gebrauch. Nicht erlaubt: Weitergabe oder Verkauf der Datei
 ✦ HINWEIS DIGITALE INHALTE
 Da es sich um einen digitalen Inhalt handelt, der sofort bereitgestellt wird, ist eine Rückgabe nicht möglich. Mit dem Kauf stimmst du zu, dass die Bereitstellung sofort beginnt.
 
+Konfigurator und Druckdateien entstehen mithilfe von KI; Entwurf und Drucktests: Art vom Hof.
+
 Fragen? Schreib mir über Etsy-Nachrichten – ich helfe gern.
 ```
 
@@ -68,6 +74,10 @@ A peg puzzle with your child's name – design it online and print it yourself.
 • Access to the name puzzle configurator (in your browser, also installable as an app)
 • [1] puzzle as print files: 3MF for Bambu Studio (colours suggested) and separate STL files
 • A PDF with the link and instructions (instant download after purchase)
+
+✦ TRY BEFORE YOU BUY
+The 3D preview is free: mikesch15.github.io/ModuNest-Studio/app/namenspuzzle/
+(Copy the address into your browser. Payment only here on Etsy.)
 
 ✦ HOW IT WORKS
 1. Download the PDF and open the link
@@ -93,6 +103,8 @@ Personal use only. Not allowed: sharing or selling the files, selling printed pu
 
 ✦ DIGITAL CONTENT
 As this is digital content delivered immediately, returns are not possible. By purchasing you agree that delivery starts immediately.
+
+The configurator and print files are created with the help of AI; design and test prints: Art vom Hof.
 
 Questions? Message me on Etsy – happy to help.
 ```
@@ -128,6 +140,10 @@ Hochladen: **Namenspuzzle-Anleitung.pdf** (erzeugen mit `python3 etsy/anleitung_
 | 2 Puzzles (z. B. Geschwister) | **CHF 12.90** |
 
 Begründung: Einzelne fertige Namenspuzzle-STL-Dateien kosten auf Etsy oft nur wenige Franken; dein Vorteil ist die freie Gestaltung (beliebiger Name, Figuren, Passung, Gravur) ohne Warten auf den Verkäufer. Nach Etsy-Gebühren (ca. 6.5 % + Zahlungsgebühr + 0.20 USD pro Angebot) bleiben bei CHF 7.90 grob CHF 6.50.
+
+## Hinweise zu Link und KI (ungeprüft)
+- **Link:** Etsy macht Adressen in der Beschreibung nicht anklickbar. Etsy verbietet, Käufer zum Bezahlen ausserhalb von Etsy zu leiten – darum der Satz «Bezahlt wird nur hier auf Etsy». Ob Etsy einen Vorschau-Link generell duldet, bitte in den Etsy-Regeln (Verkäuferrichtlinien) selbst nachlesen.
+- **KI:** Falls Etsy beim Einstellen nach KI-Nutzung fragt, dort ebenfalls angeben.
 
 ---
 *Erstellt von Claude, nicht von Etsy geprüft. Etsy-Regeln zu digitalen Produkten, personalisierten Artikeln und Spielzeug-Hinweisen bitte selbst lesen. Feldnamen können je nach Etsy-Version leicht abweichen.*
