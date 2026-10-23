@@ -18,13 +18,13 @@ async function buildMod(m,it,slots,res,tol){
  const shp=hc.map(v=>v>=H-1e-6),RADz=z=>hc.map(v=>z<v-1e-6?0:r),mkey=z=>hc.map(v=>z<v-1e-6?1:0).join(''),hcuts=hc.filter(v=>v>0&&v<H-1e-6);
  const RAD=shp.map(s=>s?0:r);
  const RADP=shp.map(s=>s?0:rp),RADF=shp.map(s=>s?0:rf),RADC=shp.map(s=>s?.8:cr);
- const cutSlots2=(x,list)=>{x.globalCompositeOperation='destination-out';
+ const cutSlots2=(x,list,z)=>{x.globalCompositeOperation='destination-out';const e=RK+c+(z!=null&&inClk(z)?CLK+.05:0); // Klick-Vertiefung
   for(const q of list){const R=q.side==='R',L=q.side==='L',B=q.side==='B';
-   if(R||L)keyShape(x,R?W/2:-W/2,q.s,RK+c,0);else keyShape(x,q.s,B?D/2:-D/2,RK+c,1)}};
+   if(R||L)keyShape(x,R?W/2:-W/2,q.s,e,0);else keyShape(x,q.s,B?D/2:-D/2,e,1)}};
  const actAt=z=>slots.filter(q=>q.zs.some(a=>a[0]<z&&z<a[1])),omemo=new Map();
- const outline=(list,extra,tag,z)=>{z=z==null?H-.01:z;const k=list.map(q=>slots.indexOf(q)).join()+'|'+mkey(z)+'|'+(tag||'');if(!omemo.has(k))omemo.set(k,ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RADz(z));cutSlots2(x,list);texCut(x,(extra&&!extra.keepTex)||m.type==='drawer');if(extra){x.globalCompositeOperation='destination-out';extra(x)}}));return omemo.get(k)};
+ const outline=(list,extra,tag,z)=>{z=z==null?H-.01:z;const k=list.map(q=>slots.indexOf(q)).join()+'|'+mkey(z)+'|'+(list.length&&inClk(z)?'k':'')+(tag||'');if(!omemo.has(k))omemo.set(k,ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RADz(z));cutSlots2(x,list,z);texCut(x,(extra&&!extra.keepTex)||m.type==='drawer');if(extra){x.globalCompositeOperation='destination-out';extra(x)}}));return omemo.get(k)};
  let zfc=[],fcAt=null; // Front-Merkmale (Griffmulde, Gravur, Schaufel): Schnitthoehen und Querschnitt je Hoehe
- const cutsIn=(z0,z1)=>{const cuts=[z0,z1];zfc.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});slots.forEach(q=>q.zs.forEach(a=>a.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)})));hcuts.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});return cuts.sort((a,b)=>a-b)};
+ const cutsIn=(z0,z1)=>{const cuts=[z0,z1];if(slots.length)clickZ().forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});zfc.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});slots.forEach(q=>q.zs.forEach(a=>a.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)})));hcuts.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});return cuts.sort((a,b)=>a-b)};
  const bands=(z0,z1,fn)=>{const cuts=cutsIn(z0,z1);
   let o=[];for(let i=0;i<cuts.length-1;i++)if(cuts[i+1]-cuts[i]>1e-6){const mid=(cuts[i]+cuts[i+1])/2;o=o.concat(fn(outline(actAt(mid),null,'',mid),cuts[i],cuts[i+1]))}return o};
  const tx=S.tex||'none',Dpt=Math.max(.3,Math.min(.8,t/2-.3)),touch=it.touch||{};
