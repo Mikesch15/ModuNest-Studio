@@ -70,10 +70,10 @@ const TPL={besteck:{W:300,D:420,H:60,mods:[B(75,280,55),B(75,280,55),B(75,280,55
  gewuerz:{W:400,D:450,H:90,mods:Array.from({length:12},()=>B(100,150,80))},
  bastel:{W:300,D:200,H:120,mods:[{...B(100,100,110),type:'tall'},{...B(100,100,110),type:'tall'},B(100,200,60,{rows:2}),B(100,100,60,{lid:'plug'}),B(100,100,60,{lid:'plug'})]},
  desk:{W:360,D:300,H:50,mods:[B(120,150,45,{cols:2,rows:2}),B(120,150,45),B(120,150,45,{cols:3}),B(60,150,45),B(60,150,45),B(120,150,45),B(120,150,45,{rows:2})]}};
-function applyTpl(id){const t=TPL[id];if(S.mode!=='plan'){S.mode='plan';PRODUCT.onChange()}Object.assign(PL,{W:t.W,D:t.D,H:t.H,fill:true,manual:false});PL.mods=JSON.parse(JSON.stringify(t.mods));FRESH=false;S.step=2;changed();buildUI()}
+function applyTpl(id){const t=TPL[id];if(S.mode!=='plan'){S.mode='plan';PRODUCT.onChange()}Object.assign(PL,{W:t.W,D:t.D,H:t.H,fill:true,manual:false});PL.mods=JSON.parse(JSON.stringify(t.mods));FRESH=false;S.step=2;lastDim=null;BASE=null;changed();buildUI()}
 let SEL=null; // angetippte Kiste (Index im Plan)
 // Plan: aendern sich Platz oder Kisten (Masse, Art, Anzahl), wird automatisch neu angeordnet; nur Verschieben/Drehen behaelt die eigene Anordnung
-const layoutSig=()=>JSON.stringify([PL.W,PL.D,PL.H,PL.fill,(PL.mods||[]).map(m=>[m.type,m.w,m.d,m.h])]);let lastSig=null,MOVED=false;
+const layoutSig=()=>JSON.stringify([PL.W,PL.D,PL.H,PL.fill,(PL.mods||[]).map(m=>[m.type,m.w,m.d,m.h])]);let lastSig=null,MOVED=false,lastDim=S.mode==='plan'?[PL.W,PL.D,PL.H]:null,BASE=null;
 function selectMod(ix){SEL=ix;if(S.step!==2)goStep(2);renderMods();present(false);const r=document.querySelectorAll('#modlist .mrow')[S.mode==='single'?0:ix];if(r)r.scrollIntoView({behavior:'smooth',block:'center'})}
 
 /* ================= ModuNest: Oberflaeche, Vorschau, Anordnung ================= */
@@ -204,9 +204,19 @@ const PRODUCT={dimKeys:['cBox'],pick:ix=>selectMod(ix),onShared(){S.step=2;lastM
  async build(res,tol){const r=await buildPlan(res,tol);r.ok=r.sol.ok;r.err=r.sol.msgs.map(m=>trf(...m)).join('; ');
   r.units=r.sol.ok?r.sol.items.map(it=>[Math.max(it.w,it.d),Math.min(it.w,it.d),it.h].map(v=>Math.round(v*10)/10)):[];return r},
  snap(){const o={};SKEYS.forEach(k=>o[k]=S[k]);return{S:o,PL:JSON.parse(JSON.stringify(PL))}},
- applySnap(s){Object.assign(S,s.S);lastMode=S.mode;for(const k in PL)delete PL[k];Object.assign(PL,JSON.parse(JSON.stringify(s.PL)))},
+ applySnap(s){Object.assign(S,s.S);lastMode=S.mode;lastDim=null;BASE=null;for(const k in PL)delete PL[k];Object.assign(PL,JSON.parse(JSON.stringify(s.PL)))},
  snapName:s=>(s.S.mode==='plan'?'Plan':'Box')+' '+s.PL.W+'x'+s.PL.D+'x'+s.PL.H,
  snapCount:s=>s.S.mode==='plan'?(s.PL.mods||[]).length:1,
  snapInfo:s=>(s.S.mode==='plan'?trf('cartMods',(s.PL.mods||[]).length):tr('cartOne'))+' · '+s.PL.W+' × '+s.PL.D+' × '+s.PL.H+' mm',
  // Wechsel Einzelbox <-> Planer: Masse getrennt merken
- onChange(){uiState();{const sg=layoutSig();if(S.mode==='plan'&&PL.manual&&lastSig!==null&&sg!==lastSig&&!MOVED){PL.manual=false;PL.mods.forEach(m=>{delete m.px;delete m.py;delete m.prot})}MOVED=false;lastSig=layoutSig()}if(S.mode!==lastMode){lastMode=S.mode;const o=PL.alt||{W:140,D:110,H:65};PL.alt={W:PL.W,D:PL.D,H:PL.H};PL.W=o.W;PL.D=o.D;PL.H=o.H;buildUI();panel.dataset.mode=S.mode}}};
+ onChange(){uiState();/* Platz geaendert: Kisten im gleichen Verhaeltnis mitskalieren (immer von BASE aus, sonst Rundungsdrift beim Regler) */if(S.mode==='plan'&&S.mode===lastMode&&lastDim){const sz=()=>JSON.stringify(PL.mods.map(m=>[m.w,m.d,m.h]));if(BASE&&BASE.set!==sz())BASE=null;if(lastDim.join()!==[PL.W,PL.D,PL.H].join()){if(!BASE){const so=typeof built!=='undefined'&&built&&built.sol;BASE={dim:lastDim,m:JSON.parse(JSON.stringify(PL.mods)),it:so&&so.ok&&so.items.length===PL.mods.length?so.items.map(t=>({i:t.i,x:t.x,y:t.y,w:t.w,d:t.d})):null}}
+  /* Anordnung als Ganzes skalieren; zu schmale Kisten mit dem Nachbarn zusammenlegen (beim Vergroessern kommen sie zurueck) */
+  const[oW,oD,oH]=BASE.dim,fx=PL.W/oW,fy=PL.D/oD,fz=PL.H/oH,mn=m=>(MODDEF[m.type]||MODDEF.box).min,cp=o=>{const m=JSON.parse(JSON.stringify(o));delete m.px;delete m.py;delete m.prot;m.h=Math.max(15,Math.min(PL.H,Math.round(o.h*fz)));return m};let ms;
+  if(BASE.it){let R=BASE.it.map(t=>{const x=Math.round(t.x*fx),y=Math.round(t.y*fy);return{m:cp(BASE.m[t.i]),x,y,w:Math.round((t.x+t.w)*fx)-x,d:Math.round((t.y+t.d)*fy)-y}});
+   const sm=r=>Math.min(r.w,r.d)<Math.min(mn(r.m)[0],mn(r.m)[1]);
+   for(;;){const bad=R.filter(sm).sort((a,b)=>a.w*a.d-b.w*b.d)[0];if(!bad||R.length<2)break;
+    const nb=R.filter(r=>r!==bad&&((r.y===bad.y&&r.d===bad.d&&(r.x+r.w===bad.x||bad.x+bad.w===r.x))||(r.x===bad.x&&r.w===bad.w&&(r.y+r.d===bad.y||bad.y+bad.d===r.y)))).sort((a,b)=>a.w*a.d-b.w*b.d)[0];
+    R.splice(R.indexOf(bad),1);if(nb){const x=Math.min(nb.x,bad.x),y=Math.min(nb.y,bad.y);nb.w=Math.max(nb.x+nb.w,bad.x+bad.w)-x;nb.d=Math.max(nb.y+nb.d,bad.y+bad.d)-y;nb.x=x;nb.y=y}}
+   ms=R.map(r=>Object.assign(r.m,{w:r.w,d:r.d}));if(!planSolve({...PL,manual:false,mods:ms}).ok){PL.manual=true;MOVED=true;R.forEach(r=>{r.m.px=r.x;r.m.py=r.y;r.m.prot=false})}}
+  else ms=BASE.m.map(o=>{const m=cp(o),r=o.prot;m.w=Math.max(20,Math.floor(o.w*(r?fy:fx)));m.d=Math.max(20,Math.floor(o.d*(r?fx:fy)));return m});
+  PL.mods=ms;SEL=null;BASE.set=sz()}}else BASE=null;{const sg=layoutSig();if(S.mode==='plan'&&PL.manual&&lastSig!==null&&sg!==lastSig&&!MOVED){PL.manual=false;PL.mods.forEach(m=>{delete m.px;delete m.py;delete m.prot})}MOVED=false;lastSig=layoutSig()}if(S.mode!==lastMode){lastMode=S.mode;const o=PL.alt||{W:140,D:110,H:65};PL.alt={W:PL.W,D:PL.D,H:PL.H};PL.W=o.W;PL.D=o.D;PL.H=o.H;buildUI();panel.dataset.mode=S.mode}lastDim=S.mode==='plan'?[PL.W,PL.D,PL.H]:null}};
