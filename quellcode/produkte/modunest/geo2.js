@@ -20,13 +20,13 @@ async function buildMod(m,it,slots,res,tol){
  const shp=hc.map(v=>v>=H-1e-6),RADz=z=>hc.map(v=>z<v-1e-6?0:r),mkey=z=>hc.map(v=>z<v-1e-6?1:0).join(''),hcuts=hc.filter(v=>v>0&&v<H-1e-6);
  const RAD=shp.map(s=>s?0:r);
  const RADP=shp.map(s=>s?0:rp),RADF=shp.map(s=>s?0:rf),RADC=shp.map(s=>s?.8:cr);
- const cutSlots2=(x,list,z)=>{x.globalCompositeOperation='destination-out';const e=RK+c-SLOTX+(z!=null&&inClk(z)?CLK+.05:0)+(z!=null&&inFlare(z)?.25:0); // Klick-Vertiefung
+ const cutSlots2=(x,list,z)=>{x.globalCompositeOperation='destination-out';const e=RK+c+(z!=null&&inFlare(z)?.25:0); // Klick-Vertiefung
   for(const q of list){const R=q.side==='R',L=q.side==='L',B=q.side==='B';
    if(R||L)keyShape(x,R?W/2:-W/2,q.s,e,0);else keyShape(x,q.s,B?D/2:-D/2,e,1)}};
  const actAt=z=>slots.filter(q=>q.zs.some(a=>a[0]<z&&z<a[1])),omemo=new Map();
- const outline=(list,extra,tag,z)=>{z=z==null?H-.01:z;const k=list.map(q=>slots.indexOf(q)).join()+'|'+mkey(z)+'|'+(list.length&&inClk(z)?'k':'')+(list.length&&inFlare(z)?'f':'')+(tag||'');if(!omemo.has(k))omemo.set(k,ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RADz(z));cutSlots2(x,list,z);texCut(x,(extra&&!extra.keepTex)||m.type==='drawer');if(extra){x.globalCompositeOperation='destination-out';extra(x)}}));return omemo.get(k)};
+ const outline=(list,extra,tag,z)=>{z=z==null?H-.01:z;const k=list.map(q=>slots.indexOf(q)).join()+'|'+mkey(z)+'|'+(list.length&&inFlare(z)?'f':'')+(tag||'');if(!omemo.has(k))omemo.set(k,ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RADz(z));cutSlots2(x,list,z);texCut(x,(extra&&!extra.keepTex)||m.type==='drawer');if(extra){x.globalCompositeOperation='destination-out';extra(x)}}));return omemo.get(k)};
  let zfc=[],fcAt=null; // Front-Merkmale (Griffmulde, Gravur, Schaufel): Schnitthoehen und Querschnitt je Hoehe
- const cutsIn=(z0,z1)=>{const cuts=[z0,z1];if(slots.length)clickZ().concat(STK()?[]:[FLR]).forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});zfc.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});slots.forEach(q=>q.zs.forEach(a=>a.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)})));hcuts.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});return cuts.sort((a,b)=>a-b)};
+ const cutsIn=(z0,z1)=>{const cuts=[z0,z1];if(slots.length&&!STK())[FLR].forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});zfc.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});slots.forEach(q=>q.zs.forEach(a=>a.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)})));hcuts.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});return cuts.sort((a,b)=>a-b)};
  const bands=(z0,z1,fn)=>{const cuts=cutsIn(z0,z1);
   let o=[];for(let i=0;i<cuts.length-1;i++)if(cuts[i+1]-cuts[i]>1e-6){const mid=(cuts[i]+cuts[i+1])/2;o=o.concat(fn(outline(actAt(mid),null,'',mid),cuts[i],cuts[i+1]))}return o};
  const tx=S.tex||'none',Dpt=Math.max(.3,Math.min(.8,t/2-.3)),touch=it.touch||{};
@@ -49,7 +49,7 @@ async function buildMod(m,it,slots,res,tol){
  if(m.type==='drawer'){
   /* Offenes Gehaeuse (Boden, Waende, Schienen mit 45°-Schraege) ohne Stuetzen; separater Deckel; Schubladen mit Front flach druckbar */
   const cxs=q=>has(q)?6.6:Math.max(t,2.4),cL=cxs('L'),cR=cxs('R'),tbk=has('B')?6.6:Math.max(t,2.4),fb=2.4,CT=4.2,GRV=2.4,TGH=2.2,zb=fb,zc=H-CT,crd=Math.max(1,r-t);
-  const RWd=3.5,RTp=1.2,RHt=RWd+RTp,dg=c+.2,gy=.4,FB=Math.max(6,Math.min(r,12));
+  const RWd=3.5,RTp=1.2,RHt=RWd+RTp,dg=c+DRAWX,gy=.4,FB=Math.max(6,Math.min(r,12));
   const nd=Math.max(1,Math.min(+m.nd||1,Math.floor((zc-zb)/26),4)),Hc=(zc-zb)/nd;
   const chr=[-W/2+cL,-D/2-6,W/2-cR,D/2-tbk],chW=chr[2]-chr[0],yF=-D/2+FB;
   const chd=p=>x=>{x.beginPath();x.roundRect(chr[0]+p,chr[1],chW-2*p,chr[3]-chr[1],Math.min(crd,(chW-2*p)/2));x.fill()};
@@ -158,7 +158,7 @@ async function buildMod(m,it,slots,res,tol){
   parts.push({key:'cLid',name:m.name+' Pin',tris:perm(extrude(pr,0,pinL),(u,v,w)=>[w,u,v]),asm:[(X,Y,Z)=>[X-pinL/2+cx,Y+ya+cy,Z-pc+H+RKN]],mod:it.i});
   notes.push(['iPin',m.name,Math.round(pinL)])}
  let trayInfo=null;
- if(m.tray){const depth=H-fl-t,tw=c+.1,trc=[cav[0]+tw,cav[1]+tw,cav[2]-tw,cav[3]-tw],Ht=Math.max(8,Math.min(+m.trayH||22,depth-3-(lid==='slide'?LH+Gh+2:0))),trr=Math.max(1,cr-tw);
+ if(m.tray){const depth=H-fl-t,tw=c+TRAYX,trc=[cav[0]+tw,cav[1]+tw,cav[2]-tw,cav[3]-tw],Ht=Math.max(8,Math.min(+m.trayH||22,depth-3-(lid==='slide'?LH+Gh+2:0))),trr=Math.max(1,cr-tw);
   const tc=cellRects(trc[0]+t,trc[1]+t,trc[2]-t,trc[3]-t,gc,gr,t),TO=ring(x=>rr4(x,...trc,RADC.map(v=>Math.max(.3,v-tw)))),TC=ring(x=>tc.o.forEach(q=>rr(x,...q,Math.max(.6,trr-t))));
   let trT;if(FIL.length){trT=[];for(let k=0;k<FN;k++){const e=Math.max(0,fin(k*FR/FN)-tw+.2),Tk=ring(x=>rr4(x,trc[0]+e,trc[1]+e,trc[2]-e,trc[3]-e,RADC.map(v=>Math.max(.3,v-tw-e))));trT=trT.concat(extrude(Tk,k*FR/FN,(k+1)*FR/FN))}
    trT=trT.concat(perm(plateWithPocket(TO,TC,Ht-FR,Ht-t),(X,Y,Z)=>[X,Y,Z+FR]))}else trT=plateWithPocket(TO,TC,Ht,Ht-t);
