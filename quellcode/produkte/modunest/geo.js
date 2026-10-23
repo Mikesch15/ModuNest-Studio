@@ -13,7 +13,10 @@ const KB=2.5,LIP=.4,CLK=.15;
 const clickZ=()=>{const z=(S.stack?FOOT:0)+LIP;return[z,z+KB+.1]}; // Vertiefung in der Nut (z von/bis)
 const inClk=z=>{const[a,b]=clickZ();return z>a&&z<b};
 function keyTris(Lk,res,tol){const R=e=>{const m=mk(WH+4,WH+4,res);keyShape(m.x,0,0,e);return marching(fieldOf(m),m.c.width,m.c.height,res).map(q=>simplify(q,tol))};
- const z0=clickZ()[0]+.05,z1=z0+KB,a=R(RK),b=R(RK+cl2()+CLK),o=[];cap(a,0,false,o);walls(a,0,z0,o);cap(b.concat(rev(a)),z0,false,o);walls(b,z0,z1,o);cap(b.concat(rev(a)),z1,true,o);walls(a,z1,Lk,o);cap(a,Lk,true,o);return o}
+ const z0=clickZ()[0]+.05,z1=z0+KB,a=R(RK),b=R(RK+cl2()+CLK),o=[];cap(a,0,false,o);walls(a,0,z0,o);cap(b.concat(rev(a)),z0,false,o);walls(b,z0,z1,o);cap(b.concat(rev(a)),z1,true,o);
+ /* Spitze oben 2-fach abgestuft (je 0.3 mm schmaler): zeigt, welches Ende zuerst hinein muss, und fuehrt beim Einstecken */
+ const zt=Math.max(z1+.6,Lk-1.2);if(Lk-zt>=.6){const a1=R(RK-.3),a2=R(RK-.6),zm=(zt+Lk)/2;walls(a,z1,zt,o);cap(a.concat(rev(a1)),zt,true,o);walls(a1,zt,zm,o);cap(a1.concat(rev(a2)),zm,true,o);walls(a2,zm,Lk,o);cap(a2,Lk,true,o);return o}
+ walls(a,z1,Lk,o);cap(a,Lk,true,o);return o}
 function singleKeyZ(){const Lk=Math.min(16,S.H-(S.stack?POCK:0)-S.wall-FOOT-4);if(Lk<6)return{Lk:0,zs:[]};const L=Math.round(Lk*10)/10;return{Lk:L,zs:[[-1e3,L+.3]]}}
 function cellRects(x0,y0,x1,y1,cols,rows,td){const cw=(x1-x0-(cols-1)*td)/cols,ch=(y1-y0-(rows-1)*td)/rows,o=[];
  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++)o.push([x0+i*(cw+td),y0+j*(ch+td),x0+i*(cw+td)+cw,y0+j*(ch+td)+ch]);return{o,cw,ch}}
