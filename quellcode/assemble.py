@@ -35,8 +35,13 @@ prods=[json.load(open(p)) for p in sorted(glob.glob('produkte/*/produkt.json'))]
 assert prods,'kein Produkt gefunden'
 os.makedirs('dist',exist_ok=True)
 REPO=os.path.exists('../config.js')  # nur im Repo die Webseite schreiben
+# Versionsnummer (unten auf jeder Seite): Datum + Kurz-Hash aller Quelldateien -> gleiche Quellen = gleiche Nummer
+import datetime
+_src=sorted(f for f in glob.glob('kern/**/*',recursive=True)+glob.glob('produkte/**/*',recursive=True) if os.path.isfile(f))
+BUILD=datetime.datetime.now(datetime.timezone.utc).strftime('%y%m%d')+'-'+hashlib.sha1(b''.join(open(f,'rb').read() for f in _src)).hexdigest()[:5]
 out_files={}
 def write(rel,data):
+    if isinstance(data,str):data=data.replace('__BUILD__',BUILD)
     out_files[rel]=data if isinstance(data,bytes) else data.encode()
     if REPO:
         os.makedirs(os.path.dirname('../'+rel) or '..',exist_ok=True)
@@ -107,4 +112,4 @@ write('icons/admin-maskable-512.png',icon(512,INK,.66,RUST));write('icons/admin-
 pre=['./','config.js']+sorted(k.replace('index.html','') for k in out_files)
 ver=hashlib.sha1(b''.join(out_files[k] for k in sorted(out_files))).hexdigest()[:10]
 write('sw.js',open(K+'sw.js').read().replace('VERSION',ver).replace('PRECACHE',json.dumps(sorted(set(pre)))))
-print('Startseite, Admin, Icons, Manifeste, sw.js (Version %s)%s'%(ver,'' if REPO else ' – nur dist/, kein Repo gefunden'))
+print('Startseite, Admin, Icons, Manifeste, sw.js (Version %s, Anzeige %s)%s'%(ver,BUILD,'' if REPO else ' – nur dist/, kein Repo gefunden'))
