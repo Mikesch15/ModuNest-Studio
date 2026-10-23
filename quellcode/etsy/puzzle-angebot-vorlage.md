@@ -37,8 +37,8 @@ Die 3D-Vorschau ist kostenlos: mikesch15.github.io/ModuNest-Studio/app/namenspuz
 (Adresse in den Browser kopieren. Bezahlt wird nur hier auf Etsy.)
 
 ✦ SO FUNKTIONIERT'S
-1. PDF herunterladen und den Link öffnen
-2. Name eingeben, Figuren und Farben wählen – die 3D-Vorschau ist kostenlos
+1. Gestalten: Name eingeben, Figuren und Farben wählen – die 3D-Vorschau ist kostenlos
+2. Kaufen: dieses Angebot (der Link ist auch im PDF nach dem Kauf)
 3. Gratis-Passungsprobe drucken (ca. 15 g) und die passende Stufe wählen
 4. Mit deiner Etsy-Bestellnummer die Dateien herunterladen und ohne Stützen drucken
 
@@ -80,8 +80,8 @@ The 3D preview is free: mikesch15.github.io/ModuNest-Studio/app/namenspuzzle/
 (Copy the address into your browser. Payment only here on Etsy.)
 
 ✦ HOW IT WORKS
-1. Download the PDF and open the link
-2. Enter the name, choose figures and colours – the 3D preview is free
+1. Design: enter the name, choose figures and colours – the 3D preview is free
+2. Buy: this listing (the link is also in the PDF after purchase)
 3. Print the free fit test (about 15 g) and pick the matching level
 4. Download your files with your Etsy order number and print without supports
 

@@ -39,9 +39,9 @@ Die 3D-Vorschau ist kostenlos: mikesch15.github.io/ModuNest-Studio
 (Adresse in den Browser kopieren. Bezahlt wird nur hier auf Etsy.)
 
 ✦ SO FUNKTIONIERT'S
-1. PDF herunterladen und den Link öffnen
-2. Einzelbox oder ganzen Plan (z. B. für eine Schublade) zusammenstellen – die 3D-Vorschau ist kostenlos
-3. Mit deiner Etsy-Bestellnummer die Dateien herunterladen
+1. Gestalten: Einzelbox oder ganze Schublade im Konfigurator zusammenstellen – die 3D-Vorschau ist kostenlos
+2. Kaufen: dieses Angebot mit der passenden Anzahl Kisten (der Link ist auch im PDF nach dem Kauf)
+3. Herunterladen: im Konfigurator mit deiner Etsy-Bestellnummer
 4. Drucken – ohne Stützen
 
 ✦ MÖGLICHKEITEN
@@ -84,9 +84,9 @@ The 3D preview is free: mikesch15.github.io/ModuNest-Studio
 (Copy the address into your browser. Payment only here on Etsy.)
 
 ✦ HOW IT WORKS
-1. Download the PDF and open the link
-2. Design a single box or a whole layout (e.g. for a drawer) – the 3D preview is free
-3. Download your files with your Etsy order number
+1. Design: put together a single box or a whole drawer in the configurator – the 3D preview is free
+2. Buy: this listing with the matching number of boxes (the link is also in the PDF after purchase)
+3. Download: in the configurator with your Etsy order number
 4. Print – no supports needed
 
 ✦ OPTIONS
