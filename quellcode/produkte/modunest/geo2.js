@@ -4,6 +4,8 @@ const GD=1.4,LH=1.6,LTS=2.4,RKN=3,PINH=1.2,LUGW=5,flatTris=(R,H,t,stack)=>{const
  if(stack){cap(R.F,0,false,o);walls(R.F,0,f,o);cap(R.O.concat(rev(R.F)),f,false,o)}else cap(R.O,0,false,o);
  walls(R.O,f,H,o);cap(R.C,f+t,true,o);walls(rev(R.C),f+t,H,o);cap(R.O.concat(rev(R.C)),H,true,o);return o};
 const rr4=(x,x0,y0,x1,y1,R)=>{x.beginPath();const m=Math.min(x1-x0,y1-y0)/2;x.roundRect(x0,y0,x1-x0,y1-y0,R.map(v=>Math.max(0,Math.min(v,m))));x.fill()};
+// an y spiegeln (Dreiecke umdrehen): Steckdeckel wird beim Aufsetzen um 180° gedreht, ungleiche Ecken muessen dann passen
+const mirY=t=>{const o=Array.from(t);for(let i=0;i<o.length;i+=9){o[i+1]=-o[i+1];o[i+4]=-o[i+4];o[i+7]=-o[i+7];for(let k=3;k<6;k++){const a=o[i+k];o[i+k]=o[i+k+3];o[i+k+3]=a}}return o};
 const perm=(tr,fn)=>{const o=new Array(tr.length);for(let i=0;i<tr.length;i+=3){const p=fn(tr[i],tr[i+1],tr[i+2]);o[i]=p[0];o[i+1]=p[1];o[i+2]=p[2]}return o};
 function cornerHc(it){if(S.sharpSeam===false)return[0,0,0,0];const H=it.h,ti=it.ti||{},X0=it.x,X1=it.x+it.w,Y0=it.y,Y1=it.y+it.d,
  hAt=(a,v)=>(ti[a]||[]).reduce((m,q)=>(q[0]<=v+.01&&q[1]>=v-.01)?Math.max(m,Math.min(q[2]==null?H:q[2],H)):m,0);
@@ -141,12 +143,12 @@ async function buildMod(m,it,slots,res,tol){
  parts.push({key:'cBox',name:m.name,tris:body,asm:[(X,Y,Z)=>[X+cx,Y+cy,Z]],mod:it.i});
  const txt=(m.label||'').trim(),RT=(lid==='plug'&&txt)?ring(x=>{x.save();x.scale(1,-1);x.font='100px KFModern';x.textAlign='center';x.textBaseline='middle';const wd=x.measureText(txt).width/100;
   x.font=Math.min(16,(W-24)/wd,D*.5)+'px KFModern';x.fillText(txt,0,0);x.restore()}):[];
- if(lid==='plug')parts.push({key:'cLid',name:m.name+' Lid',tris:lidTris({O,F:stack?ring(x=>rr4(x,P[0]+c+LIDX,P[1]+c+LIDX,P[2]-c-LIDX,P[3]-c-LIDX,RADF.map(v=>Math.max(.4,v-LIDX)))):RF},RT,stack),asm:[(X,Y,Z)=>[X+cx,-Y+cy,-Z+H+LT+10]],mod:it.i});
+ if(lid==='plug')parts.push({key:'cLid',name:m.name+' Lid',tris:mirY(lidTris({O,F:stack?ring(x=>rr4(x,P[0]+c+LIDX,P[1]+c+LIDX,P[2]-c-LIDX,P[3]-c-LIDX,RADF.map(v=>Math.max(.4,v-LIDX)))):RF},RT,stack)),asm:[(X,Y,Z)=>[X+cx,-Y+cy,-Z+H+LT+10]],mod:it.i});
  if(lid==='slide'){const Wl=cav[2]-cav[0]+2*GD-gap,Ll=cav[3]+D/2-cs;
   const RL=ring(x=>rr(x,-Wl/2,-Ll/2,Wl/2,Ll/2,Math.min(cr,3))),RG=ring(x=>rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2));
   parts.push({key:'cLid',name:m.name+' Slide lid',tris:plateWithPocket(RL,RG,LTS,1),asm:[(X,Y,Z)=>[X+cx,Y+cy-D/2+Ll/2,Z+zg0+cs]],mod:it.i})}
  if(lid==='hinge'){const{Wk,ya}=extra[0],plateRear=ya-RKN-.8,zx=Wk/2+.4+LUGW+.5;
-  const RL=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD.map(v=>Math.min(v,3)));x.globalCompositeOperation='destination-out';x.fillRect(-W,plateRear,2*W,D);x.globalCompositeOperation='source-over';x.fillRect(-Wk/2,plateRear-2,Wk,ya-plateRear+2)}); // nichts hinter der Achse: sonst taucht es beim Aufklappen in die Rueckwand
+  const RL=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD);x.globalCompositeOperation='destination-out';x.fillRect(-W,plateRear,2*W,D);x.globalCompositeOperation='source-over';x.fillRect(-Wk/2,plateRear-2,Wk,ya-plateRear+2)}); // nichts hinter der Achse: sonst taucht es beim Aufklappen in die Rueckwand
   let tr=extrude(RL,0,LTS);
   const kc=RKN-.15,kn=ringW(2*RKN+8,2*RKN+8,x=>{x.beginPath();x.arc(0,kc,RKN-.25,0,6.2832);x.fill();x.globalCompositeOperation='destination-out';x.beginPath();x.arc(0,kc,PINH,0,6.2832);x.fill()}); // Achse genau auf Hoehe der Laschen (H+RKN), 0.25 Luft zur Kistenoberkante
   tr=tr.concat(perm(extrude(kn,0,Wk),(u,v,w)=>[w-Wk/2,u+ya,v]));
