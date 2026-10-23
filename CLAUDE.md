@@ -22,7 +22,7 @@ Details/Geschichte: `quellcode/NOTIZEN.md` – **nur gezielt** lesen (grep), nic
 - Geometrie: Aussenringe CCW, Löcher CW; alles ohne Stützen druckbar; Bett 256 mm (Brett ≤ 250).
 
 ## Server (Supabase «ModuNest Studio», ref sfoscpgsumukhihkdutw – andere Projekte nie anfassen)
-`quellcode/backend/supabase/`: `schema.sql`, functions `modunest` (redeem, left, config, consume, admin/*) und `etsy-webhook`, gemeinsam `_shared/etsy.ts`; beide verify_jwt=false. Tabellen orders (per/pused = Guthaben je Produkt, status ok|pruefen|gesperrt), exports, listings, settings (site: Produkt-Status live|test|aus + off-Optionen), etsy_auth, attempts. RPC consume_credits2. Secrets setzt Mike selbst; nie Secrets ausgeben. Etsy verbunden (Shop ArtvomHof); echter Kauf/Webhook noch ungetestet.
+`quellcode/backend/supabase/`: `schema.sql`, functions `modunest` (redeem, left, config, consume, admin/*) und `etsy-webhook`, gemeinsam `_shared/etsy.ts`; beide verify_jwt=false. Tabellen orders (per/pused = Guthaben je Produkt, status ok|pruefen|gesperrt), exports, listings, settings (site: Produkt-Status live|test|aus + off-Optionen), etsy_auth, attempts. RPC consume_credits2. Secrets setzt Mike selbst; nie Secrets ausgeben. Etsy verbunden (Shop ArtvomHof); echter Testkauf 23.10. bestätigt (Webhook legt Bestellung an, Download verbraucht, Überzug verweigert).
 
 ## Offen
 Reale Drucktests (Passung, Verbinder-Passung, Puzzle-Gravur), Etsy-Angebote einstellen + in `listings` eintragen, Namenspuzzle auf «live» wenn fertig.
