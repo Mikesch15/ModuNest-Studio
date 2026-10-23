@@ -22,8 +22,8 @@ Der Server erkennt die Kistenzahl an der Angebotsnummer; Variationen innerhalb e
 | Preis | [Dein Preis] – z. B. Set 6 und Set 12 als zwei Angebote |
 
 ## 2. Titel (max. 140 Zeichen)
-**DE:** Modulare Aufbewahrungsboxen nach Mass – 3D-Druck-Dateien STL & 3MF – Konfigurator für [6] Kisten – Bambu Lab, ohne Stützen
-**EN (Übersetzung):** Custom size modular storage boxes – 3D print files STL & 3MF – online configurator for [6] boxes – Bambu Lab, no supports
+**DE:** Schubladen-Organizer nach Mass – modulare Boxen als 3D-Druck-Datei STL & 3MF – Konfigurator für [6] Kisten – Bambu Lab, ohne Stützen
+**EN (Übersetzung):** Custom drawer organizer – modular boxes as 3D print files STL & 3MF – online configurator for [6] boxes – Bambu Lab, no supports
 
 ## 3. Beschreibung (DE)
 ```
@@ -41,10 +41,12 @@ Gestalte deine eigenen Aufbewahrungsboxen – genau in deinen Massen – und dru
 4. Drucken – ohne Stützen
 
 ✦ MÖGLICHKEITEN
-• Breite, Tiefe, Höhe frei in mm
-• Fächer, herausnehmbare Trennwände, Einsatz-Tablett
-• Steck-, Schiebe- oder Klappdeckel, Schubladenboxen
-• Stapelbar, Kisten mit kleinen Verbindern koppelbar
+• Schubladen-Planer: Schublade ausmessen, Kisten wählen – die Aufteilung wird automatisch berechnet und füllt den Platz; Kisten auch selbst verschieben
+• Einzelbox: Breite, Tiefe, Höhe frei in mm, stapelbar
+• Fächer, herausnehmbare Trennwände, herausnehmbarer Einsatz
+• Steck-, Schiebe- oder Klappdeckel, Schubladen-Boxen, hohe Behälter
+• Griffmulde, Schaufel innen (kleine Teile leicht greifen), Beschriftung vorne
+• Kisten im Planer mit Verbindern fest gekoppelt
 • Oberflächen: glatt, Rillen, Wellen, Facetten
 • Passungs-Teststück für deinen Drucker
 
@@ -78,10 +80,12 @@ Design your own storage boxes – in exactly your size – and print them yourse
 4. Print – no supports needed
 
 ✦ OPTIONS
-• Width, depth, height freely in mm
-• Compartments, removable dividers, insert tray
-• Plug-in, sliding or hinged lids, drawer boxes
-• Stackable, boxes can be joined with small connectors
+• Drawer planner: measure your drawer, choose boxes – the layout is calculated automatically and fills the space; move boxes yourself if you like
+• Single box: width, depth, height freely in mm, stackable
+• Compartments, removable dividers, removable insert tray
+• Plug-in, sliding or hinged lids, drawer boxes, tall containers
+• Finger notch, inner scoop (easy to grab small parts), front label
+• Boxes in the planner joined firmly with connectors
 • Surfaces: smooth, ribs, waves, facets
 • Fit test piece for your printer
 
@@ -100,7 +104,7 @@ Questions? Message me on Etsy – happy to help.
 ```
 
 ## 5. Tags (13 Stück, je max. 20 Zeichen)
-`STL Datei` · `3MF Datei` · `3D Druck Datei` · `Aufbewahrungsbox` · `Organizer` · `Schubladen Einsatz` · `Box mit Deckel` · `Bambu Lab` · `Ordnungssystem` · `modulare Box` · `Werkstatt Ordnung` · `Box nach Mass` · `Stapelbox`
+`STL Datei` · `3MF Datei` · `3D Druck Datei` · `Aufbewahrungsbox` · `Organizer` · `Schubladen Einsatz` · `Box mit Deckel` · `Bambu Lab` · `Ordnungssystem` · `modulare Box` · `Werkstatt Ordnung` · `Box nach Mass` · `Schubladen Ordnung`
 
 ## 6. Materialien (optional)
 `STL` · `3MF` · `PDF` · `PLA` · `PETG`
@@ -122,8 +126,23 @@ Hochladen: **ModuNest-Anleitung.pdf** (die Version ohne Adresse).
 
 ## 9. Nach dem Veröffentlichen
 1. Angebotsnummer aus der Adresse kopieren: etsy.com/listing/**1234567890**/…
-2. Admin → «Konfigurator-Angebote» → Nummer, Bezeichnung (z. B. «Kisten-Set 6»), Produkt «ModuNest Kisten», Kisten pro Stück → **Speichern**
+2. Admin → «Konfigurator-Angebote» → Nummer, Bezeichnung (z. B. «Kisten-Set 6»), Produkt **«ModuNest»**, Kisten pro Kauf (z. B. 6) → **Speichern**
 3. Ohne Kauf testen: Admin → Etsy-Verbindung → «Verbindung testen (ohne Kauf)» mit einer alten Bestellnummer. Den Webhook prüft der erste echte Verkauf (im Admin schauen, ob die Bestellung mit den richtigen Kisten erscheint; sonst steht sie auf «prüfen» und du gibst sie frei).
+
+## 10. Angebote und Preisvorschlag (ungeprüft – bitte mit ähnlichen Etsy-Angeboten vergleichen)
+Pro Anzahl Kisten ein eigenes Angebot, **keine Variationen** (der Server erkennt die Anzahl an der Angebotsnummer).
+| Angebot | Kisten | Vorschlag |
+|---|---|---|
+| Einzelbox | 1 | **CHF 3.90** |
+| Kleiner Plan | 4 | **CHF 9.90** |
+| Schublade | 8 | **CHF 16.90** |
+| Grosse Schublade / Werkstatt | 15 | **CHF 24.90** |
+Begründung: Fertige Organizer-STL-Sets kosten auf Etsy oft CHF 5–15, sind aber nicht nach Mass. Dein Vorteil: exakt passend zur eigenen Schublade, ohne Warten. Etsy-Gebühren grob: 6.5 % + Zahlungsgebühr + 0.20 USD pro Angebot. Ein Angebot «1 Kiste» eignet sich auch als günstiger Einstieg.
+
+## 11. Testen vor dem ersten Verkauf
+- **Ohne Kauf (Etsy-Abfrage):** Admin → Etsy-Verbindung → «Verbindung testen (ohne Kauf)» mit einer alten Bestellnummer aus deinem Shop.
+- **Ohne Kauf (ganzer Ablauf):** Im Admin einen Code für ModuNest mit 1 Kiste erstellen → im Konfigurator damit herunterladen → Guthaben sinkt auf 0, zweiter Download wird abgelehnt.
+- **Mit echtem Kauf (nur so prüfbar: Webhook):** jemand anderes kauft das günstigste Angebot (eigene Angebote kann man auf Etsy nicht kaufen) → Bestellung erscheint im Admin mit «ok» und richtiger Anzahl.
 
 ---
 *Erstellt von Claude, nicht von Etsy geprüft. Etsy-Regeln zu digitalen Produkten und externen Links bitte selbst lesen. Feldnamen können je nach Etsy-Version leicht abweichen.*
