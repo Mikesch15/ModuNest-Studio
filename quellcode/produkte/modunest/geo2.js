@@ -132,6 +132,9 @@ async function buildMod(m,it,slots,res,tol){
   const prof=ringW(2*RKN+8,2*RKN+8,x=>{x.beginPath();x.arc(ya*0,RKN,RKN,0,6.2832);x.fill();x.fillRect(-RKN,-.5,2*RKN,RKN+.5);x.globalCompositeOperation='destination-out';x.beginPath();x.arc(0,RKN,PINH,0,6.2832);x.fill()});
   // prof: (u=y rel. Achse, v=z rel. H)
   for(const sx of[-1,1]){const x0=sx>0?Wk/2+gx:-(Wk/2+gx+LUGW);body=body.concat(perm(extrude(prof,0,LUGW),(u,v,w)=>[w+x0,u+ya,v+H]))}
+  /* Rueckkante neben dem Gelenk bis Oberkante Deckel aufbauen (kein Absatz); Rille entlang der Achse, damit der Stift seitlich einsteckbar bleibt */
+  {const zx=Wk/2+gx+LUGW+.5,y0=Math.max(ya-RKN-.8+.4,cav[3]),zT=H+.15+LTS,za=H+RKN,zg=za-PINH,blk=hw=>ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD);x.globalCompositeOperation='destination-out';x.fillRect(-W,-D,2*W,D+y0);x.fillRect(-zx,-D,2*zx,2*D);if(hw>0)x.fillRect(-W,ya-hw,2*W,2*hw)});
+   if(zx<W/2-1){body=body.concat(extrude(blk(0),H,zg));const ns=4;for(let k=0;k<ns;k++){const z0=zg+k*(zT-zg)/ns,z1=zg+(k+1)*(zT-zg)/ns;body=body.concat(extrude(blk(Math.sqrt(Math.max(0,PINH*PINH-(z1-za)*(z1-za)))+.05),z0,z1))}}}
   extra.push({Wk,ya,prof});
  }
  if(!flat){const fr=fcAt&&fcAt(H-.1);const exr=x=>{cutR(x,RP);fr&&fr.draw(x)};exr.keepTex=true;body=shell(stack?H-POCK:H,RC).concat(stack?extrude(fr?outline(actAt(H-.1),exr,'fcr'+fr.key,H-.1):outline(actAt(H-.1)).concat(rev(RP)),H-POCK,H):[])}
@@ -148,8 +151,8 @@ async function buildMod(m,it,slots,res,tol){
   const kc=RKN-.15,kn=ringW(2*RKN+8,2*RKN+8,x=>{x.beginPath();x.arc(0,kc,RKN-.25,0,6.2832);x.fill();x.globalCompositeOperation='destination-out';x.beginPath();x.arc(0,kc,PINH,0,6.2832);x.fill()}); // Achse genau auf Hoehe der Laschen (H+RKN), 0.25 Luft zur Kistenoberkante
   tr=tr.concat(perm(extrude(kn,0,Wk),(u,v,w)=>[w-Wk/2,u+ya,v]));
   parts.push({key:'cLid',name:m.name+' Hinge lid',tris:tr,asm:[(X,Y,Z)=>[X+cx,Y+cy,Z+H+.15]],mod:it.i});
-  const pinL=Wk+2*(LUGW+.4)-.6,pr=ringW(8,8,x=>{x.beginPath();x.arc(0,0,PINH-.25,0,6.2832);x.fill()});
-  parts.push({key:'cLid',name:m.name+' Pin',tris:extrude(pr,0,pinL),asm:[(X,Y,Z)=>[Z-pinL/2+cx+0*X,X+ya+cy,Y+H+RKN+0*Z]],mod:it.i});
+  const pinL=Wk+2*(LUGW+.4)-.6,pR=PINH-.25,pc=pR-.25,pr=ringW(8,8,x=>{x.beginPath();x.arc(0,pc,pR,0,6.2832);x.fill();x.globalCompositeOperation='destination-out';x.fillRect(-4,-4,8,4)}); // Stift liegend drucken: unten 0.25 mm abgeflacht
+  parts.push({key:'cLid',name:m.name+' Pin',tris:perm(extrude(pr,0,pinL),(u,v,w)=>[w,u,v]),asm:[(X,Y,Z)=>[X-pinL/2+cx,Y+ya+cy,Z-pc+H+RKN]],mod:it.i});
   notes.push(['iPin',m.name,Math.round(pinL)])}
  let trayInfo=null;
  if(m.tray){const depth=H-fl-t,tw=.6,trc=[cav[0]+tw,cav[1]+tw,cav[2]-tw,cav[3]-tw],Ht=Math.max(8,Math.min(+m.trayH||22,depth-3-(lid==='slide'?LH+Gh+2:0))),trr=Math.max(1,cr-tw);
