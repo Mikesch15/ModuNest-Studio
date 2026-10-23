@@ -10,7 +10,7 @@ const keyShape=(x,cx,cy,e,v)=>{x.beginPath();[[-DS,-WH/2],[0,-WN/2],[DS,-WH/2],[
 const dvY=D=>D>130?[-D/6,D/6]:[0];
 // Verbinder: gerader Schmetterlings-Schluessel, haelt durch die Passung (Stufe = «geht mit etwas Druck rein»).
 // Spitze oben 2-fach abgestuft (je 0.3 mm schmaler) als Einfuehrhilfe. Druck stehend, keine Stuetzen.
-const FLR=.6; // ohne Fuss: Nut-Oeffnung unten 0.6 mm um .25 aufgeweitet (gegen Elefantenfuss)
+const FLR=.6,ROOF=7,ROOFN=28; // ROOF: Nut-Dach oben 45° (Form schrumpft auf 7 mm in 0.25-mm-Stufen) statt flacher Decke // ohne Fuss: Nut-Oeffnung unten 0.6 mm um .25 aufgeweitet (gegen Elefantenfuss)
 const inFlare=z=>!STK()&&z<FLR;
 function keyTris(Lk,res,tol){const R=e=>{const m=mk(WH+4,WH+4,res);keyShape(m.x,0,0,e);return marching(fieldOf(m),m.c.width,m.c.height,res).map(q=>simplify(q,tol))};
  const a=R(RK),o=[];cap(a,0,false,o);const zt=Lk-1.2;if(zt>1){const a1=R(RK-.3),a2=R(RK-.6),zm=(zt+Lk)/2;walls(a,0,zt,o);cap(a.concat(rev(a1)),zt,true,o);walls(a1,zt,zm,o);cap(a1.concat(rev(a2)),zm,true,o);walls(a2,zm,Lk,o);cap(a2,Lk,true,o);return o}

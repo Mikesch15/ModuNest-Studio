@@ -20,13 +20,16 @@ async function buildMod(m,it,slots,res,tol){
  const shp=hc.map(v=>v>=H-1e-6),RADz=z=>hc.map(v=>z<v-1e-6?0:r),mkey=z=>hc.map(v=>z<v-1e-6?1:0).join(''),hcuts=hc.filter(v=>v>0&&v<H-1e-6);
  const RAD=shp.map(s=>s?0:r);
  const RADP=shp.map(s=>s?0:rp),RADF=shp.map(s=>s?0:rf),RADC=shp.map(s=>s?.8:cr);
- const cutSlots2=(x,list,z)=>{x.globalCompositeOperation='destination-out';const e=RK+c+(z!=null&&inFlare(z)?.25:0); // Klick-Vertiefung
-  for(const q of list){const R=q.side==='R',L=q.side==='L',B=q.side==='B';
-   if(R||L)keyShape(x,R?W/2:-W/2,q.s,e,0);else keyShape(x,q.s,B?D/2:-D/2,e,1)}};
+ const RST=ROOF/ROOFN,rIdx=(q,z)=>q.rs!=null&&z!=null&&z>q.rs?Math.floor((z-q.rs)/RST):-1;
+ const cutSlots2=(x,list,z)=>{x.globalCompositeOperation='destination-out';const e=RK+c+(z!=null&&inFlare(z)?.25:0);
+  for(const q of list){const R=q.side==='R',L=q.side==='L',B=q.side==='B',ri=rIdx(q,z),kk=ri<0?1:Math.max(.02,1-ri*RST/ROOF); // Dach: Form zur Nahtmitte hin verkleinern
+   const px=R?W/2:L?-W/2:q.s,py=(R||L)?q.s:(B?D/2:-D/2);x.save();x.translate(px,py);x.scale(kk,kk);keyShape(x,0,0,e,(R||L)?0:1);x.restore()}};
  const actAt=z=>slots.filter(q=>q.zs.some(a=>a[0]<z&&z<a[1])),omemo=new Map();
- const outline=(list,extra,tag,z)=>{z=z==null?H-.01:z;const k=list.map(q=>slots.indexOf(q)).join()+'|'+mkey(z)+'|'+(list.length&&inFlare(z)?'f':'')+(tag||'');if(!omemo.has(k))omemo.set(k,ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RADz(z));cutSlots2(x,list,z);texCut(x,(extra&&!extra.keepTex)||m.type==='drawer');if(extra){x.globalCompositeOperation='destination-out';extra(x)}}));return omemo.get(k)};
+ const outline=(list,extra,tag,z)=>{z=z==null?H-.01:z;const ch=stack&&z>fl-1e-6&&z<fl+CH?Math.floor((z-fl)/.25)*.25:-1,k=list.map(q=>slots.indexOf(q)+':'+rIdx(q,z)).join()+'|'+mkey(z)+'|'+(list.length&&inFlare(z)?'f':'')+'|'+ch+(tag||'');if(!omemo.has(k))omemo.set(k,ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RADz(z));cutSlots2(x,list,z);texCut(x,(extra&&!extra.keepTex)||m.type==='drawer');if(ch>=0){x.globalCompositeOperation='destination-in';rr4(x,F[0]-ch,F[1]-ch,F[2]+ch,F[3]+ch,RADF.map(v=>v+ch))} /* Stapelfuss -> Wand: 45°-Schraege statt Absatz */if(extra){x.globalCompositeOperation='destination-out';extra(x)}}));return omemo.get(k)};
  let zfc=[],fcAt=null; // Front-Merkmale (Griffmulde, Gravur, Schaufel): Schnitthoehen und Querschnitt je Hoehe
- const cutsIn=(z0,z1)=>{const cuts=[z0,z1];if(slots.length&&!STK())[FLR].forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});zfc.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});slots.forEach(q=>q.zs.forEach(a=>a.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)})));hcuts.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});return cuts.sort((a,b)=>a-b)};
+ const cutsIn=(z0,z1)=>{const cuts=[z0,z1];if(stack)for(let v=fl;v<fl+CH;v+=.25)if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v);
+  slots.forEach(q=>{if(q.rs!=null)for(let i=1;i<ROOFN;i++){const v=q.rs+i*RST;if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)}});
+  if(slots.length&&!STK())[FLR].forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});zfc.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});slots.forEach(q=>q.zs.forEach(a=>a.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)})));hcuts.forEach(v=>{if(v>z0+1e-6&&v<z1-1e-6)cuts.push(v)});return cuts.sort((a,b)=>a-b)};
  const bands=(z0,z1,fn)=>{const cuts=cutsIn(z0,z1);
   let o=[];for(let i=0;i<cuts.length-1;i++)if(cuts[i+1]-cuts[i]>1e-6){const mid=(cuts[i]+cuts[i+1])/2;o=o.concat(fn(outline(actAt(mid),null,'',mid),cuts[i],cuts[i+1]))}return o};
  const tx=S.tex||'none',Dpt=Math.max(.3,Math.min(.8,t/2-.3)),touch=it.touch||{};
@@ -86,7 +89,7 @@ async function buildMod(m,it,slots,res,tol){
   return{parts,vol,cells:nd,notes:(+m.nd||1)>nd?[['iDrw',m.name,nd]]:[]}}
  const flat=lid==='slide'||lid==='hinge',pk=flat?0:1;
  const pI=s=>has(s)?5.2:t/2,cI=s=>{let v=has(s)?6.6:t;if(lid==='slide'&&(s==='L'||s==='R'))v=Math.max(v,3);if(lid==='hinge'&&s==='B')v=Math.max(v,9);return v};
- const P=[-W/2+pI('L'),-D/2+pI('T'),W/2-pI('R'),D/2-pI('B')],F=[P[0]+c,P[1]+c,P[2]-c,P[3]-c];
+ const P=[-W/2+pI('L'),-D/2+pI('T'),W/2-pI('R'),D/2-pI('B')],F=[P[0]+c,P[1]+c,P[2]-c,P[3]-c];const CH=stack?Math.max(P[0]+W/2,P[1]+D/2,W/2-P[2],D/2-P[3])+c+.25:0;
  const cav=[-W/2+cI('L'),-D/2+cI('T'),W/2-cI('R'),D/2-cI('B')];
  const RP=pock&&!flat?ring(x=>rr4(x,...P,RADP)):[],RF=stack?ring(x=>rr4(x,...F,RADF)):[];
  const gc=Math.max(1,m.cols|0),gr=Math.max(1,m.rows|0),useGrid=gc*gr>1&&!m.tray&&m.type!=='drawer',cellsB=useGrid?cellRects(...cav,gc,gr,t):null,n=(useGrid||m.tray)?0:(m.div|0),alongX=(cav[2]-cav[0])>=(cav[3]-cav[1]),hw=(PT+2*c)/2;
@@ -127,7 +130,9 @@ async function buildMod(m,it,slots,res,tol){
   const ext=(x0,x1,lst)=>x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD);cutSlots2(x,lst);cutOuter(x,0);x.globalCompositeOperation='destination-out';
    x.beginPath();x.roundRect(x0,-D,x1-x0,cav[3]+D,Math.min(cr,(x1-x0)/2));x.fill()};
   const RUG=ring(ext(cav[0]-GD,cav[2]+GD,actAt(zg0+1))),RUC=ring(ext(cav[0],cav[2],actAt(zg1+1)));
-  const eg=extrude(RUG,zg0,zg1),ec=extrude(RUC,zg1,H);window.__sh=[lowT,eg,ec];body=body.concat(eg,ec);
+  /* Nut-Decke 45° (0.25-mm-Stufen) statt flach: oberste GD mm der Nut werden nach oben schmaler */
+  const zc0=zg1-GD,NB=Math.ceil(GD/.25),stb=GD/NB;let eg=extrude(RUG,zg0,zc0);for(let i=0;i<NB;i++){const gd=GD-i*stb;eg=eg.concat(extrude(ring(ext(cav[0]-gd,cav[2]+gd,actAt(zg0+1))),zc0+i*stb,zc0+(i+1)*stb))}
+  const ec=extrude(RUC,zg1,H);window.__sh=[lowT,eg,ec];body=body.concat(eg,ec);
  }else if(lid==='hinge'){
   body=shell(H,RC);
   const Wk=Math.max(14,Math.min(40,W/3)),ya=D/2-5.8,gx=.4;
@@ -145,9 +150,13 @@ async function buildMod(m,it,slots,res,tol){
   x.font=Math.min(16,(W-24)/wd,D*.5)+'px KFModern';x.fillText(txt,0,0);x.restore()}):[];
  if(lid==='plug')parts.push({key:'cLid',name:m.name+' Lid',tris:mirY(lidTris({O,F:pock?ring(x=>rr4(x,P[0]+c+LIDX,P[1]+c+LIDX,P[2]-c-LIDX,P[3]-c-LIDX,RADF.map(v=>Math.max(.4,v-LIDX)))):RF},RT,pock)),asm:[(X,Y,Z)=>[X+cx,-Y+cy,-Z+H+LT+10]],mod:it.i});
  if(lid==='slide'){const Wl=cav[2]-cav[0]+2*GD-gap,Ll=cav[3]+D/2-cs;
-  const ox=(cav[0]+cav[2])/2,oy=-D/2+Ll/2,RL=ring(x=>{x.beginPath();x.roundRect(-Wl/2,-Ll/2,Wl,Ll,[0,0,Math.max(.5,cr-cs),Math.max(.5,cr-cs)]);x.fill(); /* hinten wie die Nut gerundet, vorne exakt der Kistenumriss */
-   x.globalCompositeOperation='destination-in';rr4(x,-W/2-ox,-D/2-oy,W/2-ox,D/2-oy,RAD)}),RG=ring(x=>rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2));
-  parts.push({key:'cLid',name:m.name+' Slide lid',tris:plateWithPocket(RL,RG,LTS,1),asm:[(X,Y,Z)=>[X+cx+(cav[0]+cav[2])/2,Y+cy-D/2+Ll/2,Z+zg0+cs]],mod:it.i})}
+  const ox=(cav[0]+cav[2])/2,oy=-D/2+Ll/2,cw=cav[2]-cav[0],zc0=zg1-GD,h1=zc0-(zg0+cs),pk=LTS-1;
+  /* Rand oben passend zur 45°-Nutdecke abgeschraegt (Breite je Band an dessen Oberkante), Griffmulde oben 1 mm */
+  const RLw=(w,hole)=>ring(x=>{x.beginPath();x.roundRect(-w/2,-Ll/2,w,Ll,[0,0,Math.max(.5,cr-cs-(Wl-w)/2),Math.max(.5,cr-cs-(Wl-w)/2)]);x.fill(); /* hinten wie die Nut gerundet, vorne exakt der Kistenumriss */
+   x.globalCompositeOperation='destination-in';rr4(x,-W/2-ox,-D/2-oy,W/2-ox,D/2-oy,RAD);if(hole){x.globalCompositeOperation='destination-out';rr(x,-6,-Ll/2+3,6,-Ll/2+8,2.2)}});
+  const hs=new Set([0,LTS,pk]);for(let h=Math.max(0,h1);h<LTS;h+=.25)hs.add(h);const hl=[...hs].sort((a,b)=>a-b);let slT=[];
+  for(let i=0;i<hl.length-1;i++){const a=hl[i],b=hl[i+1];if(b-a<1e-6)continue;const gdb=Math.max(0,Math.min(GD,GD-(zg0+cs+b-zc0)));slT=slT.concat(extrude(RLw(Math.min(Wl,cw+2*gdb-gap),a>=pk-1e-6),a,b))}
+  parts.push({key:'cLid',name:m.name+' Slide lid',tris:slT,asm:[(X,Y,Z)=>[X+cx+(cav[0]+cav[2])/2,Y+cy-D/2+Ll/2,Z+zg0+cs]],mod:it.i})}
  if(lid==='hinge'){const{Wk,ya}=extra[0],plateRear=ya-RKN-.8,zx=Wk/2+.4+LUGW+.5;
   const RL=ring(x=>{rr4(x,-W/2,-D/2,W/2,D/2,RAD);x.globalCompositeOperation='destination-out';x.fillRect(-W,plateRear,2*W,D);x.globalCompositeOperation='source-over';x.fillRect(-Wk/2,plateRear-2,Wk,ya-PINH-.3-plateRear+2)}); // nichts hinter der Achse: sonst taucht es beim Aufklappen in die Rueckwand
   let tr=extrude(RL,0,LTS);
@@ -160,7 +169,7 @@ async function buildMod(m,it,slots,res,tol){
  let trayInfo=null;
  if(m.tray){const depth=H-fl-t,tw=c+TRAYX,trc=[cav[0]+tw,cav[1]+tw,cav[2]-tw,cav[3]-tw],Ht=Math.max(8,Math.min(+m.trayH||22,depth-3-(lid==='slide'?LH+Gh+2:0))),trr=Math.max(1,cr-tw);
   const tc=cellRects(trc[0]+t,trc[1]+t,trc[2]-t,trc[3]-t,gc,gr,t),TO=ring(x=>rr4(x,...trc,RADC.map(v=>Math.max(.3,v-tw)))),TC=ring(x=>tc.o.forEach(q=>rr(x,...q,Math.max(.6,trr-t))));
-  let trT;if(FIL.length){trT=[];for(let k=0;k<FN;k++){const e=Math.max(0,fin(k*FR/FN)-tw+.2),Tk=ring(x=>rr4(x,trc[0]+e,trc[1]+e,trc[2]-e,trc[3]-e,RADC.map(v=>Math.max(.3,v-tw-e))));trT=trT.concat(extrude(Tk,k*FR/FN,(k+1)*FR/FN))}
+  let trT;if(FIL.length){trT=[];for(let k=0;k<FN;k++){const e=Math.max(0,FR-k*FR/FN-tw+.2),Tk=ring(x=>rr4(x,trc[0]+e,trc[1]+e,trc[2]-e,trc[3]-e,RADC.map(v=>Math.max(.3,v-tw-e))));trT=trT.concat(extrude(Tk,k*FR/FN,(k+1)*FR/FN))}
    trT=trT.concat(perm(plateWithPocket(TO,TC,Ht-FR,Ht-t),(X,Y,Z)=>[X,Y,Z+FR]))}else trT=plateWithPocket(TO,TC,Ht,Ht-t);
   parts.push({key:'cTray',name:m.name+' Insert',tris:trT,asm:[(X,Y,Z)=>[X+cx,Y+cy,Z+fl+t+.1]],mod:it.i});trayInfo={cells:tc.o.length,vol:tc.o.length*tc.cw*tc.ch*(Ht-t)/1e6}}
  if(n){const span=alongX?cav[3]-cav[1]:cav[2]-cav[0],Lp=span-2*c,Hp=(stack?H-POCK:H)-(fl+t)-.8-(lid==='slide'?LH+Gh:0);
@@ -169,13 +178,13 @@ async function buildMod(m,it,slots,res,tol){
   const am=p=>alongX?(X,Y,Z)=>[-Y+p+cx,X+mid+cy,Z+fl+t+.1]:(X,Y,Z)=>[X+mid+cx,Y+p+cy,Z+fl+t+.1];
   /* Mit Schaufel: Trennwaende unten vorne der Rundung folgend ausschneiden (laengs) bzw. unten anheben (quer), 0.4 mm Luft */
   const zf0=fl+t,sr2=m.type!=='drawer'&&lid!=='slide'&&lid!=='hinge'&&m.scoop&&!m.tray?Math.min(25,(cav[3]-cav[1])/2,(H-zf0)/2):0;
-  if(sr2<5)parts.push({key:'cTray',name:m.name+' Divider',tris:dvT||extrude(RPl,0,Hp),qty:n,asm:pl.map(am),mod:it.i});
+  if(sr2<5)parts.push({key:'cTray',name:m.name+' Divider',pf:(X,Y,Z)=>[X,Z,PT/2-Y],tris:dvT||extrude(RPl,0,Hp),qty:n,asm:pl.map(am),mod:it.i});
   else{const zb=zf0+.1,rD=Z=>{const u=zf0+sr2-Z;return u>0?sr2-Math.sqrt(Math.max(0,sr2*sr2-u*u)):0},rZ=dd=>dd>=sr2?zf0:zf0+sr2-Math.sqrt(Math.max(0,sr2*sr2-(sr2-dd)*(sr2-dd))),rm=new Map();
    const dvB=(front,z0)=>{const cs=new Set([z0,Hp]);if(FIL.length)for(let k=0;k<=FN;k++)cs.add(k*FR/FN);if(front)for(let k=0;k<=12;k++)cs.add(k*sr2/12);const zs=[...cs].filter(v=>v>=z0-1e-9&&v<=Hp).sort((a,b)=>a-b);let o=[];
     for(let i=0;i<zs.length-1;i++){const a=zs[i],b=zs[i+1];if(b-a<1e-6)continue;const e=FIL.length&&a<FR-1e-6?fin(a):0,cf=front?Math.max(0,rD(zb+a)+.4-c):0,k=e.toFixed(3)+'|'+cf.toFixed(3);
      if(!rm.has(k))rm.set(k,ring(x=>rr(x,-Lp/2+e+cf,-PT/2,Lp/2-e,PT/2,.6)));o=o.concat(extrude(rm.get(k),a,b))}return o};
-   if(alongX)parts.push({key:'cTray',name:m.name+' Divider',tris:dvB(true,0),qty:n,asm:pl.map(am),mod:it.i});
-   else pl.forEach((p,j)=>{const dd=p-PT/2-cav[1],z0=dd<sr2?Math.max(0,rZ(dd)+.4-zb):0;parts.push({key:'cTray',name:m.name+' Divider '+(j+1),tris:dvB(false,z0),qty:1,asm:[am(p)],mod:it.i})})}}
+   if(alongX)parts.push({key:'cTray',name:m.name+' Divider',pf:(X,Y,Z)=>[X,Z,PT/2-Y],tris:dvB(true,0),qty:n,asm:pl.map(am),mod:it.i});
+   else pl.forEach((p,j)=>{const dd=p-PT/2-cav[1],z0=dd<sr2?Math.max(0,rZ(dd)+.4-zb):0;parts.push({key:'cTray',name:m.name+' Divider '+(j+1),pf:(X,Y,Z)=>[X,Z,PT/2-Y],tris:dvB(false,z0),qty:1,asm:[am(p)],mod:it.i})})}}
  const cells=trayInfo?trayInfo.cells:useGrid?gc*gr:n+1,iw=cav[2]-cav[0],id=cav[3]-cav[1],vol=trayInfo?trayInfo.vol:iw*id*(H-fl-t)/1e6;
  return{parts,vol,cells,notes}}
 

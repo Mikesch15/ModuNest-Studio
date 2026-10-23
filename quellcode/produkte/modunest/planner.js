@@ -10,8 +10,8 @@ const zlo=it=>it.mod.type==='drawer'?3.9:(S.stack?FOOT:0)+S.wall+1.5;
 const zhi=it=>{const h=it.h,l=it.mod.lid;return it.mod.type==='drawer'?h-3.9:l==='slide'?h-1.6-2.4-2*cl2()-1.5:(l==='plug'&&STK())||(l!=='hinge'&&l!=='slide'&&S.stack&&it.mod.type!=='drawer')?h-POCK-1.5:h-1.5};
 /* Schluessel: von unten einstecken. Tasche nach unten offen, oben geschlossen, bei allen Modulen auf gleicher Hoehe (z=0). */
 const keyMarg=()=>Math.max(9,(+S.r||0)+6.8);
-function keyZ(F,G){const Hm=Math.min(F.h,G.h),Lk=Math.min(40,Hm-POCK-S.wall-FOOT-4);if(Lk<6)return{Lk:0,zs:[]};
- const L=Math.round(Lk*10)/10;return{Lk:L,zs:[[-1e3,L+.3]]}}
+function keyZ(F,G){const Hm=Math.min(F.h,G.h),Lk=Math.min(40,Hm-12.5);if(Lk<6)return{Lk:0,zs:[]}; // oben Platz fuer Nut-Dach (ROOF) unter Deckel/Tasche
+ const L=Math.round(Lk*10)/10;return{Lk:L,zs:[[-1e3,L+.3+ROOF]],rs:L+.3}}
 const effPlan=()=>S.mode==='single'?{...PL,fill:true,mods:[{...PL.one,w:PL.W,d:PL.D,h:PL.H}]}:PL;
 function planSolve(P){
  const msgs=[],ms=P.mods.map((m,i)=>({...m,i,name:(m.type==='drawer'?'Drawer ':m.type==='tall'?'Tall ':'Box ')+(i+1)}));
@@ -82,6 +82,6 @@ function planSolve(P){
 /* Slots eines Moduls (lokal, Mitte = Modulzentrum): side 'R','L','B'(y+),'T'(y-), s = Position entlang der Seite */
 function slotsFor(it,keys){const o=[],cx=it.x+it.w/2,cy=it.y+it.d/2;
  for(const k of keys){
-  if(k.F===it.i)o.push(k.ax?{side:'B',s:k.s-cx,zs:k.zs}:{side:'R',s:k.s-cy,zs:k.zs});
-  else if(k.G===it.i)o.push(k.ax?{side:'T',s:k.s-cx,zs:k.zs}:{side:'L',s:k.s-cy,zs:k.zs})}
+  if(k.F===it.i)o.push(k.ax?{side:'B',s:k.s-cx,zs:k.zs,rs:k.rs}:{side:'R',s:k.s-cy,zs:k.zs,rs:k.rs});
+  else if(k.G===it.i)o.push(k.ax?{side:'T',s:k.s-cx,zs:k.zs,rs:k.rs}:{side:'L',s:k.s-cy,zs:k.zs,rs:k.rs})}
  return o}
