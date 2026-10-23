@@ -15,7 +15,12 @@ const inClk=z=>{const[a,b]=clickZ();return z>a&&z<b};
 function keyTris(Lk,res,tol){const R=e=>{const m=mk(WH+4,WH+4,res);keyShape(m.x,0,0,e);return marching(fieldOf(m),m.c.width,m.c.height,res).map(q=>simplify(q,tol))};
  const z0=clickZ()[0]+.05,z1=z0+KB,a=R(RK),b=R(RK+cl2()+CLK),o=[];cap(a,0,false,o);walls(a,0,z0,o);cap(b.concat(rev(a)),z0,false,o);walls(b,z0,z1,o);cap(b.concat(rev(a)),z1,true,o);
  /* Spitze oben 2-fach abgestuft (je 0.3 mm schmaler): zeigt, welches Ende zuerst hinein muss, und fuehrt beim Einstecken */
- const zt=Math.max(z1+.6,Lk-1.2);if(Lk-zt>=.6){const a1=R(RK-.3),a2=R(RK-.6),zm=(zt+Lk)/2;walls(a,z1,zt,o);cap(a.concat(rev(a1)),zt,true,o);walls(a1,zt,zm,o);cap(a1.concat(rev(a2)),zm,true,o);walls(a2,zm,Lk,o);cap(a2,Lk,true,o);return o}
+ const zt=Math.max(z1+.6,Lk-1.2);if(Lk-zt>=.6){const a1=R(RK-.3),a2=R(RK-.6),zm=(zt+Lk)/2;walls(a,z1,zt,o);cap(a.concat(rev(a1)),zt,true,o);walls(a1,zt,zm,o);
+  /* «O» 0.4 mm tief oben eingraviert: markiert das obere Ende (alle Flaechen aus denselben Ringen -> dicht) */
+  const ze=Lk-.4,ann=x=>{x.beginPath();x.arc(0,0,2.2,0,7);x.arc(0,0,1.3,0,7,true);x.fill('evenodd')};
+  const T=(()=>{const m=mk(WH+4,WH+4,res);keyShape(m.x,0,0,RK-.6);m.x.globalCompositeOperation='destination-out';ann(m.x);return marching(fieldOf(m),m.c.width,m.c.height,res).map(q=>simplify(q,tol))})().sort((p,q)=>Math.abs(area(q))-Math.abs(area(p)));
+  if(Lk-zm>.5&&T.length===3){const out=[T[0]];cap(a1.concat(rev(out)),zm,true,o);walls(out,zm,ze,o);cap(rev(T.slice(1)),ze,true,o);walls(T,ze,Lk,o);cap(T.slice(0,2),Lk,true,o);cap([T[2]],Lk,true,o)}
+  else{cap(a1.concat(rev(a2)),zm,true,o);walls(a2,zm,Lk,o);cap(a2,Lk,true,o)}return o}
  walls(a,z1,Lk,o);cap(a,Lk,true,o);return o}
 function singleKeyZ(){const Lk=Math.min(16,S.H-(S.stack?POCK:0)-S.wall-FOOT-4);if(Lk<6)return{Lk:0,zs:[]};const L=Math.round(Lk*10)/10;return{Lk:L,zs:[[-1e3,L+.3]]}}
 function cellRects(x0,y0,x1,y1,cols,rows,td){const cw=(x1-x0-(cols-1)*td)/cols,ch=(y1-y0-(rows-1)*td)/rows,o=[];
