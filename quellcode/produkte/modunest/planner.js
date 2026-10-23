@@ -73,8 +73,11 @@ function planSolve(P){
     const KEYMARG=keyMarg();
     if(Lc<2*KEYMARG+2){msgs.push(['iShort',F.mod.name,G.mod.name]);continue}
     const n=Math.max(1,Math.floor((Lc-2*KEYMARG)/KEYSPAN)+1),sp=Lc-2*KEYMARG;
-    for(let k=0;k<n;k++){const s=n===1?(lo+hi)/2:lo+KEYMARG+k*sp/(n-1);
-     keys.push({F:F.i,G:G.i,ax,seam:pf,s,...keyZ(F,G)})}}}}
+    let ss=[];for(let k=0;k<n;k++)ss.push(n===1?(lo+hi)/2:lo+KEYMARG+k*sp/(n-1));
+    /* Griffmulde vorne in der Mitte (G.y = Naht): dort keine Verbinder, sonst an die Enden ausweichen */
+    const gm=G.mod;if(ax===1&&gm.grip&&gm.type!=='drawer'&&gm.lid!=='slide'&&gm.lid!=='hinge'){const gc=G.x+G.w/2,zone=15+3+WH/2+RK+cl2()+1,fr=v=>Math.abs(v-gc)>=zone;
+     ss=ss.filter(fr);if(!ss.length)ss=[lo+KEYMARG,hi-KEYMARG].filter(fr).filter((v,i,a)=>a.indexOf(v)===i)}
+    for(const s of ss)keys.push({F:F.i,G:G.i,ax,seam:pf,s,...keyZ(F,G)})}}}
  for(const it of items){const l=it.mod.lid;if(l==='slide'&&keys.some(k=>k.G===it.i&&k.ax===1))msgs.push(['iSlide',it.mod.name]);
   if(l==='hinge'&&keys.some(k=>k.F===it.i&&k.ax===1&&items[k.G].h>it.h))msgs.push(['iHinge',it.mod.name])}
  return{ok:true,msgs,items,keys,rows:nRows}}

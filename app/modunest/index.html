@@ -541,8 +541,11 @@ function planSolve(P){
     const KEYMARG=keyMarg();
     if(Lc<2*KEYMARG+2){msgs.push(['iShort',F.mod.name,G.mod.name]);continue}
     const n=Math.max(1,Math.floor((Lc-2*KEYMARG)/KEYSPAN)+1),sp=Lc-2*KEYMARG;
-    for(let k=0;k<n;k++){const s=n===1?(lo+hi)/2:lo+KEYMARG+k*sp/(n-1);
-     keys.push({F:F.i,G:G.i,ax,seam:pf,s,...keyZ(F,G)})}}}}
+    let ss=[];for(let k=0;k<n;k++)ss.push(n===1?(lo+hi)/2:lo+KEYMARG+k*sp/(n-1));
+    /* Griffmulde vorne in der Mitte (G.y = Naht): dort keine Verbinder, sonst an die Enden ausweichen */
+    const gm=G.mod;if(ax===1&&gm.grip&&gm.type!=='drawer'&&gm.lid!=='slide'&&gm.lid!=='hinge'){const gc=G.x+G.w/2,zone=15+3+WH/2+RK+cl2()+1,fr=v=>Math.abs(v-gc)>=zone;
+     ss=ss.filter(fr);if(!ss.length)ss=[lo+KEYMARG,hi-KEYMARG].filter(fr).filter((v,i,a)=>a.indexOf(v)===i)}
+    for(const s of ss)keys.push({F:F.i,G:G.i,ax,seam:pf,s,...keyZ(F,G)})}}}
  for(const it of items){const l=it.mod.lid;if(l==='slide'&&keys.some(k=>k.G===it.i&&k.ax===1))msgs.push(['iSlide',it.mod.name]);
   if(l==='hinge'&&keys.some(k=>k.F===it.i&&k.ax===1&&items[k.G].h>it.h))msgs.push(['iHinge',it.mod.name])}
  return{ok:true,msgs,items,keys,rows:nRows}}
@@ -812,7 +815,7 @@ help4:['Öffne die 3MF-Datei in Bambu Studio (oder die STL-Dateien in deinem Sli
  warnBed:['Die Teile passen nicht auf das 256-mm-Druckbett des P1S.','The parts do not fit the 256 mm bed of the P1S.'],
  warnCell:['Sehr kleines Fach (unter 15 mm).','Very small compartment (under 15 mm).'],
  warnTray:['Hinweis: Box hat nur ein grosses Fach, die Aufteilung gilt für den Einsatz.','Note: the box has one large compartment; the layout applies to the insert.'],
- mode:['Modus','Mode'],mSingle:['Einzelbox','Single box'],mPlan:['Schublade (Planer)','Drawer (planner)'],space:['Platz / Aussenmasse','Space / outer size'],fill:['Platz ausfüllen (Module strecken)','Fill the space (stretch modules)'],plmods:['Modul(e)','Module(s)'],randFill:['🎲 Zufällig füllen','🎲 Random fill'],randQ:['Alle Kisten durch eine neue, zufällige Aufteilung ersetzen? (Mit ↶ rückgängig machen)','Replace all boxes with a new random layout? (Undo with ↶)'],add_box:['+ Box','+ Box'],add_tall:['+ Hoher Behälter','+ Tall container'],add_drawer:['+ Schublade','+ Drawer'],plset:['Bauweise','Construction'],plmsg:['Prüfung','Check'],
+ mode:['Modus','Mode'],mSingle:['Einzelbox','Single box'],mPlan:['Schublade (Planer)','Drawer (planner)'],space:['Platz / Aussenmasse','Space / outer size'],fill:['Platz ausfüllen (Module strecken)','Fill the space (stretch modules)'],plmods:['Modul(e)','Module(s)'],randFill:['🎲 Zufällig füllen','🎲 Random fill'],boxSize:['Kistengrösse (teilt den Plan neu auf)','Box size (re-divides the layout)'],randQ:['Alle Kisten durch eine neue, zufällige Aufteilung ersetzen? (Mit ↶ rückgängig machen)','Replace all boxes with a new random layout? (Undo with ↶)'],add_box:['+ Box','+ Box'],add_tall:['+ Hoher Behälter','+ Tall container'],add_drawer:['+ Schublade','+ Drawer'],plset:['Bauweise','Construction'],plmsg:['Prüfung','Check'],
  mW:['Breite','Width'],mD:['Tiefe','Depth'],mH:['Höhe','Height'],divN:['Trennwände','Dividers'],lidPlug:['Deckel','Lid'],typeSel:['Art','Type'],lidSel:['Deckel','Lid'],filler:['Füllstücke für eingeschlossene Ecken (optional)','Filler pieces for enclosed corners (optional)'],sharpSeam:['Ecken an Nähten scharf bis zur Nachbarhöhe (kein Schmutz in den Fugen)','Sharp corners at seams up to the neighbour height (no dirt in the gaps)'],_old:['Ecken an Nähten scharf (kein Schmutz in den Fugen)','Sharp corners at seams (no dirt in the gaps)'],sbtype:['Art der Box','Box type'],tBox:['Box mit Fächern','Box with compartments'],tDrawer:['Schubladenbox','Drawer box'],nDrawers:['Schubladen','Drawers'],nDr:['Schubladen übereinander','Drawers stacked'],iDrw:['{0}: zu niedrig für mehr Schubladen, es sind {1}.','{0}: too low for more drawers; using {1}.'],tex:['Oberfläche (freie Aussenseiten)','Surface (free outer sides)'],tx_none:['glatt','smooth'],tx_ribs:['Rillen','Ribs'],tx_waves:['Wellen','Waves'],tx_facets:['Facetten','Facets'],lid_none:['ohne Deckel','no lid'],lid_plug:['Steckdeckel','Plug lid'],lid_slide:['Schiebedeckel','Sliding lid'],lid_hinge:['Klappdeckel','Hinged lid'],iPin:['{0}: Scharnierstift mitdrucken oder ein Stück 1,75-mm-Filament ({1} mm) einfädeln.','{0}: print the hinge pin or thread a piece of 1.75 mm filament ({1} mm).'],eDrawer:['Schubladen müssen in der vordersten Reihe liegen (Vorderseite frei). Verkleinere die Schubladen oder vergrössere die Breite.','Drawers must sit in the front row (front side free). Make the drawers narrower or the space wider.'],drawerBtn:['+ Schublade','+ Drawer'],iPlates:['Dieser Plan braucht ca. {0} Druckplatten. In Bambu Studio die Teile mit «Anordnen» auf Platten verteilen.','This plan needs about {0} build plates. In Bambu Studio use “Arrange” to spread the parts.'],eLidH:['{0}: für diesen Deckel ist die Höhe zu klein (mind. 35 mm). → Erhöhe die Kiste oder wähle einen anderen Deckel.','{0}: too low for this lid (min. 35 mm). → Make the box taller or choose another lid.'],iSlide:['{0}: Schiebedeckel braucht eine freie Vorderseite (unten im Plan), sonst lässt er sich nicht herausziehen.','{0}: the sliding lid needs a free front side, otherwise it cannot be pulled out.'],iHinge:['{0}: Klappdeckel braucht oben freien Platz zum Aufklappen.','{0}: the hinged lid needs free space above to swing open.'],del:['Entfernen','Remove'],t_box:['Box','Box'],t_tall:['Hoher Behälter','Tall container'],t_drawer:['Schublade','Drawer'],sMods:['Module','Modules'],
  eEmpty:['Füge mindestens ein Modul hinzu.','Add at least one module.'],eTall:['{0}: Höhe {1} mm ist grösser als der Platz ({2} mm). → Verringere die Höhe der Kiste oder erhöhe die Platzhöhe.','{0}: height {1} mm exceeds the space ({2} mm). → Reduce the box height or increase the space height.'],eSmall:['{0}: zu klein (mind. {1}×{2}×{3} mm). → Vergrössere die Kiste.','{0}: too small (min. {1}×{2}×{3} mm). → Make the box larger.'],eBig:['{0} passt nicht in den Platz. → Verkleinere die Kiste oder vergrössere den Platz.','{0} does not fit the space. → Make the box smaller or the space larger.'],eArea:['Die Module brauchen {0} cm² Grundfläche, verfügbar sind {1} cm². → Entferne oder verkleinere Kisten oder vergrössere den Platz.','The modules need {0} cm² of floor area; only {1} cm² available. → Remove or shrink boxes, or enlarge the space.'],eNoFit:['Die Module lassen sich nicht überlappungsfrei anordnen. Verkleinere ein Modul oder vergrössere den Platz.','The modules cannot be arranged without overlap. Shrink a module or enlarge the space.'],iFree:['{0} cm² bleiben frei. „Platz ausfüllen“ streckt die Module.','{0} cm² stay free. “Fill the space” stretches the modules.'],iShort:['{0} und {1} berühren sich nur kurz, dort gibt es keine Steckverbindung.','{0} and {1} touch only briefly; no connector there.'],okFit:['Alles passt: {0} Module, {1} Verbinder.','Everything fits: {0} modules, {1} connectors.'],
  cartMods:['Plan, {0} Kisten','Plan, {0} boxes'],cartOne:['Einzelbox','Single box'],
@@ -850,7 +853,7 @@ const S={sharpSeam:true,filler:false,tex:'none',mode:'single',W:140,D:110,H:65,w
 let FRESH=true;try{const st=localStorage.getItem('mn-state');FRESH=!st;Object.assign(S,JSON.parse(st||'{}'))}catch(e){}
 // Bedienung (nur Oberflaeche, nicht Teil der Konfiguration): step 'start'|1|2|3, expert = alle Einstellungen sichtbar
 if(FRESH)S.step='start';else if(!S.step)S.step=1;S.expert=!!S.expert;
-S.mode=S.mode||'single';if(S.plan)PL=S.plan;else S.plan=PL;PL.one=PL.one||{type:'box',div:0,lid:'plug',cols:2,rows:2,tray:false,trayH:22,label:''};if(S.mode==='single'&&!PL.alt){PL.alt={W:PL.W,D:PL.D,H:PL.H};PL.W=140;PL.D=110;PL.H=65}
+S.mode=S.mode||'single';S.bsize=+S.bsize||100;if(S.plan)PL=S.plan;else S.plan=PL;PL.one=PL.one||{type:'box',div:0,lid:'plug',cols:2,rows:2,tray:false,trayH:22,label:''};if(S.mode==='single'&&!PL.alt){PL.alt={W:PL.W,D:PL.D,H:PL.H};PL.W=140;PL.D=110;PL.H=65}
 const FONTS={modern:'KFModern'};
 const B=(w,d,h,o={})=>({type:'box',w,d,h,div:0,lid:'none',cols:1,rows:1,...o});
 const TPL={besteck:{W:300,D:420,H:60,mods:[B(75,280,55),B(75,280,55),B(75,280,55),B(75,280,55),B(300,130,55,{cols:3})]},
@@ -860,17 +863,15 @@ const TPL={besteck:{W:300,D:420,H:60,mods:[B(75,280,55),B(75,280,55),B(75,280,55
 function applyTpl(id){const t=TPL[id];if(S.mode!=='plan'){S.mode='plan';PRODUCT.onChange()}Object.assign(PL,{W:t.W,D:t.D,H:t.H,fill:true,manual:false});PL.mods=JSON.parse(JSON.stringify(t.mods));FRESH=false;S.step=2;lastDim=null;BASE=null;lastN=null;changed();buildUI()}
 let SEL=null; // angetippte Kiste (Index im Plan)
 // Plan: aendern sich Platz oder Kisten (Masse, Art, Anzahl), wird automatisch neu angeordnet; nur Verschieben/Drehen behaelt die eigene Anordnung
-const layoutSig=()=>JSON.stringify([PL.W,PL.D,PL.H,PL.fill,(PL.mods||[]).map(m=>[m.type,m.w,m.d,m.h])]);let lastSig=null,MOVED=false,lastDim=S.mode==='plan'?[PL.W,PL.D,PL.H]:null,BASE=null,lastN=S.mode==='plan'?PL.mods.length:null;
-// Zufaellige Aufteilung in Reihen (wie der Planer anordnet): Reihentiefen und Kistenbreiten je 45..150 mm, gelegentlich Faecher/Schaufel/Griffmulde/hoher Behaelter; nur gueltige Plaene
-function randomFill(){const r5=v=>Math.round(v/5)*5,mn=45,mx=150,h=Math.max(20,PL.H-5);
- const parts=L=>{const n=Math.max(Math.ceil(L/mx),Math.min(Math.floor(L/mn),Math.ceil(L/mx)+Math.floor(Math.random()*3))),w=Array.from({length:n},()=>.6+Math.random());const sm=w.reduce((a,b)=>a+b,0);
-  let o=w.map(v=>Math.max(mn,r5(v/sm*L)));o[o.length-1]=Math.max(mn,L-o.slice(0,-1).reduce((a,b)=>a+b,0));return o};
- for(let tries=0;tries<40;tries++){const out=[];
-  for(const d of parts(PL.D))for(const w of parts(PL.W)){const m={type:'box',w,d,h,div:0,lid:'none',cols:1,rows:1};
-   if(PL.H>=70&&w<=110&&d<=110&&Math.random()<.15)m.type='tall';else{const q=Math.random();if(w>=80&&q<.3)m.cols=2;else if(d>=80&&q<.5)m.rows=2;else if(q<.65)m.scoop=true;if(Math.random()<.15)m.grip=true}
-   out.push(m)}
-  if(planSolve({...PL,fill:true,manual:false,mods:out}).ok){Object.assign(PL,{fill:true,manual:false});PL.mods=out;break}}
- lastDim=null;BASE=null;lastN=null;SEL=null;FRESH=false;changed();buildUI()}
+const layoutSig=()=>JSON.stringify([PL.W,PL.D,PL.H,PL.fill,(PL.mods||[]).map(m=>[m.type,m.w,m.d,m.h])]);let lastBs=+S.bsize||100,lastSig=null,MOVED=false,lastDim=S.mode==='plan'?[PL.W,PL.D,PL.H]:null,BASE=null,lastN=S.mode==='plan'?PL.mods.length:null;
+// Neue Aufteilung in Reihen (wie der Planer anordnet), nur Standard-Kisten ohne Zubehoer. Zielgroesse sz (Regler «Kistengroesse»), rnd: Groessen zufaellig streuen
+function fillPlan(sz,rnd){ /* aendert nur PL; Aufrufer aktualisiert die Oberflaeche */
+const r5=v=>Math.round(v/5)*5,h=Math.max(20,PL.H-5),mn=Math.max(40,sz*.6),mx=Math.min(245,sz*1.5);
+ const parts=L=>{let n=Math.max(1,Math.round(L/sz),Math.ceil(L/245));if(rnd)n=Math.max(Math.ceil(L/mx),Math.min(Math.floor(L/mn)||1,n+Math.floor(Math.random()*3)-1));n=Math.max(1,Math.min(n,Math.floor(L/40)||1));
+  const w=Array.from({length:n},()=>rnd?.6+Math.random():1),sm=w.reduce((a,b)=>a+b,0);let o=w.map(v=>Math.max(40,r5(v/sm*L)));o[n-1]=Math.max(40,L-o.slice(0,-1).reduce((a,b)=>a+b,0));return o};
+ for(let tries=0;tries<40;tries++){const out=[];for(const d of parts(PL.D))for(const w of parts(PL.W))out.push({type:'box',w,d,h,div:0,lid:'none',cols:1,rows:1});
+  if(planSolve({...PL,fill:true,manual:false,mods:out}).ok){Object.assign(PL,{fill:true,manual:false});PL.mods=out;break}if(!rnd)rnd=true}
+ lastDim=null;BASE=null;lastN=null;SEL=null;FRESH=false}
 function selectMod(ix){SEL=ix;if(S.step!==2)goStep(2);renderMods();present(false);const r=document.querySelectorAll('#modlist .mrow')[S.mode==='single'?0:ix];if(r)r.scrollIntoView({behavior:'smooth',block:'center'})}
 
 /* ================= ModuNest: Oberflaeche, Vorschau, Anordnung ================= */
@@ -958,9 +959,9 @@ function renderMods(){const list=document.getElementById('modlist');list.innerHT
   row.append(o);list.append(row)})}
 function buildPlanUI(){let c=tag(card(S.mode==='plan'?'spacePlan':'spaceOne'),'1');c._t=PL;if(S.mode==='plan')para(c,'measureTip');
  rng(c,'W','width',50,600,5,'mm');rng(c,'D','depth',50,400,5,'mm');rng(c,'H','height',25,250,5,'mm');chk(c,'fill','fill');c.lastChild.classList.add('pfill');
- c=tag(card('plmods'),'2');const add=document.createElement('div');add.className='addrow';
+ c=tag(card('plmods'),'2');if(S.mode==='plan')rng(c,'bsize','boxSize',40,200,5,'mm');const add=document.createElement('div');add.className='addrow';
  ['box','tall','drawer'].filter(featOn).forEach(ty=>{const b=document.createElement('button');b.className='btn';b.dataset.k='add_'+ty;b.onclick=()=>{const d=MODDEF[ty];PL.mods.push({type:ty,w:d.w,d:d.d,h:Math.min(d.h,PL.H),div:0,lid:'none'});if(PL.manual){const m=PL.mods[PL.mods.length-1];[m.px,m.py]=spotFor(m)}renderMods();changed()};add.append(b)});
- if(S.mode==='plan'){const b=document.createElement('button');b.className='btn';b.dataset.k='randFill';b.onclick=()=>{if(confirm(tr('randQ')))randomFill()};add.append(b)}
+ if(S.mode==='plan'){const b=document.createElement('button');b.className='btn';b.dataset.k='randFill';b.onclick=()=>{if(confirm(tr('randQ'))){fillPlan(+S.bsize||100,true);changed();buildUI()}};add.append(b)}
  const list=document.createElement('div');list.id='modlist';const tv=document.createElement('div');tv.id='topv';c.append(tv,add,list);
  c=tag(card('plset'),'2',1);seg(c,'wall','wall',[[1.6,'1.6 mm'],[2,'2.0 mm'],[2.4,'2.4 mm'],[3,'3.0 mm']]);rng(c,'r','corners',0,12,1,'mm');if(S.mode!=='plan')chk(c,'stack','stack');chk(c,'sharpSeam','sharpSeam');chk(c,'filler','filler');if(featOn('tex'))seg(c,'tex','tex',[['none','tx_none'],['ribs','tx_ribs'],['waves','tx_waves'],['facets','tx_facets']]);
  c=tag(card('plmsg'),'2 3');const sm=document.createElement('p');sm.id='plsum';sm.className='plsum';const pb=document.createElement('div');pb.id='perbox';pb.dataset.st='3';c.append(sm,pb);const ul=document.createElement('ul');ul.id='plmsgs';c.append(ul);renderMods()}
@@ -1002,12 +1003,13 @@ const PRODUCT={dimKeys:['cBox'],pick:ix=>selectMod(ix),onShared(){S.step=2;lastM
  async build(res,tol){const r=await buildPlan(res,tol);r.ok=r.sol.ok;r.err=r.sol.msgs.map(m=>trf(...m)).join('; ');
   r.units=r.sol.ok?r.sol.items.map(it=>[Math.max(it.w,it.d),Math.min(it.w,it.d),it.h].map(v=>Math.round(v*10)/10)):[];return r},
  snap(){const o={};SKEYS.forEach(k=>o[k]=S[k]);return{S:o,PL:JSON.parse(JSON.stringify(PL))}},
- applySnap(s){Object.assign(S,s.S);lastMode=S.mode;lastDim=null;BASE=null;lastN=null;for(const k in PL)delete PL[k];Object.assign(PL,JSON.parse(JSON.stringify(s.PL)));if(S.mode==='plan'){lastDim=[PL.W,PL.D,PL.H];lastN=PL.mods.length}},
+ applySnap(s){Object.assign(S,s.S);lastMode=S.mode;lastDim=null;BASE=null;lastN=null;lastBs=+S.bsize||100;for(const k in PL)delete PL[k];Object.assign(PL,JSON.parse(JSON.stringify(s.PL)));if(S.mode==='plan'){lastDim=[PL.W,PL.D,PL.H];lastN=PL.mods.length}},
  snapName:s=>(s.S.mode==='plan'?'Plan':'Box')+' '+s.PL.W+'x'+s.PL.D+'x'+s.PL.H,
  snapCount:s=>s.S.mode==='plan'?(s.PL.mods||[]).length:1,
  snapInfo:s=>(s.S.mode==='plan'?trf('cartMods',(s.PL.mods||[]).length):tr('cartOne'))+' · '+s.PL.W+' × '+s.PL.D+' × '+s.PL.H+' mm',
  // Wechsel Einzelbox <-> Planer: Masse getrennt merken
- onChange(){uiState();let dimCh=false;/* Platz geaendert: Kisten im gleichen Verhaeltnis mitskalieren (immer von BASE aus, sonst Rundungsdrift beim Regler) */if(S.mode==='plan'&&S.mode===lastMode&&lastDim){const sz=()=>JSON.stringify(PL.mods.map(m=>[m.w,m.d,m.h]));if(BASE&&BASE.set!==sz())BASE=null;if(lastDim.join()!==[PL.W,PL.D,PL.H].join()){if(!BASE){const so=typeof built!=='undefined'&&built&&built.sol;BASE={dim:lastDim,m:JSON.parse(JSON.stringify(PL.mods)),it:so&&so.ok&&so.items.length===PL.mods.length?so.items.map(t=>({i:t.i,x:t.x,y:t.y,w:t.w,d:t.d})):null}}
+ onChange(){uiState();let dimCh=false;
+  /* Regler Kistengroesse: Plan mit Standard-Kisten dieser Groesse neu aufteilen */if(S.mode==='plan'&&S.mode===lastMode&&+S.bsize!==lastBs){lastBs=+S.bsize;fillPlan(lastBs,false);renderMods()}lastBs=+S.bsize;/* Platz geaendert: Kisten im gleichen Verhaeltnis mitskalieren (immer von BASE aus, sonst Rundungsdrift beim Regler) */if(S.mode==='plan'&&S.mode===lastMode&&lastDim){const sz=()=>JSON.stringify(PL.mods.map(m=>[m.w,m.d,m.h]));if(BASE&&BASE.set!==sz())BASE=null;if(lastDim.join()!==[PL.W,PL.D,PL.H].join()){if(!BASE){const so=typeof built!=='undefined'&&built&&built.sol;BASE={dim:lastDim,m:JSON.parse(JSON.stringify(PL.mods)),it:so&&so.ok&&so.items.length===PL.mods.length?so.items.map(t=>({i:t.i,x:t.x,y:t.y,w:t.w,d:t.d})):null}}
   /* Anordnung als Ganzes skalieren; zu schmale Kisten mit dem Nachbarn zusammenlegen (beim Vergroessern kommen sie zurueck) */
   const[oW,oD,oH]=BASE.dim,fx=PL.W/oW,fy=PL.D/oD,fz=PL.H/oH,mn=m=>(MODDEF[m.type]||MODDEF.box).min,cp=o=>{const m=JSON.parse(JSON.stringify(o));delete m.px;delete m.py;delete m.prot;m.h=Math.max(15,Math.min(PL.H,Math.round(o.h*fz)));return m};let ms;
   if(BASE.it){let R=BASE.it.map(t=>{const x=Math.round(t.x*fx),y=Math.round(t.y*fy);return{m:cp(BASE.m[t.i]),x,y,w:Math.round((t.x+t.w)*fx)-x,d:Math.round((t.y+t.d)*fy)-y}});
@@ -1074,7 +1076,7 @@ function expertBar(){panel.dataset.expert=S.expert?'1':'0';if(panel.querySelecto
  const bar=document.createElement('div');bar.className='uibar';const md=document.createElement('div');md.className='seg uimode';
  [[false,'mEasy'],[true,'mExpert']].forEach(([v,k])=>{const b=document.createElement('button');b.dataset.k=k;b.classList.toggle('on',!!S.expert===v);b.onclick=()=>{S.expert=v;md.querySelectorAll('button').forEach((x,n)=>x.classList.toggle('on',n===(v?1:0)));panel.dataset.expert=v?'1':'0';save()};md.append(b)});
  bar.append(md);document.getElementById('stats').after(bar)}
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261023-2c113</p></footer>');applyLang()}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261023-6b0b9</p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');
