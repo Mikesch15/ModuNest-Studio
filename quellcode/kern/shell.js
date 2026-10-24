@@ -84,7 +84,8 @@ function siteGate(){const st=prodCfg().status||PRODUCT_START,t=document.getEleme
  document.getElementById('closed').style.display=st==='aus'||(st==='test'&&!ADMIN_DEV)?'grid':'none';
  t.hidden=st==='live';t.textContent=st==='aus'?'AUS':'TEST'}
 siteGate();
-(async()=>{if(!CONFIG.api)return;try{const r=await fetch(CONFIG.api.replace(/\/$/,'')+'/config',{method:'POST',headers:{'content-type':'application/json'},body:'{}'});if(!r.ok)return;
+(async()=>{if(!CONFIG.api)return;try{let vb='{}';try{const k='mn-v-'+PRODUCT.id;if(!sessionStorage.getItem(k)&&!localStorage.getItem('mna-key')){sessionStorage.setItem(k,'1');vb=JSON.stringify({visit:PRODUCT.id})}}catch(e){} /* Besuchszaehler: 1x je Sitzung, eigene Admin-Besuche nicht */
+ const r=await fetch(CONFIG.api.replace(/\/$/,'')+'/config',{method:'POST',headers:{'content-type':'application/json'},body:vb});if(!r.ok)return;
  const j=await r.json(),old=JSON.stringify(prodCfg().off||[]);SITE=j;try{localStorage.setItem('mn-site',JSON.stringify(j))}catch(e){}
  siteGate();if(JSON.stringify(prodCfg().off||[])!==old){buildUI();changed()}}catch(e){}})();
 /* Mehrere Produkte: Knopf zur Produktauswahl; installierbar (PWA) ueber ../sw.js */

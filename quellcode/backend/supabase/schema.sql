@@ -102,3 +102,13 @@ alter table public.settings enable row level security;
 insert into public.settings(key,value) values ('site','{"products":{"modunest":{"status":"live","off":[]},"namenspuzzle":{"status":"test","off":[]}}}') on conflict (key) do nothing;
 -- alte Bestellungen ohne Produkt-Aufteilung -> ModuNest (21.10.2026)
 update public.orders set per = jsonb_build_object('modunest', credits), pused = jsonb_build_object('modunest', used) where per is null and status = 'ok' and credits > 0;
+
+-- Besuchszaehler (24.10.2026): je Tag und Modul die Anzahl Sitzungen, keine Personendaten
+create table if not exists public.visits (day date not null, product text not null, n int not null default 0, primary key (day, product));
+alter table public.visits enable row level security;
+create or replace function public.hit_visit(p_product text)
+returns void language sql security definer set search_path = public as $$
+  insert into visits(day, product, n) values ((now() at time zone 'Europe/Zurich')::date, p_product, 1)
+  on conflict (day, product) do update set n = visits.n + 1;
+$$;
+revoke all on function public.hit_visit(text) from public, anon, authenticated;

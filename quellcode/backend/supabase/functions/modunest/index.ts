@@ -82,7 +82,10 @@ Deno.serve(async (req) => {
     const exp = Date.now() + TTL;
     return json({ token: await sign({ id: data.id, exp }), left: leftFor(data, prodOf(b.product)), exp });
   }
-  if (path === "config") return json(await siteCfg()); // oeffentlich: welche Produkte/Optionen freigegeben sind
+  if (path === "config") { // oeffentlich: welche Produkte/Optionen freigegeben sind; { visit } zaehlt einen Besuch (1x je Sitzung und Modul, keine Personendaten)
+    if (typeof b.visit === "string" && PRODUCTS_OK.test(b.visit)) { try { await sb.rpc("hit_visit", { p_product: b.visit }); } catch (_) { /* Zaehler darf nie stoeren */ } }
+    return json(await siteCfg());
+  }
   if (path === "left") { // { token, product }: Restguthaben fuer dieses Produkt (Anzeige beim Oeffnen einer Produktseite)
     const p = await check(b.token); if (!p) return json({ error: "token" }, 401);
     const { data: o } = await sb.from("orders").select("credits,used,per,pused").eq("id", p.id).single();
@@ -169,6 +172,11 @@ Deno.serve(async (req) => {
       if (b.id) q = q.eq("order_id", String(b.id));
       const { data } = await q;
       return json({ exports: data ?? [] });
+    }
+    if (path === "admin/visits") { // Besuche der letzten 90 Tage je Tag und Modul
+      const since = new Date(Date.now() - 90 * 864e5).toISOString().slice(0, 10);
+      const { data } = await sb.from("visits").select("day,product,n").gte("day", since).order("day", { ascending: false });
+      return json({ visits: data ?? [] });
     }
     if (path === "admin/settings") { // { site } speichern oder (ohne site) lesen
       if (b.site) {

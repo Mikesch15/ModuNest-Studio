@@ -95,6 +95,7 @@ table.t{width:100%;border-collapse:collapse;font-size:13px}table.t th,table.t td
 <p class="warn" id="pendw" hidden></p>
 <div class="stats"><div class="stat"><span>Bestellungen</span><strong id="sN">–</strong></div><div class="stat"><span>davon letzte 30 Tage</span><strong id="s30">–</strong></div><div class="stat"><span>Downloads 48 h</span><strong id="sX">–</strong></div></div>
 <table class="t" id="ptab"></table>
+<h3 style="margin:14px 0 6px;font-size:15px">Besuche</h3><p class="info" style="display:block;margin:0 0 6px">Sitzungen je Modul (1× pro Besuch gezählt, deine eigenen mit Admin-Schlüssel nicht). Keine Personendaten.</p><table class="t" id="vtab"></table>
 <details><summary style="font-size:13px;color:var(--mut);cursor:pointer">Letzte Downloads</summary><ul class="exl" id="exall"></ul></details>
 <button class="b" id="reload">Alles neu laden</button>
 </section>
@@ -160,7 +161,11 @@ async function copy(t,b){try{await navigator.clipboard.writeText(t);const o=b.te
 document.querySelectorAll('.ib').forEach(b=>b.onclick=()=>{const p=$(b.dataset.i);p.hidden=!p.hidden;b.classList.toggle('on',!p.hidden)});
 $('eye').onclick=()=>{$('key').type=$('key').type==='password'?'text':'password'};
 let ORD=[],LST=[],EXP=[],SITE={products:{}};const OPEN=new Set();
-const PRODUCTS=[{"id": "hofpuzzle", "name": {"de": "Hofpuzzle", "en": "Farm puzzle"}, "features": [{"id": "gravur", "name": "Gravierter Titel"}], "standard": "test"}, {"id": "modunest", "name": {"de": "ModuNest Kisten", "en": "ModuNest boxes"}, "features": [{"id": "plan", "name": "Planer (mehrere Kisten)"}, {"id": "drawer", "name": "Schubladenbox"}, {"id": "tall", "name": "Hoher Behälter"}, {"id": "slide", "name": "Schiebedeckel"}, {"id": "hinge", "name": "Klappdeckel"}, {"id": "tex", "name": "Oberflächen-Muster"}], "standard": "live"}, {"id": "namenspuzzle", "name": {"de": "Namenspuzzle", "en": "Name puzzle"}, "features": [{"id": "figuren", "name": "Figuren"}, {"id": "gravur", "name": "Gravierte 2. Zeile"}], "standard": "live"}, {"id": "raster", "name": {"de": "Raster mit Kisten", "en": "Grid with bins"}, "features": [{"id": "boden", "name": "Geschlossener Boden"}], "standard": "test"}, {"id": "schild", "name": {"de": "Stall- & Türschild", "en": "Stable & door sign"}, "features": [{"id": "figur", "name": "Figur auf dem Schild"}, {"id": "script", "name": "Schreibschrift"}, {"id": "formen", "name": "Formen Oval/Bogen"}], "standard": "test"}, {"id": "stecker", "name": {"de": "Pflanzenstecker-Set", "en": "Plant marker set"}, "features": [{"id": "symbol", "name": "Symbol auf dem Stecker"}, {"id": "script", "name": "Schreibschrift"}], "standard": "test"}],pname=id=>{const p=PRODUCTS.find(p=>p.id===id);return p?p.name.de:id},unit=id=>({modunest:'Kisten',namenspuzzle:'Puzzles',hofpuzzle:'Puzzles',schild:'Schilder',stecker:'Sets'})[id]||'Einheiten';
+const PRODUCTS=[{"id": "hofpuzzle", "name": {"de": "Hofpuzzle", "en": "Farm puzzle"}, "features": [{"id": "gravur", "name": "Gravierter Titel"}], "standard": "test"}, {"id": "modunest", "name": {"de": "ModuNest Kisten", "en": "ModuNest boxes"}, "features": [{"id": "plan", "name": "Planer (mehrere Kisten)"}, {"id": "drawer", "name": "Schubladenbox"}, {"id": "tall", "name": "Hoher Behälter"}, {"id": "slide", "name": "Schiebedeckel"}, {"id": "hinge", "name": "Klappdeckel"}, {"id": "tex", "name": "Oberflächen-Muster"}], "standard": "live"}, {"id": "namenspuzzle", "name": {"de": "Namenspuzzle", "en": "Name puzzle"}, "features": [{"id": "figuren", "name": "Figuren"}, {"id": "gravur", "name": "Gravierte 2. Zeile"}], "standard": "live"}, {"id": "raster", "name": {"de": "Raster mit Kisten", "en": "Grid with bins"}, "features": [{"id": "boden", "name": "Geschlossener Boden"}], "standard": "test"}, {"id": "schild", "name": {"de": "Stall- & Türschild", "en": "Stable & door sign"}, "features": [{"id": "figur", "name": "Figur auf dem Schild"}, {"id": "script", "name": "Schreibschrift"}, {"id": "formen", "name": "Formen Oval/Bogen"}], "standard": "test"}, {"id": "stecker", "name": {"de": "Pflanzenstecker-Set", "en": "Plant marker set"}, "features": [{"id": "symbol", "name": "Symbol auf dem Stecker"}, {"id": "script", "name": "Schreibschrift"}], "standard": "test"}],pname=id=>{if(id==='start')return 'Produktauswahl';const p=PRODUCTS.find(p=>p.id===id);return p?p.name.de:id},unit=id=>({modunest:'Kisten',namenspuzzle:'Puzzles',hofpuzzle:'Puzzles',schild:'Schilder',stecker:'Sets',raster:'Teile'})[id]||'Einheiten';
+/* Besuche: heute / 7 / 30 / 90 Tage je Modul */
+function renderVisits(V){const t=new Date(),d0=t.toLocaleDateString('sv-SE',{timeZone:'Europe/Zurich'}),ago=n=>new Date(Date.now()-n*864e5).toLocaleDateString('sv-SE',{timeZone:'Europe/Zurich'}),P={};
+ for(const r of V){const p=P[r.product]=P[r.product]||[0,0,0,0];if(r.day===d0)p[0]+=r.n;if(r.day>ago(7))p[1]+=r.n;if(r.day>ago(30))p[2]+=r.n;p[3]+=r.n}
+ const ks=Object.keys(P).sort((a,b)=>P[b][2]-P[a][2]);$('vtab').innerHTML='<tr><th>Modul</th><th>heute</th><th>7 Tage</th><th>30 Tage</th><th>90 Tage</th></tr>'+(ks.length?ks.map(k=>'<tr><td>'+esc(pname(k))+'</td>'+P[k].map(n=>'<td>'+n+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="5">Noch keine Besuche gezählt.</td></tr>')}
 document.querySelectorAll('.psel').forEach(s=>s.innerHTML=PRODUCTS.map(p=>`<option value="${esc(p.id)}">${esc(p.name.de)}</option>`).join(''));
 const nrOf=o=>o.source==='etsy'?o.receipt_id:fmt(o.code),stOf=id=>((SITE.products||{})[id]||{}).status||(PRODUCTS.find(p=>p.id===id)||{}).standard||'live',ST={live:'Live',test:'Test',aus:'Aus'};
 const perTxt=o=>o.per?Object.entries(o.per).map(([k,v])=>esc(pname(k))+': '+((o.pused||{})[k]||0)+'/'+v).join(', '):'alle Produkte';
@@ -216,7 +221,7 @@ $('psave').onclick=async()=>{const products={};$('plist').querySelectorAll('[dat
 /* ---- Laden ---- */
 async function load(){const r=await call('admin/list');if(r.error){say('cmsg',ERR[r.error]||('Fehler: '+r.error));$('m').classList.add('lock');document.body.classList.remove('conn-ok');return false}
  ORD=r.orders||[];$('m').classList.remove('lock');document.body.classList.add('conn-ok');
- const[x,s]=await Promise.all([call('admin/exports'),call('admin/settings')]);EXP=x.exports||[];if(s.site){SITE=s.site;try{localStorage.setItem('mn-site',JSON.stringify(SITE))}catch(e){}}
+ const[x,s,v]=await Promise.all([call('admin/exports'),call('admin/settings'),call('admin/visits')]);EXP=x.exports||[];renderVisits(v.visits||[]);if(s.site){SITE=s.site;try{localStorage.setItem('mn-site',JSON.stringify(SITE))}catch(e){}}
  dash();render();renderP();loadL();loadE();return true}
 $('reload').onclick=load;$('connedit').onclick=()=>document.body.classList.remove('conn-ok');
 
@@ -264,6 +269,6 @@ $('rem').onchange=()=>{if($('key').value.trim())st.set('mna-key',$('key').value.
 if($('key').value)$('conn').click();
 if('serviceWorker' in navigator&&WEB)navigator.serviceWorker.register('../sw.js',{scope:'../'}).catch(()=>{});
 </script>
-<p class="legal">Version 261024-2b368</p>
+<p class="legal">Version 261024-9b0fd</p>
 </body>
 </html>
