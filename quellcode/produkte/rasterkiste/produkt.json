@@ -1,0 +1,8 @@
+{
+ "id": "rasterkiste",
+ "name": {"de": "Raster-Kiste", "en": "Grid bin"},
+ "text": {"de": "Kisten für das 42-mm-Raster – kompatibel mit Gridfinity. Grösse, Höhe und Fächer frei wählbar, stapelbar.", "en": "Bins for the 42 mm grid – Gridfinity compatible. Size, height and compartments of your choice, stackable."},
+ "standard": "test",
+ "dateien": ["../../kern/figuren.js", "produkt.js"],
+ "features": [{"id": "lip", "name": "Stapelrand"}]
+}
