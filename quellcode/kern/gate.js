@@ -44,7 +44,7 @@ async function exportCart(){if(!unlockedNow())return;let msg='';const keep=PRODU
    const dir=(i+1)+'-'+list[i].name+'/',arr=arrange(r.parts,'print');
    files.push({name:dir+list[i].name+'.3mf',data:new Uint8Array(await threeMF(arr.map(p=>({...p,color:PRODUCT.color?PRODUCT.color(p):S[p.key]}))).arrayBuffer())});
    r.parts.forEach((p,k)=>files.push({name:dir+'stl/'+(k+1)+'-'+p.name+(p.qty>1?'_x'+p.qty:'')+'.stl',data:stlOf(p.pf?xf(p.tris,p.pf):p.tris)}))}
-  PRODUCT.applySnap(keep);
+  PRODUCT.applySnap(keep);if(PRODUCT.notice)files.push({name:'LIZENZ-HINWEIS.txt',data:new TextEncoder().encode(PRODUCT.notice)});
   const c=await charge(cfgs);if(c){setTimeout(showNext,400);download(zip(files),CART.length?PRODUCT.file+'-Warenkorb.zip':PRODUCT.file+'-'+keep.name.normalize('NFD').replace(/[^\w\- ]/g,'').trim().replace(/ +/g,'-')+'.zip');if(CONFIG.requireCode)msg=[c.n?trf('charged',c.n):'',c.free?trf('chargedFree',c.free):''].filter(Boolean).join(' ')}}
  catch(e){st.textContent=e.message}
  finally{PRODUCT.applySnap(keep);buildUI();present(false);renderCart();if(msg)st.innerHTML+='<br><b>'+msg+'</b>'}}

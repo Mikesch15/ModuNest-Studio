@@ -2,7 +2,7 @@
 // Geometrie mit tools/baseline.txt. Ausgabe nur Abweichungen und Fehler.
 //   node quellcode/tools/check.mjs            pruefen
 //   node quellcode/tools/check.mjs --update   Baseline neu schreiben (nach gewollten Geometrie-Aenderungen)
-//   node quellcode/tools/check.mjs shot <modunest|namenspuzzle|hofpuzzle|schild|stecker|admin> ['{"S":{...}}'] [breite]   Screenshot -> /tmp/mn-shot.png
+//   node quellcode/tools/check.mjs shot <modunest|namenspuzzle|hofpuzzle|schild|stecker|raster|admin> ['{"S":{...}}'] [breite]   Screenshot -> /tmp/mn-shot.png
 import {execSync} from 'child_process';import fs from 'fs';import path from 'path';import {fileURLToPath} from 'url';
 const {chromium}=await import('/opt/node22/lib/node_modules/playwright/index.mjs');
 const Q=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),ROOT=path.resolve(Q,'..'),BASE=path.join(Q,'tools/baseline.txt');
@@ -13,7 +13,7 @@ async function page(f,state,w=1000,h=800){const p=await b.newPage({viewport:{wid
  await p.goto('file://'+(f==='admin'?ROOT+'/admin/index.html':Q+'/dist/'+f+'.html'));await p.waitForTimeout(2500);return{p,errs}}
 const mode=process.argv[2];
 if(mode==='shot'){const f=process.argv[3]||'modunest',st=process.argv[4]?JSON.parse(process.argv[4]):null,w=+process.argv[5]||900;
- const ST={modunest:'mn',namenspuzzle:'np',hofpuzzle:'hp',schild:'sc',stecker:'st'},s={'mna-key':'x',...(st&&st.S?{[ST[f]+'-state']:st.S}:st||{})};const{p,errs}=await page(f,s,w,900);await p.screenshot({path:'/tmp/mn-shot.png',fullPage:f==='admin'||process.argv[6]==='full'});
+ const ST={modunest:'mn',namenspuzzle:'np',hofpuzzle:'hp',schild:'sc',stecker:'st',raster:'rs'},s={'mna-key':'x',...(st&&st.S?{[ST[f]+'-state']:st.S}:st||{})};const{p,errs}=await page(f,s,w,900);await p.screenshot({path:'/tmp/mn-shot.png',fullPage:f==='admin'||process.argv[6]==='full'});
  console.log('/tmp/mn-shot.png',errs.length?'FEHLER '+errs.join(' | '):'');await b.close();process.exit(0)}
 const out=[],errs=[];
 // ModuNest: Planer-Konfigurationen
@@ -35,7 +35,8 @@ const out=[],errs=[];
 // Hofpuzzle, Schild, Stecker
 for(const[f,code]of[['hofpuzzle',"const r=await buildPuzzle(6,.03);return['hp '+(r.ok?Math.round(r.info.Wb)+'x'+Math.round(r.info.Db)+' n'+r.info.n+' open'+r.parts.reduce((a,q)=>a+openEdges(q.tris),0):r.err)]"],
  ['schild',"const o=[];for(const st of[{},{form:'oval',font:'Script',fig:'kuh'},{form:'arch',t2:'',rim:false,holes:false}]){Object.assign(S,st);const r=await buildSign(6,.03);o.push('sc '+(r.ok?Math.round(r.info.W)+'x'+Math.round(r.info.Hb)+' H'+r.info.H1+' open'+openEdges(r.parts[0].tris)+' vol'+Math.round(Math.abs(volume(r.parts[0].tris))/100)*100:r.err))}return o"],
- ['stecker',"const r=await buildMarkers(6,.03);return['st '+(r.ok?r.parts.length+' open'+r.parts.reduce((a,q)=>a+openEdges(q.tris),0)+' vol'+Math.round(r.parts.reduce((a,q)=>a+Math.abs(volume(q.tris)),0)/100)*100:r.err)]"]]){
+ ['stecker',"const r=await buildMarkers(6,.03);return['st '+(r.ok?r.parts.length+' open'+r.parts.reduce((a,q)=>a+openEdges(q.tris),0)+' vol'+Math.round(r.parts.reduce((a,q)=>a+Math.abs(volume(q.tris)),0)/100)*100:r.err)]"],
+ ['raster',"const o=[];for(const st of[{W:400,D:300,al:'c',floor:0},{W:200,D:150,al:'l',floor:1}]){Object.assign(S,st);const r=await buildPlate(6,.03);o.push('rs '+(r.ok?r.info.nx+'x'+r.info.ny+' n'+r.parts.length+' vol'+Math.round(r.parts.reduce((a,q)=>a+Math.abs(volume(q.tris)),0)/100)*100:r.err))}return o"]]){
  const{p,errs:e}=await page(f,{'mna-key':'x'});errs.push(...e.map(x=>f+': '+x));out.push(...await p.evaluate(c=>new Function('return (async()=>{'+c+'})()')(),code));await p.close()}
 // Admin mit Schein-Server
 {const p=await b.newPage();const e=[];p.on('pageerror',x=>e.push(x.message));

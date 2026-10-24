@@ -1,0 +1,8 @@
+{
+ "id": "raster",
+ "name": {"de": "Raster-Grundplatte", "en": "Grid baseplate"},
+ "text": {"de": "Grundplatte nach Mass für deine Schublade – kompatibel mit Gridfinity, mit Randstreifen und automatisch in Teile fürs Druckbett zerlegt.", "en": "Baseplate made to measure for your drawer – Gridfinity compatible, with edge fillers and split automatically to fit your print bed."},
+ "standard": "test",
+ "dateien": ["../../kern/figuren.js", "produkt.js"],
+ "features": [{"id": "boden", "name": "Geschlossener Boden"}]
+}

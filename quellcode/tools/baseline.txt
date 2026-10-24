@@ -52,4 +52,6 @@ sc 180x60 H19 open0 vol48200
 sc 180x51 H14 open0 vol32300
 sc 180x68 H29 open0 vol48900
 st 4 open0 vol54900
+rs 9x7 n4 vol123500
+rs 4x3 n1 vol99800
 admin geladen=true
