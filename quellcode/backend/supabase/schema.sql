@@ -112,3 +112,16 @@ returns void language sql security definer set search_path = public as $$
   on conflict (day, product) do update set n = visits.n + 1;
 $$;
 revoke all on function public.hit_visit(text) from public, anon, authenticated;
+
+-- Abbuchen + Export-Eintrag in EINER Transaktion (24.10.2026): nie "bezahlt, aber nicht gespeichert",
+-- damit ein Wiederholungsversuch derselben Konfiguration innert 24 h sicher gratis bleibt.
+create or replace function public.consume_export(p_id uuid, p_n int, p_product text, p_dims jsonb)
+returns int language plpgsql security definer set search_path = public as $$
+declare r int;
+begin
+  r := consume_credits2(p_id, p_n, p_product);
+  if r is null or r < 0 then return -1; end if;
+  insert into exports(order_id, product, dims) select p_id, p_product, d from jsonb_array_elements(p_dims) d;
+  return r;
+end $$;
+revoke all on function public.consume_export(uuid, int, text, jsonb) from public, anon, authenticated;

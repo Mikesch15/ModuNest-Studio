@@ -116,13 +116,14 @@ Deno.serve(async (req) => {
         const k = best.filter((x) => !x).length;
         if (!k) free.push(i); else { n += k; rec.push(c.map((m, j) => best[j] ?? m)); }
       });
-      if (!n) { const { data: o } = await sb.from("orders").select("credits,used,per,pused").eq("id", p.id).single(); return json({ left: o ? leftFor(o, product) : 0, n: 0, free }); }
-      const { data } = await sb.rpc("consume_credits2", { p_id: p.id, p_n: n, p_product: product });
+      // dry: nur ausrechnen, was dieser Export kosten wuerde (Anzeige vor dem Download), nichts abbuchen
+      if (!n || b.dry) { const { data: o } = await sb.from("orders").select("credits,used,per,pused").eq("id", p.id).single(); const left = o ? leftFor(o, product) : 0; return json({ left, n, free, dry: !!b.dry, enough: left >= n }); }
+      // Abbuchen und Export-Eintrag in einer Transaktion (consume_export): Wiederholung derselben Konfiguration bleibt sicher gratis
+      const { data } = await sb.rpc("consume_export", { p_id: p.id, p_n: n, p_product: product, p_dims: rec });
       if (data === -1 || data == null) {
         const { data: o } = await sb.from("orders").select("credits,used,per,pused").eq("id", p.id).single();
         return json({ error: "credits", left: o ? leftFor(o, product) : 0, need: n }, 402);
       }
-      await sb.from("exports").insert(rec.map((dims) => ({ order_id: p.id, product, dims })));
       return json({ left: data, n, free });
     }
     // alt (Version <= 2.9): n Exporte
