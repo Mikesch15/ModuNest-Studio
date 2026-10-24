@@ -22,6 +22,9 @@ help4:['Öffne die 3MF-Datei in Bambu Studio (oder die STL-Dateien in deinem Sli
  fitDl:['Teststück herunterladen (STL)','Download test piece (STL)'],fitPick:['Gewählte Passung (1 stramm … 5 locker)','Chosen fit (1 tight … 5 loose)'],
  sVol:['Innenvolumen','Inner volume'],sCell:['Fach (innen)','Compartment'],sMat:['Filament max.','Filament max.'],sParts:['Teile','Parts'],sKeys:['Verbinder','Connectors'],
  b3mf:['3MF exportieren','Export 3MF'],bstl:['STL (ZIP)','STL (ZIP)'],
+ warnBedL:['Zu gross für dein Druckbett ({0} mm): {1}. Kisten verkleinern oder ein grösseres Druckbett wählen.','Too big for your print bed ({0} mm): {1}. Make the boxes smaller or choose a bigger bed.'],
+ bedSel:['Druckbett','Print bed'],bed180:['180 mm (z. B. A1 mini)','180 mm (e.g. A1 mini)'],bed220:['220 mm (z. B. Prusa MK4, Ender 3)','220 mm (e.g. Prusa MK4, Ender 3)'],bed256:['256 mm (Bambu P1S, X1, A1)','256 mm (Bambu P1S, X1, A1)'],bed300:['300 mm und grösser','300 mm and larger'],
+ pcBox:['Kiste(n)','box(es)'],pcLid:['Deckel','lid(s)'],pcPin:['Scharnierstift(e)','hinge pin(s)'],pcIns:['Einsatz/Einsätze','insert(s)'],pcDiv:['Trennwand/-wände','divider(s)'],pcKey:['Verbinder','connector(s)'],pcFill:['Füllstück(e)','filler(s)'],pcDrw:['Schublade(n)','drawer(s)'],pcTitle:['Im Download','In the download'],
  warnBed:['Die Teile passen nicht auf das 256-mm-Druckbett des P1S.','The parts do not fit the 256 mm bed of the P1S.'],
  warnCell:['Sehr kleines Fach (unter 15 mm).','Very small compartment (under 15 mm).'],
  warnTray:['Hinweis: Box hat nur ein grosses Fach, die Aufteilung gilt für den Einsatz.','Note: the box has one large compartment; the layout applies to the insert.'],
@@ -65,6 +68,7 @@ let FRESH=true;try{const st=localStorage.getItem('mn-state');FRESH=!st;Object.as
 if(FRESH)S.step='start';else if(!S.step)S.step=1;S.expert=!!S.expert;
 S.mode=S.mode||'single';S.bsize=+S.bsize||100;if(S.plan)PL=S.plan;else S.plan=PL;PL.one=PL.one||{type:'box',div:0,lid:'plug',cols:2,rows:2,tray:false,trayH:22,label:''};if(S.mode==='single'&&!PL.alt){PL.alt={W:PL.W,D:PL.D,H:PL.H};PL.W=140;PL.D=110;PL.H=65}
 const FONTS={modern:'KFModern'};
+const BED=()=>{try{return +localStorage.getItem('mn-bed')||256}catch(e){return 256}}; /* Druckbett-Kante in mm (Auswahl im Pruef-Schritt, gilt auch fuer Raster) */
 const B=(w,d,h,o={})=>({type:'box',w,d,h,div:0,lid:'none',cols:1,rows:1,...o});
 const TPL={besteck:{W:300,D:420,H:60,mods:[B(75,280,55),B(75,280,55),B(75,280,55),B(75,280,55),B(300,130,55,{cols:3})]},
  gewuerz:{W:400,D:450,H:90,mods:Array.from({length:12},()=>B(100,150,80))},
@@ -127,7 +131,7 @@ function present(reframe){if(!built)return;if(true){presentPlan(reframe);return}
  const i=built.info,mass=built.parts.reduce((s,p)=>s+Math.abs(volume(p.tris)),0)/1000*1.24,span=arrange(built.parts,'print').span;
  const f1=v=>v.toFixed(1);
  document.getElementById('stats').innerHTML=[[tr('sVol'),f1(i.vol)+' L'],[tr('sCell'),`${i.cells}× ${Math.round(i.cw)}×${Math.round(i.ch)}`],[tr('sMat'),'≈ '+Math.round(mass)+' g'],[tr('sParts'),built.parts.reduce((s,p)=>s+(p.qty||1),0)]].map(a=>`<div class="stat"><span>${a[0]}</span><strong>${a[1]}</strong></div>`).join('');
- let w='';if(span[0]>256||span[1]>256||S.H>256)w+=tr('warnBed')+' ';if(Math.min(i.cw,i.ch)<15)w+=tr('warnCell')+' ';if(S.tray)w+=tr('warnTray');
+ let w='';if(span[0]>BED()||span[1]>BED()||S.H>BED())w+=trf('warnBedL',BED(),'Box')+' ';if(Math.min(i.cw,i.ch)<15)w+=tr('warnCell')+' ';if(S.tray)w+=tr('warnTray');
  status.innerHTML=`${S.W} × ${S.D} × ${S.H} mm`+(w?`<br><b>${w}</b>`:'')}
 async function downloadFit(){const t=await fitTestTris(9,.02);const all=Float32Array.from([...t[0],...t[1]]);download(new Blob([stlOf(all)],{type:'model/stl'}),'ModuNest-Passungstest.stl')}
 function presentPlan(reframe){const sol=built.sol,arr0=sol.ok?arrange(built.parts,S.view):[],arr=arr0.filter(p=>!(S.hide&&S.hide[p.key])&&!(S.step===2&&S.view==='asm'&&p.key==='cLid'));
@@ -139,9 +143,9 @@ function presentPlan(reframe){const sol=built.sol,arr0=sol.ok?arrange(built.part
  topView(sol);perBox(sol);const ps=document.getElementById('plsum');if(ps)ps.innerHTML=!sol.ok?'<b>'+tr('blocked')+'</b>':S.mode==='single'?trf('sumOne',PL.W,PL.D,PL.H):trf('sumPlan',sol.items.length,Math.round(sol.items.reduce((a,it)=>a+it.w*it.d,0)/100),Math.round(PL.W*PL.D/100));
  const i=built.info,mass=sol.ok?built.parts.reduce((s,p)=>s+Math.abs(volume(p.tris))*(p.qty||1),0)/1000*1.24:0,span=sol.ok?arrange(built.parts,'print').span:[0,0];
  document.getElementById('stats').innerHTML=sol.ok?[[tr('sVol'),i.vol.toFixed(1)+' L'],[tr('sMods'),sol.items.length],[tr('sMat'),'≈ '+Math.round(mass)+' g'],[tr('sParts'),built.parts.reduce((s,p)=>s+(p.qty||1),0)]].map(a=>`<div class="stat"><span>${a[0]}</span><strong>${a[1]}</strong></div>`).join(''):'';
- let wmsg='';if(sol.ok){let big=false,fa=0;built.parts.forEach(p=>{const q=bbox(p.tris);const w=q.b[0]-q.a[0],d=q.b[1]-q.a[1];if(Math.min(w,d)>250||Math.max(w,d)>256&&Math.min(w,d)>256||q.b[2]>256)big=true;fa+=(w+8)*(d+8)*(p.qty||1)});
-  if(big)wmsg=tr('warnBed');else if(fa>.75*246*246)wmsg=trf('iPlates',Math.ceil(fa/(.75*246*246)))}
- status.innerHTML=`${PL.W} × ${PL.D} × ${PL.H} mm`+(wmsg?(wmsg===tr('warnBed')?`<br><b>${wmsg}</b>`:`<br><span class="note">${wmsg}</span>`):'');{const l=document.getElementById('statline');if(l)l.textContent=sol.ok?(S.mode==='single'?trf('statOne',Math.round(mass)):trf('statLine',sol.items.length,Math.round(mass))):''}
+ let wmsg='';if(sol.ok){let big=[],fa=0;const bd=BED();built.parts.forEach(p=>{const q=bbox(p.pf?xf(p.tris,p.pf):p.tris);const w=q.b[0]-q.a[0],d=q.b[1]-q.a[1],h=q.b[2]-q.a[2];if(Math.max(w,d)>bd-4||h>bd)big.push(p.name);fa+=(w+8)*(d+8)*(p.qty||1)});
+  if(big.length)wmsg=trf('warnBedL',bd,big.slice(0,6).join(', ')+(big.length>6?' …':''));else if(fa>.75*(bd-10)*(bd-10))wmsg=trf('iPlates',Math.ceil(fa/(.75*(bd-10)*(bd-10))))}
+ status.innerHTML=`${PL.W} × ${PL.D} × ${PL.H} mm`+(wmsg?(wmsg.startsWith(tr('warnBedL').slice(0,8))?`<br><b>${wmsg}</b>`:`<br><span class="note">${wmsg}</span>`):'');{const l=document.getElementById('statline');if(l)l.textContent=sol.ok?(S.mode==='single'?trf('statOne',Math.round(mass)):trf('statLine',sol.items.length,Math.round(mass))):''}
  renderCart()}
 function numIn(m,k,mn,mx){const i=document.createElement('input');i.type='number';i.min=mn;i.max=mx;i.step=5;i.value=m[k];i.onchange=()=>{m[k]=Math.max(mn,Math.min(mx,+i.value||mn));i.value=m[k];changed()};return i}
 function mkSel(m,key,lk,vals,lab){const l=document.createElement('label'),s=document.createElement('span'),sel=document.createElement('select');s.textContent=tr(lk);vals.forEach(v=>{const op=document.createElement('option');op.value=v;op.textContent=lab?tr(lab+v):v;sel.append(op)});sel.value=m[key]??vals[0];sel.onchange=()=>{m[key]=typeof vals[0]==='number'?+sel.value:sel.value;changed()};l.append(s,sel);return l}
@@ -199,9 +203,14 @@ function topView(sol){const e=document.getElementById('topv');if(!e)return;if(S.
 // Neue Kiste in eigener Anordnung: erste freie Stelle (5-mm-Raster), sonst links vorne (Fehler zeigt Ueberlappung)
 function spotFor(m){const os=PL.mods.filter(q=>q!==m&&q.px!=null).map(q=>({x:q.px,y:q.py,w:q.prot?q.d:q.w,d:q.prot?q.w:q.d}));
  for(let y=0;y+m.d<=PL.D;y+=5)for(let x=0;x+m.w<=PL.W;x+=5)if(!os.some(t=>x<t.x+t.w&&t.x<x+m.w&&y<t.y+t.d&&t.y<y+m.d))return[x,y];return[0,0]}
+function partsLine(){const c={};const add=(k,n)=>c[k]=(c[k]||0)+n;
+ for(const p of built.parts){const q=p.qty||1,nm=p.name||'';if(/ Drawer( \d+)?$/.test(nm))add('pcDrw',q);else if(p.key==='cBox')add('pcBox',q);else if(p.key==='cLid')add(/Pin/.test(nm)?'pcPin':'pcLid',q);else if(p.key==='cTray')add(/Divider/.test(nm)?'pcDiv':'pcIns',q);else if(p.key==='cKey')add(/Filler/.test(nm)?'pcFill':'pcKey',q)}
+ return Object.entries(c).map(([k,n])=>n+' '+tr(k)).join(' · ')}
+function bedSelect(){const s=document.createElement('select');s.id='bedsel';for(const v of[180,220,256,300]){const o=document.createElement('option');o.value=v;o.textContent=tr('bed'+v);if(v===BED())o.selected=true;s.append(o)}
+ s.onchange=()=>{try{localStorage.setItem('mn-bed',s.value)}catch(e){}present(false)};const l=document.createElement('label'),t=document.createElement('span');t.textContent=tr('bedSel');l.append(t,s);return l}
 function perBox(sol){const e=document.getElementById('perbox');if(!e)return;if(!sol.ok){e.innerHTML='';return}
- e.innerHTML=`<p class="note">${tr('perBox')}</p><ul>`+sol.items.map(it=>{const g=built.parts.filter(p=>p.mod===it.i).reduce((a,p)=>a+Math.abs(volume(p.tris))*(p.qty||1),0)/1000*1.24;
-  return`<li><b>${tr('t_'+it.mod.type)}${S.mode==='plan'?' '+(it.i+1):''}</b> · ${Math.round(it.w)}×${Math.round(it.d)}×${Math.round(it.h)} mm · ≈ ${Math.round(g)} g</li>`}).join('')+'</ul>'}
+ e.innerHTML=`<p><b>${tr('pcTitle')}:</b> ${partsLine()}</p><p class="note">${tr('perBox')}</p><ul>`+sol.items.map(it=>{const g=built.parts.filter(p=>p.mod===it.i).reduce((a,p)=>a+Math.abs(volume(p.tris))*(p.qty||1),0)/1000*1.24;
+  return`<li><b>${tr('t_'+it.mod.type)}${S.mode==='plan'?' '+(it.i+1):''}</b> · ${Math.round(it.w)}×${Math.round(it.d)}×${Math.round(it.h)} mm · ≈ ${Math.round(g)} g</li>`}).join('')+'</ul>';e.prepend(bedSelect())}
 window.__mn={slotsFor,S,PL,buildPlan,planSolve,renderMods,buildAll,openEdges,get volume(){return volume},fitTestTris,arrange,get built(){return built}};
 
 /* ================= ModuNest: Produktbeschreibung fuer den Kern ================= */

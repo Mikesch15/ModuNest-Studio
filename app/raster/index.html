@@ -601,18 +601,19 @@ Object.assign(L,{
  rkNoFit:['Passt nicht aufs Raster: {0}. Kiste verkleinern oder entfernen.','Does not fit the grid: {0}. Make the bin smaller or remove it.'],
  i_rkBins:['Die Kisten werden automatisch auf dem Raster angeordnet. Kistengrösse teilt das Raster gleichmässig neu auf; in der Liste kannst du jede Kiste ändern. Höhe in Einheiten zu 7 mm (ohne Stapelrand), Stapelrand = Kisten lassen sich stapeln.','Bins are arranged on the grid automatically. Bin size re-divides the grid evenly; in the list you can change each bin. Height in 7 mm units (without lip); stacking lip = bins can be stacked.'],
  sBins:['Kisten','Bins'],rkTap:['Kiste antippen zum Ändern, freies Feld (+) antippen für eine neue Kiste. Gestrichelt: Fugen zwischen den Plattenteilen.','Tap a bin to change it, tap a free cell (+) for a new bin. Dashed: seams between plate parts.'],rkDel:['Kiste entfernen','Remove bin'],
+ bedSel:['Druckbett','Print bed'],bed180:['180 mm (z. B. A1 mini)','180 mm (e.g. A1 mini)'],bed220:['220 mm (z. B. Prusa MK4, Ender 3)','220 mm (e.g. Prusa MK4, Ender 3)'],bed256:['256 mm (Bambu P1S, X1, A1)','256 mm (Bambu P1S, X1, A1)'],bed300:['300 mm und grösser','300 mm and larger'],
  cartOne:['Grundplatte','Baseplate']
 });
 const S={W:400,D:300,al:'c',floor:0,bon:1,bsz:2,U:3,lip:1,wt:1.2,bins:null,view:'asm',hide:{},cBase:'#86ab7c',cBin:'#c8714f'};
 try{Object.assign(S,JSON.parse(localStorage.getItem('rs-state')||'{}'))}catch(e){}
 
 /* ================= Raster: Geometrie ================= */
-const TNK=1,THK=1.8,TLK=5,TCLK=.15,TZK=2.2,PZK=2.4,OV=.2,GF=42,PB=[.7,1.8,2.15],PH=4.65,RCELL=4,FLOOR=1.2,BED=250,ROUT=2,FIT=.5;
+const TNK=1,THK=1.8,TLK=5,TCLK=.15,TZK=2.2,PZK=2.4,OV=.2,GF=42,PB=[.7,1.8,2.15],PH=4.65,RCELL=4,FLOOR=1.2,ROUT=2,FIT=.5;
 // Aufteilung: Felder, Raender (unter 2 mm weg), Teile (Spalten-/Zeilengruppen bis BED)
 function rsPlan(){const W=Math.max(0,+S.W-2*FIT),D=Math.max(0,+S.D-2*FIT),nx=Math.floor(W/GF),ny=Math.floor(D/GF);
  const mx=W-nx*GF,my=D-ny*GF,c=S.al!=='l',e=v=>v<2?0:v,l=e(c?mx/2:0),r=e(c?mx/2:mx),f=e(c?my/2:0),b=e(c?my/2:my);
  const grp=(n,a,z)=>{for(let m=1;m<=n;m++){const g=[];let i=0;for(let j=0;j<m;j++){const k=Math.floor(n/m)+(j<n%m?1:0);g.push([i,k]);i+=k} /* gleichmaessig auf m Teile */
-   if(g.every(([i0,k])=>(i0===0?a:0)+k*GF+(i0+k===n?z:0)<=BED))return g}return Array.from({length:n},(_,i)=>[i,1])};
+   if(g.every(([i0,k])=>(i0===0?a:0)+k*GF+(i0+k===n?z:0)<=BEDR()-6-TLK))return g} /* inkl. Puzzle-Nase */return Array.from({length:n},(_,i)=>[i,1])};
  return{nx,ny,l,r,f,b,gx:grp(nx,l,r),gy:grp(ny,f,b)}}
 async function platePieces(P,res,tol){
  const F=S.floor&&featOn('boden')?FLOOR:0,parts=[],CELL=new Map(),Wt=P.l+P.nx*GF+P.r,Dt=P.f+P.ny*GF+P.b;
@@ -653,7 +654,8 @@ async function platePieces(P,res,tol){
 /* ================= Kisten (Gridfinity-kompatibel) =================
    Kiste 42*n - 0.5 mm, Ecken r 3.75, Hoehe 7 mm je Einheit (ohne Stapelrand). Fuss je Feld von unten 0.8 (45°) + 1.8 + 2.15 (45°) = 4.75 mm.
    Stapelrand oben = Aufnahmeprofil der Grundplatte - 0.25 (oben bei 0.5-mm-Kante abgeschnitten), darunter 45°-Stuetze nach innen. */
-const BW=.5,RB=3.75,FT=[.8,1.8,2.15],FH=4.75,UH=7,LTOP=.75,MAXB=5;
+const BW=.5,RB=3.75,FT=[.8,1.8,2.15],FH=4.75,UH=7,LTOP=.75;
+const BEDR=()=>{try{return +localStorage.getItem('mn-bed')||256}catch(e){return 256}},MB=()=>Math.max(1,Math.min(5,Math.floor((BEDR()-6+BW)/GF))); /* Druckbett (gemeinsame Auswahl) -> groesste Kiste */
 function binTris(X,Y,U,cx,cy,lip,wt,res,tol,C){const W=X*GF-BW,D=Y*GF-BW,H=U*UH,FLZ=FH+1.2,t=[],R=(w,d,draw)=>pzRings(w+4,d+4,res,tol,draw);
  const ex=(rg,a,b,dx=0,dy=0)=>{const q=extrude(rg,a,b);for(let i=0;i<q.length;i+=3){q[i]+=dx;q[i+1]+=dy}for(const v of q)t.push(v)};
  const rr=(x,w,d,r)=>{x.beginPath();x.roundRect(-w/2,-d/2,w,d,Math.max(0,Math.min(r,w/2,d/2)));x.fill()};
@@ -689,8 +691,8 @@ function packBins(nx,ny,bins){const run=usePos=>{const occ=Array.from({length:ny
   return{pl,bad,free:occ.flat().filter(v=>v<0).length}};
  const a=run(true);if(!a.bad.length)return a;const b=run(false);return b.bad.length<a.bad.length?b:a}
 /* Neue Aufteilung des Rasters in Kisten: Reihen/Spalten ~sz Felder (max. 5), rnd = Groessen streuen */
-function genBins(nx,ny,sz,rnd){const cut=n=>{const o=[];let r=n;while(r>0){let k=rnd?Math.max(1,Math.min(MAXB,sz+Math.floor(Math.random()*3)-1)):Math.min(MAXB,sz);
-  if(!rnd&&r-k>0&&r-k<sz)k=Math.min(MAXB,Math.ceil(r/Math.ceil(r/sz)));k=Math.min(k,r);o.push(k);r-=k}return o};
+function genBins(nx,ny,sz,rnd){const cut=n=>{const o=[];let r=n;while(r>0){let k=rnd?Math.max(1,Math.min(MB(),sz+Math.floor(Math.random()*3)-1)):Math.min(MB(),sz);
+  if(!rnd&&r-k>0&&r-k<sz)k=Math.min(MB(),Math.ceil(r/Math.ceil(r/sz)));k=Math.min(k,r);o.push(k);r-=k}return o};
  const bins=[];let y=0;for(const d of cut(ny)){let x=0;for(const w of cut(nx)){bins.push({w,d,cx:1,cy:1,x,y});x+=w}y+=d}return bins}
 async function buildPlate(res,tol){const P=rsPlan();if(P.nx<1||P.ny<1)return{ok:false,err:tr('eSmall'),parts:[],units:[],info:{}};
  if(!Array.isArray(S.bins))S.bins=genBins(P.nx,P.ny,+S.bsz||2,false);
@@ -706,8 +708,10 @@ async function buildPlate(res,tol){const P=rsPlan();if(P.nx<1||P.ny<1)return{ok:
 function arrange(parts,mode){return mode==='asm'?parts.flatMap(p=>p.asm.map(f=>({...p,tris:xf(p.tris,f)}))):arrangePrint(parts)}
 function ui(){if(!featOn('boden'))S.floor=0;
  let c=card('rsSize');rng(c,'W','rsW',60,800,1,'mm');rng(c,'D','rsD',60,800,1,'mm');
+ {const l=document.createElement('label'),t=document.createElement('span'),sl=document.createElement('select');t.textContent=tr('bedSel');for(const v of[180,220,256,300]){const op=document.createElement('option');op.value=v;op.textContent=tr('bed'+v);if(v===BEDR())op.selected=true;sl.append(op)}
+  sl.onchange=()=>{try{localStorage.setItem('mn-bed',sl.value)}catch(e){}S.bins=null;changed();buildUI()};l.append(t,sl);l.classList.add('xp');c.append(l)}
  c=card('rsAl');seg(c,'al','rsAl',[['c','al_c'],['l','al_l']]);
- c=card('rkBins');seg(c,'bon','',[[1,'bon_1'],[0,'bon_0']]);if(+S.bon){rng(c,'bsz','rkBsz',1,MAXB,1,'');rng(c,'U','rkU',2,20,1,'');seg(c,'lip','rkLip',[[1,'lipY'],[0,'lipN']]);rng(c,'wt','rkWall',.8,2.4,.2,'mm');c.lastChild.classList.add('xp');
+ c=card('rkBins');seg(c,'bon','',[[1,'bon_1'],[0,'bon_0']]);if(+S.bon){rng(c,'bsz','rkBsz',1,MB(),1,'');rng(c,'U','rkU',2,20,1,'');seg(c,'lip','rkLip',[[1,'lipY'],[0,'lipN']]);rng(c,'wt','rkWall',.8,2.4,.2,'mm');c.lastChild.classList.add('xp');
   const ar=document.createElement('div');ar.className='addrow';const ab=document.createElement('button');ab.className='btn';ab.dataset.k='rkAdd';ab.onclick=()=>{S.bins.push({w:1,d:1,cx:1,cy:1});RSEL=S.bins.length-1;changed();buildUI()};
   const rb=document.createElement('button');rb.className='btn';rb.dataset.k='rkRand';rb.onclick=()=>{if(!confirm(tr('rkRandQ')))return;const P=rsPlan();S.bins=genBins(P.nx,P.ny,+S.bsz||2,true);RSEL=null;changed();buildUI()};ar.append(ab,rb);c.append(ar);
   const tv=document.createElement('div');tv.id='rtv';const ed=document.createElement('div');ed.id='rted';c.append(tv,ed);renderEd()}
@@ -733,7 +737,7 @@ function renderEd(){const e=document.getElementById('rted');if(!e)return;e.inner
  const r=document.createElement('div');r.className='mrow rkrow';const t=document.createElement('b');t.textContent=tr('rkBin')+' '+(RSEL+1)+' ';
  const sp=x=>{const s=document.createElement('span');s.textContent=x;return s};
  const del=document.createElement('button');del.className='mini';del.textContent='✕';del.title=tr('rkDel');del.onclick=()=>{S.bins.splice(RSEL,1);RSEL=null;changed();renderEd()};
- r.append(t,opt(b.w,MAXB,v=>b.w=v),sp(' × '),opt(b.d,MAXB,v=>b.d=v),sp(' '+tr('rkCells')+' · '+tr('rkComp')+' '),opt(b.cx,6,v=>b.cx=v),sp(' × '),opt(b.cy,6,v=>b.cy=v),del);e.append(r)}
+ r.append(t,opt(b.w,MB(),v=>b.w=v),sp(' × '),opt(b.d,MB(),v=>b.d=v),sp(' '+tr('rkCells')+' · '+tr('rkComp')+' '),opt(b.cx,6,v=>b.cx=v),sp(' × '),opt(b.cy,6,v=>b.cy=v),del);e.append(r)}
 function present(reframe){if(!built)return;const arr=built.ok?arrange(built.parts,S.view):[];
  setMeshes(arr.map(p=>({...p,tris:clean(p.tris)})));if(reframe&&arr.length)frame(arr);draw();
  document.querySelectorAll('.vt button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
@@ -806,7 +810,7 @@ function expertBar(){panel.dataset.expert=S.expert?'1':'0';if(panel.querySelecto
  const bar=document.createElement('div');bar.className='uibar';const md=document.createElement('div');md.className='seg uimode';
  [[false,'mEasy'],[true,'mExpert']].forEach(([v,k])=>{const b=document.createElement('button');b.dataset.k=k;b.classList.toggle('on',!!S.expert===v);b.onclick=()=>{S.expert=v;md.querySelectorAll('button').forEach((x,n)=>x.classList.toggle('on',n===(v?1:0)));panel.dataset.expert=v?'1':'0';save()};md.append(b)});
  bar.append(md);document.getElementById('stats').after(bar)}
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261024-7c652</p></footer>');applyLang()}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261024-d7280</p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');
