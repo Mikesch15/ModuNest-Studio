@@ -594,7 +594,7 @@ Object.assign(L,{
  rkFree:['{0} Feld(er) frei – mit «+ Kiste» füllen oder Kistengrösse ändern.','{0} cell(s) free – fill with «+ Bin» or change the bin size.'],
  rkNoFit:['Passt nicht aufs Raster: {0}. Kiste verkleinern oder entfernen.','Does not fit the grid: {0}. Make the bin smaller or remove it.'],
  i_rkBins:['Die Kisten werden automatisch auf dem Raster angeordnet. Kistengrösse teilt das Raster gleichmässig neu auf; in der Liste kannst du jede Kiste ändern. Höhe in Einheiten zu 7 mm (ohne Stapelrand), Stapelrand = Kisten lassen sich stapeln.','Bins are arranged on the grid automatically. Bin size re-divides the grid evenly; in the list you can change each bin. Height in 7 mm units (without lip); stacking lip = bins can be stacked.'],
- sBins:['Kisten','Bins'],
+ sBins:['Kisten','Bins'],rkTap:['Kiste antippen zum Ändern, freies Feld (+) antippen für eine neue Kiste. Gestrichelt: Fugen zwischen den Plattenteilen.','Tap a bin to change it, tap a free cell (+) for a new bin. Dashed: seams between plate parts.'],rkDel:['Kiste entfernen','Remove bin'],
  cartOne:['Grundplatte','Baseplate']
 });
 const S={W:400,D:300,al:'c',floor:0,bon:1,bsz:2,U:3,lip:1,wt:1.2,bins:null,view:'asm',hide:{},cBase:'#86ab7c',cBin:'#c8714f'};
@@ -682,7 +682,7 @@ async function buildPlate(res,tol){const P=rsPlan();if(P.nx<1||P.ny<1)return{ok:
    if(!G.has(k)){const g=binTris(q.w,q.d,U,cx,cy,lip,wt,res,tol,C);G.set(k,{key:'cBin',name:'Kiste '+q.w+'x'+q.d+'x'+U+(cx*cy>1?' '+cx+'x'+cy+' Faecher':''),tris:Float32Array.from(g.t),asm:[],qty:0,Ht:g.Ht})}
    const g=G.get(k),ox=P.l+q.x*GF+q.w*GF/2-pp.Wt/2,oy=P.f+q.y*GF+q.d*GF/2-pp.Dt/2;g.asm.push((X,Y,Z)=>[X+ox,Y+oy,Z+pp.F]);g.qty++;units.push([Math.max(q.w,q.d),Math.min(q.w,q.d),U])}
   parts.push(...G.values())}
- return{ok:true,err:'',parts,units,info:{...P,H:pp.F+PH-.25,n:np,bins:pk.pl.length,free:S.bon?pk.free:0,bad:S.bon?pk.bad:[]}}}
+ return{ok:true,err:'',parts,units,info:{...P,H:pp.F+PH-.25,n:np,bins:pk.pl.length,free:S.bon?pk.free:0,bad:S.bon?pk.bad:[],pl:S.bon?pk.pl:[]}}}
 
 /* ================= Raster: Oberflaeche, Vorschau ================= */
 function arrange(parts,mode){return mode==='asm'?parts.flatMap(p=>p.asm.map(f=>({...p,tris:xf(p.tris,f)}))):arrangePrint(parts)}
@@ -690,30 +690,44 @@ function ui(){if(!featOn('boden'))S.floor=0;
  let c=card('rsSize');rng(c,'W','rsW',60,800,1,'mm');rng(c,'D','rsD',60,800,1,'mm');
  c=card('rsAl');seg(c,'al','rsAl',[['c','al_c'],['l','al_l']]);
  c=card('rkBins');seg(c,'bon','',[[1,'bon_1'],[0,'bon_0']]);if(+S.bon){rng(c,'bsz','rkBsz',1,MAXB,1,'');rng(c,'U','rkU',2,20,1,'');seg(c,'lip','rkLip',[[1,'lipY'],[0,'lipN']]);rng(c,'wt','rkWall',.8,2.4,.2,'mm');c.lastChild.classList.add('xp');
-  const ar=document.createElement('div');ar.className='addrow';const ab=document.createElement('button');ab.className='btn';ab.dataset.k='rkAdd';ab.onclick=()=>{S.bins.push({w:1,d:1,cx:1,cy:1});changed();buildUI()};
-  const rb=document.createElement('button');rb.className='btn';rb.dataset.k='rkRand';rb.onclick=()=>{if(!confirm(tr('rkRandQ')))return;const P=rsPlan();S.bins=genBins(P.nx,P.ny,+S.bsz||2,true);changed();buildUI()};ar.append(ab,rb);c.append(ar);
-  const opt=(v,n,f)=>{const s=document.createElement('select');for(let k=1;k<=n;k++){const o=document.createElement('option');o.value=k;o.textContent=k;if(k==v)o.selected=true;s.append(o)}s.onchange=()=>{f(+s.value);changed()};return s};
-  (S.bins||[]).forEach((b,i)=>{const r=document.createElement('div');r.className='mrow rkrow';const t=document.createElement('b');t.textContent=tr('rkBin')+' '+(i+1)+' ';
-   const x=document.createElement('span');x.textContent=' × ';const f=document.createElement('span');f.textContent=' '+tr('rkCells')+' · '+tr('rkComp')+' ';const x2=document.createElement('span');x2.textContent=' × ';
-   const del=document.createElement('button');del.className='mini';del.textContent='✕';del.onclick=()=>{S.bins.splice(i,1);changed();buildUI()};
-   r.append(t,opt(b.w,MAXB,v=>b.w=v),x,opt(b.d,MAXB,v=>b.d=v),f,opt(b.cx,6,v=>b.cx=v),x2,opt(b.cy,6,v=>b.cy=v),del);c.append(r)})}
+  const ar=document.createElement('div');ar.className='addrow';const ab=document.createElement('button');ab.className='btn';ab.dataset.k='rkAdd';ab.onclick=()=>{S.bins.push({w:1,d:1,cx:1,cy:1});RSEL=S.bins.length-1;changed();buildUI()};
+  const rb=document.createElement('button');rb.className='btn';rb.dataset.k='rkRand';rb.onclick=()=>{if(!confirm(tr('rkRandQ')))return;const P=rsPlan();S.bins=genBins(P.nx,P.ny,+S.bsz||2,true);RSEL=null;changed();buildUI()};ar.append(ab,rb);c.append(ar);
+  const tv=document.createElement('div');tv.id='rtv';const ed=document.createElement('div');ed.id='rted';c.append(tv,ed);renderEd()}
  if(featOn('boden')){c=card('rsFloor');seg(c,'floor','rsFloor',[[0,'fl_0'],[1,'fl_1']])}
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
  ['cBase','cBin'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
  const n=document.createElement('p');n.className='note';n.dataset.k='gfNote';c.append(n);
  cartCard()}
+/* Draufsicht: Kisten antippen = bearbeiten, freies Feld antippen = neue 1x1-Kiste dort; gestrichelt = Trennfugen der Plattenteile */
+let RSEL=null;
+function topView(){const e=document.getElementById('rtv');if(!e||!built||!built.ok)return;const i=built.info,u=10,W=i.nx*u,D=i.ny*u,Y=y=>D-y*u;
+ const fill=S.cBin||'#c8714f',occ=new Set();(i.pl||[]).forEach(q=>{for(let x=q.x;x<q.x+q.w;x++)for(let y=q.y;y<q.y+q.d;y++)occ.add(x+','+y)});
+ let h=`<svg viewBox="-1 -1 ${W+2} ${D+2}" style="width:100%;max-height:260px;touch-action:manipulation">`;
+ for(let x=0;x<i.nx;x++)for(let y=0;y<i.ny;y++)if(!occ.has(x+','+y))h+=`<rect class="rfree" data-x="${x}" data-y="${y}" x="${x*u+.6}" y="${Y(y+1)+.6}" width="${u-1.2}" height="${u-1.2}" rx="1.2" fill="none" stroke="#999" stroke-dasharray="1 1" stroke-width=".3" style="cursor:pointer"/><text x="${x*u+u/2}" y="${Y(y)-u/2+1.5}" text-anchor="middle" font-size="4" fill="#999" pointer-events="none">+</text>`;
+ (i.pl||[]).forEach(q=>{const on=q.i===RSEL;h+=`<g class="rbin" data-i="${q.i}" style="cursor:pointer"><rect x="${q.x*u+.5}" y="${Y(q.y+q.d)+.5}" width="${q.w*u-1}" height="${q.d*u-1}" rx="1.5" fill="${fill}" fill-opacity="${on?.95:.55}" stroke="${on?'#222':'#fff'}" stroke-width="${on?.8:.3}"/><text x="${(q.x+q.w/2)*u}" y="${Y(q.y+q.d/2)+1.6}" text-anchor="middle" font-size="4.5" fill="#fff" pointer-events="none">${q.i+1}</text></g>`});
+ for(const[ix]of(i.gx||[]).slice(1))h+=`<line x1="${ix*u}" y1="-1" x2="${ix*u}" y2="${D+1}" stroke="#333" stroke-width=".4" stroke-dasharray="2 1.5" pointer-events="none"/>`;
+ for(const[iy]of(i.gy||[]).slice(1))h+=`<line x1="-1" y1="${Y(iy)}" x2="${W+1}" y2="${Y(iy)}" stroke="#333" stroke-width=".4" stroke-dasharray="2 1.5" pointer-events="none"/>`;
+ e.innerHTML=h+'</svg>';
+ e.querySelectorAll('.rbin').forEach(g=>g.onclick=()=>{RSEL=+g.dataset.i;topView();renderEd()});
+ e.querySelectorAll('.rfree').forEach(r=>r.onclick=()=>{S.bins.push({w:1,d:1,cx:1,cy:1,x:+r.dataset.x,y:+r.dataset.y});RSEL=S.bins.length-1;changed();renderEd()})}
+function renderEd(){const e=document.getElementById('rted');if(!e)return;e.innerHTML='';const b=(S.bins||[])[RSEL];if(!b){const n=document.createElement('p');n.className='note';n.dataset.k='rkTap';n.textContent=tr('rkTap');e.append(n);return}
+ const opt=(v,n,f)=>{const s=document.createElement('select');for(let k=1;k<=n;k++){const o=document.createElement('option');o.value=k;o.textContent=k;if(k==v)o.selected=true;s.append(o)}s.onchange=()=>{f(+s.value);changed()};return s};
+ const r=document.createElement('div');r.className='mrow rkrow';const t=document.createElement('b');t.textContent=tr('rkBin')+' '+(RSEL+1)+' ';
+ const sp=x=>{const s=document.createElement('span');s.textContent=x;return s};
+ const del=document.createElement('button');del.className='mini';del.textContent='✕';del.title=tr('rkDel');del.onclick=()=>{S.bins.splice(RSEL,1);RSEL=null;changed();renderEd()};
+ r.append(t,opt(b.w,MAXB,v=>b.w=v),sp(' × '),opt(b.d,MAXB,v=>b.d=v),sp(' '+tr('rkCells')+' · '+tr('rkComp')+' '),opt(b.cx,6,v=>b.cx=v),sp(' × '),opt(b.cy,6,v=>b.cy=v),del);e.append(r)}
 function present(reframe){if(!built)return;const arr=built.ok?arrange(built.parts,S.view):[];
  setMeshes(arr.map(p=>({...p,tris:clean(p.tris)})));if(reframe&&arr.length)frame(arr);draw();
  document.querySelectorAll('.vt button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
  const i=built.info||{},mass=built.ok?built.parts.reduce((s,p)=>s+Math.abs(volume(p.tris))*(p.qty||1),0)/1000*1.24:0,f1=v=>(+v).toFixed(1);
  document.getElementById('stats').innerHTML=built.ok?[[tr('sGrid'),i.nx+' × '+i.ny],[tr('sParts'),i.n],[tr('sBins'),i.bins||0],[tr('sMat'),'≈ '+Math.round(mass)+' g']].map(a=>`<div class="stat"><span>${a[0]}</span><strong>${a[1]}</strong></div>`).join(''):'';
- status.innerHTML=built.ok?trf('rsInfo',i.nx,i.ny,f1(i.l),f1(i.r),f1(i.f),f1(i.b),i.n)+(i.bad&&i.bad.length?'<br><b>'+trf('rkNoFit',i.bad.map(k=>tr('rkBin')+' '+(k+1)).join(', '))+'</b>':i.free?'<br><span class="note">'+trf('rkFree',i.free)+'</span>':'')+'<br><span class="note">'+tr('rsGap')+'</span>':'<b>'+built.err+'</b>';renderCart()}
+ topView();status.innerHTML=built.ok?trf('rsInfo',i.nx,i.ny,f1(i.l),f1(i.r),f1(i.f),f1(i.b),i.n)+(i.bad&&i.bad.length?'<br><b>'+trf('rkNoFit',i.bad.map(k=>tr('rkBin')+' '+(k+1)).join(', '))+'</b>':i.free?'<br><span class="note">'+trf('rkFree',i.free)+'</span>':'')+'<br><span class="note">'+tr('rsGap')+'</span>':'<b>'+built.err+'</b>';renderCart()}
 
 /* ================= Raster: Produktbeschreibung fuer den Kern ================= */
 const RS_KEYS=['W','D','al','floor','bon','bsz','U','lip','wt','bins','cBase','cBin'];
 let lastNN=(()=>{const P=rsPlan();return P.nx+'x'+P.ny})(),lastBsz=+S.bsz||2; /* Raster oder Kistengroesse geaendert -> Kisten neu aufteilen (wie bei ModuNest automatisch) */
 const PRODUCT={id:'raster',name:'Raster',file:'Raster',store:'rs',dimKeys:['cBase'],
- onChange(){const P=rsPlan(),nn=P.nx+'x'+P.ny;if(P.nx>0&&P.ny>0&&((lastNN!==null&&nn!==lastNN)||(lastBsz!==null&&+S.bsz!==lastBsz)||!Array.isArray(S.bins)))S.bins=genBins(P.nx,P.ny,+S.bsz||2,false);lastNN=nn;lastBsz=+S.bsz},
+ onChange(){const P=rsPlan(),nn=P.nx+'x'+P.ny;if(P.nx>0&&P.ny>0&&((lastNN!==null&&nn!==lastNN)||(lastBsz!==null&&+S.bsz!==lastBsz)||!Array.isArray(S.bins))){S.bins=genBins(P.nx,P.ny,+S.bsz||2,false);RSEL=null;setTimeout(renderEd)}lastNN=nn;lastBsz=+S.bsz},
  color:p=>S[p.key],
  unit:{one:['Platte','plate'],n:['Platte(n)','plate(s)'],many:['Platten','plates']},
  build:(res,tol)=>buildPlate(res,tol),
@@ -774,7 +788,7 @@ function expertBar(){panel.dataset.expert=S.expert?'1':'0';if(panel.querySelecto
  const bar=document.createElement('div');bar.className='uibar';const md=document.createElement('div');md.className='seg uimode';
  [[false,'mEasy'],[true,'mExpert']].forEach(([v,k])=>{const b=document.createElement('button');b.dataset.k=k;b.classList.toggle('on',!!S.expert===v);b.onclick=()=>{S.expert=v;md.querySelectorAll('button').forEach((x,n)=>x.classList.toggle('on',n===(v?1:0)));panel.dataset.expert=v?'1':'0';save()};md.append(b)});
  bar.append(md);document.getElementById('stats').after(bar)}
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261024-931ca</p></footer>');applyLang()}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261024-2b368</p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');
