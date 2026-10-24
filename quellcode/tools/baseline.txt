@@ -52,8 +52,6 @@ sc 180x60 H19 open0 vol48200
 sc 180x51 H14 open0 vol32300
 sc 180x68 H29 open0 vol48900
 st 4 open0 vol54900
-rs 9x7 n4 vol123500
-rs 4x3 n1 vol99800
-rk 83.5x41.5x24.9 vol23800
-rk 125.5x83.5x42.0 vol90200
+rs 9x7 Teile4 Kisten20 frei0 vol828900
+rs 4x3 Teile1 Kisten0 frei0 vol99800
 admin geladen=true

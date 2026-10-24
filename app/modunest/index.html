@@ -1025,7 +1025,7 @@ const PRODUCT={dimKeys:['cBox'],pick:ix=>selectMod(ix),onShared(){S.step=2;lastM
    let r=tryF(1);if(!r){let lo=.15,hi=1;for(let k=0;k<12;k++){const f=(lo+hi)/2;if(tryF(f))lo=f;else hi=f}r=tryF(lo)}
    if(r){r.so.items.forEach(t=>{const m=r.ms[t.i];m.w=t.rot?t.d:t.w;m.d=t.rot?t.w:t.d});PL.manual=false;if(!planSolve({...PL,manual:false,mods:r.ms}).ok){PL.manual=true;MOVED=true;r.so.items.forEach(t=>{const m=r.ms[t.i];m.px=t.x;m.py=t.y;m.prot=!!t.rot})}PL.mods=r.ms;SEL=null;if(!PL.manual)MOVED=false;if(BASE)BASE.set=JSON.stringify(PL.mods.map(m=>[m.w,m.d,m.h]))}}
   lastN=S.mode==='plan'?PL.mods.length:null;{const sg=layoutSig();if(S.mode==='plan'&&PL.manual&&lastSig!==null&&sg!==lastSig&&!MOVED){PL.manual=false;PL.mods.forEach(m=>{delete m.px;delete m.py;delete m.prot})}MOVED=false;lastSig=layoutSig()}if(S.mode!==lastMode){lastMode=S.mode;const o=PL.alt||{W:140,D:110,H:65};PL.alt={W:PL.W,D:PL.D,H:PL.H};PL.W=o.W;PL.D=o.D;PL.H=o.H;buildUI();panel.dataset.mode=S.mode}lastDim=S.mode==='plan'?[PL.W,PL.D,PL.H]:null}};
-const PRODUCT_COUNT=7;
+const PRODUCT_COUNT=6;
 /* ================= Kern: App-Rahmen =================
    Jedes Produkt (produkte/<id>/produkt.js) liefert:
    S (Zustand, mit view/hide/mode), PRODUCT {id,name,file,store,unit,build,snap,applySnap,snapName,snapCount,snapInfo,units,color?,onChange?},
@@ -1076,7 +1076,7 @@ function expertBar(){panel.dataset.expert=S.expert?'1':'0';if(panel.querySelecto
  const bar=document.createElement('div');bar.className='uibar';const md=document.createElement('div');md.className='seg uimode';
  [[false,'mEasy'],[true,'mExpert']].forEach(([v,k])=>{const b=document.createElement('button');b.dataset.k=k;b.classList.toggle('on',!!S.expert===v);b.onclick=()=>{S.expert=v;md.querySelectorAll('button').forEach((x,n)=>x.classList.toggle('on',n===(v?1:0)));panel.dataset.expert=v?'1':'0';save()};md.append(b)});
  bar.append(md);document.getElementById('stats').after(bar)}
-function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261024-d93df</p></footer>');applyLang()}
+function buildUI(){panel.innerHTML='<div class="stats" id="stats"></div>';ui();expertBar();addInfo();panel.insertAdjacentHTML('beforeend','<footer class="legal"><p><a href="../impressum/" data-k="imprint"></a> · <a href="../datenschutz/" data-k="privacy"></a></p><p data-k="etsyNote"></p><p class="ver">Version 261024-931ca</p></footer>');applyLang()}
 document.querySelectorAll('.vt button').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;present(true)});
 function applyLang(){document.documentElement.lang=lang?'en':'de';document.querySelectorAll('[data-k]').forEach(e=>e.textContent=tr(e.dataset.k));
  document.getElementById('tag').textContent=tr('tag');document.getElementById('langbtn').textContent=lang?'DE':'EN';document.querySelectorAll('.ib').forEach(b=>b.title=b.ariaLabel=tr('infoBtn'));document.getElementById('helpbtn').title=document.getElementById('helpbtn').ariaLabel=tr('helpBtn');

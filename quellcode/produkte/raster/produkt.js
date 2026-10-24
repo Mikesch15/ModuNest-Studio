@@ -5,7 +5,7 @@ Object.assign(L,{
  tag:['Deine Schublade. Dein Raster. Dein Druck.','Your drawer. Your grid. Your print.'],
  help1:['Miss deine Schublade innen aus und gib Breite und Tiefe ein. Die Grundplatte füllt sie mit 42-mm-Feldern, der Rest wird zum Randstreifen.','Measure the inside of your drawer and enter width and depth. The baseplate fills it with 42 mm cells; the rest becomes an edge filler.'],
  help2:['Grosse Platten werden automatisch in Teile fürs Druckbett (bis 25 cm) zerlegt. Die Teile legst du einfach nebeneinander in die Schublade.','Large plates are split automatically into parts for the print bed (up to 25 cm). Simply lay the parts side by side in the drawer.'],
- help3:['Unter «Herunterladen» holst du die Dateien. Dafür brauchst du die Bestellnummer deines Etsy-Kaufs. Jede Grundplatte zählt 1.','Get the files under «Download». You need the order number of your Etsy purchase. Each baseplate counts 1.'],
+ help3:['Unter «Herunterladen» holst du die Dateien. Dafür brauchst du die Bestellnummer deines Etsy-Kaufs. Die Grundplatte zählt 1, jede Kiste 1.','Get the files under «Download». You need the order number of your Etsy purchase. The baseplate counts 1, each bin 1.'],
  help4:['Drucke ohne Stützen. Passend für Gridfinity-Kisten (42-mm-Raster).','Print without supports. Fits Gridfinity bins (42 mm grid).'],
  helpTip:['Tipp: Bei jedem Abschnitt erklärt dir das ⓘ, was die Einstellungen bewirken.','Tip: in every section, the ⓘ explains what the settings do.'],
  rsSize:['Schublade (innen)','Drawer (inside)'],rsW:['Breite','Width'],rsD:['Tiefe','Depth'],
@@ -22,9 +22,17 @@ Object.assign(L,{
  i_colors:['Die Farbe ist nur für die Vorschau.','The colour is for the preview only.'],
  gfNote:['Kompatibel mit Gridfinity, einem offenen System von Zack Freedman (MIT-Lizenz). Keine Verbindung zu Zack Freedman oder Voidstar Lab LLC.','Compatible with Gridfinity, an open system by Zack Freedman (MIT licence). Not affiliated with Zack Freedman or Voidstar Lab LLC.'],
  next2:['Die Teile ohne Stützen drucken und nebeneinander in die Schublade legen.','Print the parts without supports and lay them side by side in the drawer.'],
+ rkBins:['Kisten','Bins'],bon_1:['mit Kisten','with bins'],bon_0:['nur Grundplatte','baseplate only'],rkBsz:['Kistengrösse in Feldern (teilt neu auf)','Bin size in cells (re-divides)'],
+ rkU:['Höhe (Einheiten à 7 mm)','Height (7 mm units)'],rkLip:['Stapelrand','Stacking lip'],lipY:['mit','with'],lipN:['ohne','without'],rkWall:['Wandstärke','Wall thickness'],
+ rkRand:['🎲 Zufällig füllen','🎲 Random fill'],rkRandQ:['Alle Kisten durch eine neue, zufällige Aufteilung ersetzen? (Mit ↶ rückgängig machen)','Replace all bins with a new random layout? (Undo with ↶)'],
+ rkAdd:['+ Kiste','+ Bin'],rkBin:['Kiste','Bin'],rkCells:['Felder','cells'],rkComp:['Fächer','compartments'],cBin:['Kisten','Bins'],
+ rkFree:['{0} Feld(er) frei – mit «+ Kiste» füllen oder Kistengrösse ändern.','{0} cell(s) free – fill with «+ Bin» or change the bin size.'],
+ rkNoFit:['Passt nicht aufs Raster: {0}. Kiste verkleinern oder entfernen.','Does not fit the grid: {0}. Make the bin smaller or remove it.'],
+ i_rkBins:['Die Kisten werden automatisch auf dem Raster angeordnet. Kistengrösse teilt das Raster gleichmässig neu auf; in der Liste kannst du jede Kiste ändern. Höhe in Einheiten zu 7 mm (ohne Stapelrand), Stapelrand = Kisten lassen sich stapeln.','Bins are arranged on the grid automatically. Bin size re-divides the grid evenly; in the list you can change each bin. Height in 7 mm units (without lip); stacking lip = bins can be stacked.'],
+ sBins:['Kisten','Bins'],
  cartOne:['Grundplatte','Baseplate']
 });
-const S={W:400,D:300,al:'c',floor:0,view:'asm',hide:{},cBase:'#86ab7c'};
+const S={W:400,D:300,al:'c',floor:0,bon:1,bsz:2,U:3,lip:1,wt:1.2,bins:null,view:'asm',hide:{},cBase:'#86ab7c',cBin:'#c8714f'};
 try{Object.assign(S,JSON.parse(localStorage.getItem('rs-state')||'{}'))}catch(e){}
 
 /* ================= Raster: Geometrie ================= */
@@ -35,7 +43,7 @@ function rsPlan(){const W=Math.max(0,+S.W-2*FIT),D=Math.max(0,+S.D-2*FIT),nx=Mat
  const grp=(n,a,z)=>{for(let m=1;m<=n;m++){const g=[];let i=0;for(let j=0;j<m;j++){const k=Math.floor(n/m)+(j<n%m?1:0);g.push([i,k]);i+=k} /* gleichmaessig auf m Teile */
    if(g.every(([i0,k])=>(i0===0?a:0)+k*GF+(i0+k===n?z:0)<=BED))return g}return Array.from({length:n},(_,i)=>[i,1])};
  return{nx,ny,l,r,f,b,gx:grp(nx,l,r),gy:grp(ny,f,b)}}
-async function buildPlate(res,tol){const P=rsPlan();if(P.nx<1||P.ny<1)return{ok:false,err:tr('eSmall'),parts:[],units:[],info:{}};
+async function platePieces(P,res,tol){
  const F=S.floor&&featOn('boden')?FLOOR:0,parts=[],CELL=new Map(),Wt=P.l+P.nx*GF+P.r,Dt=P.f+P.ny*GF+P.b;
  // Profil-Baender: Einzug d der Zellenoeffnung je Band (an der Band-Oberkante -> Kiste hat nie weniger Platz)
  const bands=[];if(F)bands.push([0,F,null]);for(let k=0;k<7;k++)bands.push([F+k*.1,F+(k+1)*.1,2.85-(k+1)*.1]);bands.push([F+PB[0],F+PB[0]+PB[1],2.15]);
@@ -57,33 +65,96 @@ async function buildPlate(res,tol){const P=rsPlan();if(P.nx<1||P.ny<1)return{ok:
     if(!CELL.has(k))CELL.set(k,pzRings(GF+4,GF+4,res,tol,x=>{x.beginPath();x.roundRect(-GF/2-o[0],-GF/2-o[2],GF+o[0]+o[1],GF+o[2]+o[3],cr);x.fill();x.globalCompositeOperation='destination-out';x.beginPath();x.roundRect(-GF/2+dd,-GF/2+dd,GF-2*dd,GF-2*dd,Math.max(.3,RCELL-dd));x.fill()}));
     ex(CELL.get(k),a,b,ox+GF/2,oy+GF/2)}}
   parts.push({key:'cBase',name:'Platte '+String.fromCharCode(65+gj)+(gi+1),tris:Float32Array.from(t),asm:[(X,Y,Z)=>[X+cx-Wt/2,Y+cy-Dt/2,Z]]})}
- return{ok:true,err:'',parts,units:[[Math.round(Math.max(+S.W,+S.D)),Math.round(Math.min(+S.W,+S.D)),0]],info:{...P,H:F+PH-.25,n:parts.length}}}
+ return{parts,F,Wt,Dt}}
+
+/* ================= Kisten (Gridfinity-kompatibel) =================
+   Kiste 42*n - 0.5 mm, Ecken r 3.75, Hoehe 7 mm je Einheit (ohne Stapelrand). Fuss je Feld von unten 0.8 (45°) + 1.8 + 2.15 (45°) = 4.75 mm.
+   Stapelrand oben = Aufnahmeprofil der Grundplatte - 0.25 (oben bei 0.5-mm-Kante abgeschnitten), darunter 45°-Stuetze nach innen. */
+const BW=.5,RB=3.75,FT=[.8,1.8,2.15],FH=4.75,UH=7,LTOP=.75,MAXB=5;
+function binTris(X,Y,U,cx,cy,lip,wt,res,tol,C){const W=X*GF-BW,D=Y*GF-BW,H=U*UH,FLZ=FH+1.2,t=[],R=(w,d,draw)=>pzRings(w+4,d+4,res,tol,draw);
+ const ex=(rg,a,b,dx=0,dy=0)=>{const q=extrude(rg,a,b);for(let i=0;i<q.length;i+=3){q[i]+=dx;q[i+1]+=dy}for(const v of q)t.push(v)};
+ const rr=(x,w,d,r)=>{x.beginPath();x.roundRect(-w/2,-d/2,w,d,Math.max(0,Math.min(r,w/2,d/2)));x.fill()};
+ const memo=(k,f)=>{if(!C.has(k))C.set(k,f());return C.get(k)};
+ /* Fuss je Feld: Band-Breite am schmalsten Punkt (Unterkante) -> passt sicher in die Grundplatte */
+ const fb=[];for(let k=0;k<8;k++)fb.push([k*.1,(k+1)*.1,FT[0]+FT[2]-k*.1]);fb.push([FT[0],FT[0]+FT[1],FT[2]]);for(let k=0;k<10;k++)fb.push([FT[0]+FT[1]+k*.215,FT[0]+FT[1]+(k+1)*.215,FT[2]-k*.215]);
+ for(const[a,b,ins]of fb){const rg=memo('f'+ins.toFixed(3),()=>R(GF,GF,x=>rr(x,GF-BW-2*ins,GF-BW-2*ins,Math.max(.8,RB-ins))));
+  for(let i=0;i<X;i++)for(let j=0;j<Y;j++)ex(rg,a,b,(i-(X-1)/2)*GF,(j-(Y-1)/2)*GF)}
+ /* Boden ueber den Fuessen (ueberbrueckt nur die 0.5-mm-Fugen), dann Waende */
+ ex(memo('s'+W+'|'+D,()=>R(W,D,x=>rr(x,W,D,RB))),FH,FLZ);
+ const INS0=2.85-.25,zS=lip?H-Math.max(0,INS0-wt):H; /* Stapelrand-Unterkante ragt INS0 nach innen: darunter 45°-Stuetze */
+ const wall=ins=>memo('w'+W+'|'+D+'|'+ins.toFixed(3),()=>R(W,D,x=>{rr(x,W,D,RB);x.globalCompositeOperation='destination-out';rr(x,W-2*ins,D-2*ins,Math.max(.5,RB-ins))}));
+ ex(wall(wt),FLZ,zS);
+ /* Faecher: einzelne Trennwaende (ueberlappen die Aussenwand; viele Loecher in einer Flaeche kann die Triangulierung nicht) */
+ const iw=W-2*wt,id=D-2*wt,dw=Math.max(.8,wt*.8);
+ for(let k=1;k<cx;k++)ex(memo('dx'+id+'|'+dw,()=>R(dw+1,id+1,x=>x.fillRect(-dw/2,-id/2-.2,dw,id+.4))),FLZ,zS,-iw/2+k*iw/cx,0);
+ for(let k=1;k<cy;k++)ex(memo('dy'+iw+'|'+dw,()=>R(iw+1,dw+1,x=>x.fillRect(-iw/2-.2,-dw/2,iw+.4,dw))),FLZ,zS,0,-id/2+k*id/cy);
+ let Ht=H;if(lip){let z=zS;while(z<H-1e-6){const z1=Math.min(H,z+.2);ex(wall(Math.min(INS0,wt+(z-zS))),z,z1);z=z1}
+  const lb=[];for(let k=0;k<7;k++)lb.push([k*.1,(k+1)*.1,INS0-(k+1)*.1]);lb.push([PB[0],PB[0]+PB[1],2.15-.25]);const n2=8,st=(2.15-LTOP)/n2; /* Oeffnung je Band an der Oberkante (groesser) -> Fuss passt sicher */
+  for(let k=0;k<n2;k++)lb.push([PB[0]+PB[1]+k*st,PB[0]+PB[1]+(k+1)*st,2.15-.25-(k+1)*st]);
+  for(const[a,b,ins]of lb)ex(wall(Math.max(.5,ins)),H+a,H+b);Ht=H+PB[0]+PB[1]+(2.15-LTOP)}
+ return{t,W,D,H,Ht}}
+/* Anordnung: Kisten mit gemerkter Position (aus der Aufteilung) zuerst, dann groesste zuerst an die erste freie Stelle, notfalls gedreht.
+   Bleibt etwas uebrig, wird alles ohne gemerkte Positionen neu gepackt und das bessere Ergebnis genommen. */
+function packBins(nx,ny,bins){const run=usePos=>{const occ=Array.from({length:ny},()=>Array(nx).fill(-1)),pl=[],bad=[];
+  const fits=(x,y,w,d)=>{if(x<0||y<0||x+w>nx||y+d>ny)return false;for(let j=y;j<y+d;j++)for(let i=x;i<x+w;i++)if(occ[j][i]>=0)return false;return true};
+  const put=(i,o)=>{for(let j=o.y;j<o.y+o.d;j++)for(let k=o.x;k<o.x+o.w;k++)occ[j][k]=i;pl.push({i,...o})};
+  const rest=[];bins.forEach((b,i)=>{if(usePos&&b.x!=null&&fits(b.x,b.y,b.w,b.d))put(i,{x:b.x,y:b.y,w:b.w,d:b.d,rot:0});else rest.push(i)});
+  rest.sort((a,b)=>bins[b].w*bins[b].d-bins[a].w*bins[a].d||a-b);
+  for(const i of rest){const b=bins[i];let ok=null;
+   for(const rot of b.w===b.d?[0]:[0,1]){const w=rot?b.d:b.w,d=rot?b.w:b.d;for(let y=0;y<ny&&!ok;y++)for(let x=0;x<nx&&!ok;x++)if(fits(x,y,w,d))ok={x,y,w,d,rot};if(ok)break}
+   if(ok)put(i,ok);else bad.push(i)}
+  return{pl,bad,free:occ.flat().filter(v=>v<0).length}};
+ const a=run(true);if(!a.bad.length)return a;const b=run(false);return b.bad.length<a.bad.length?b:a}
+/* Neue Aufteilung des Rasters in Kisten: Reihen/Spalten ~sz Felder (max. 5), rnd = Groessen streuen */
+function genBins(nx,ny,sz,rnd){const cut=n=>{const o=[];let r=n;while(r>0){let k=rnd?Math.max(1,Math.min(MAXB,sz+Math.floor(Math.random()*3)-1)):Math.min(MAXB,sz);
+  if(!rnd&&r-k>0&&r-k<sz)k=Math.min(MAXB,Math.ceil(r/Math.ceil(r/sz)));k=Math.min(k,r);o.push(k);r-=k}return o};
+ const bins=[];let y=0;for(const d of cut(ny)){let x=0;for(const w of cut(nx)){bins.push({w,d,cx:1,cy:1,x,y});x+=w}y+=d}return bins}
+async function buildPlate(res,tol){const P=rsPlan();if(P.nx<1||P.ny<1)return{ok:false,err:tr('eSmall'),parts:[],units:[],info:{}};
+ if(!Array.isArray(S.bins))S.bins=genBins(P.nx,P.ny,+S.bsz||2,false);
+ const pp=await platePieces(P,res,tol),np=pp.parts.length,parts=pp.parts,units=[[Math.round(Math.max(+S.W,+S.D)),Math.round(Math.min(+S.W,+S.D)),0]];let pk={pl:[],bad:[],free:0};
+ if(S.bon){const U=Math.max(2,Math.min(20,S.U|0)),lip=!!+S.lip,wt=Math.max(.8,Math.min(2.4,+S.wt||1.2)),C=new Map(),G=new Map();pk=packBins(P.nx,P.ny,S.bins);
+  for(const q of pk.pl){const b=S.bins[q.i],cx=Math.max(1,Math.min(6,(q.rot?b.cy:b.cx)|0)),cy=Math.max(1,Math.min(6,(q.rot?b.cx:b.cy)|0)),k=q.w+'x'+q.d+'|'+cx+'x'+cy;
+   if(!G.has(k)){const g=binTris(q.w,q.d,U,cx,cy,lip,wt,res,tol,C);G.set(k,{key:'cBin',name:'Kiste '+q.w+'x'+q.d+'x'+U+(cx*cy>1?' '+cx+'x'+cy+' Faecher':''),tris:Float32Array.from(g.t),asm:[],qty:0,Ht:g.Ht})}
+   const g=G.get(k),ox=P.l+q.x*GF+q.w*GF/2-pp.Wt/2,oy=P.f+q.y*GF+q.d*GF/2-pp.Dt/2;g.asm.push((X,Y,Z)=>[X+ox,Y+oy,Z+pp.F]);g.qty++;units.push([Math.max(q.w,q.d),Math.min(q.w,q.d),U])}
+  parts.push(...G.values())}
+ return{ok:true,err:'',parts,units,info:{...P,H:pp.F+PH-.25,n:np,bins:pk.pl.length,free:S.bon?pk.free:0,bad:S.bon?pk.bad:[]}}}
 
 /* ================= Raster: Oberflaeche, Vorschau ================= */
 function arrange(parts,mode){return mode==='asm'?parts.flatMap(p=>p.asm.map(f=>({...p,tris:xf(p.tris,f)}))):arrangePrint(parts)}
 function ui(){if(!featOn('boden'))S.floor=0;
  let c=card('rsSize');rng(c,'W','rsW',60,800,1,'mm');rng(c,'D','rsD',60,800,1,'mm');
  c=card('rsAl');seg(c,'al','rsAl',[['c','al_c'],['l','al_l']]);
+ c=card('rkBins');seg(c,'bon','',[[1,'bon_1'],[0,'bon_0']]);if(+S.bon){rng(c,'bsz','rkBsz',1,MAXB,1,'');rng(c,'U','rkU',2,20,1,'');seg(c,'lip','rkLip',[[1,'lipY'],[0,'lipN']]);rng(c,'wt','rkWall',.8,2.4,.2,'mm');c.lastChild.classList.add('xp');
+  const ar=document.createElement('div');ar.className='addrow';const ab=document.createElement('button');ab.className='btn';ab.dataset.k='rkAdd';ab.onclick=()=>{S.bins.push({w:1,d:1,cx:1,cy:1});changed();buildUI()};
+  const rb=document.createElement('button');rb.className='btn';rb.dataset.k='rkRand';rb.onclick=()=>{if(!confirm(tr('rkRandQ')))return;const P=rsPlan();S.bins=genBins(P.nx,P.ny,+S.bsz||2,true);changed();buildUI()};ar.append(ab,rb);c.append(ar);
+  const opt=(v,n,f)=>{const s=document.createElement('select');for(let k=1;k<=n;k++){const o=document.createElement('option');o.value=k;o.textContent=k;if(k==v)o.selected=true;s.append(o)}s.onchange=()=>{f(+s.value);changed()};return s};
+  (S.bins||[]).forEach((b,i)=>{const r=document.createElement('div');r.className='mrow rkrow';const t=document.createElement('b');t.textContent=tr('rkBin')+' '+(i+1)+' ';
+   const x=document.createElement('span');x.textContent=' × ';const f=document.createElement('span');f.textContent=' '+tr('rkCells')+' · '+tr('rkComp')+' ';const x2=document.createElement('span');x2.textContent=' × ';
+   const del=document.createElement('button');del.className='mini';del.textContent='✕';del.onclick=()=>{S.bins.splice(i,1);changed();buildUI()};
+   r.append(t,opt(b.w,MAXB,v=>b.w=v),x,opt(b.d,MAXB,v=>b.d=v),f,opt(b.cx,6,v=>b.cx=v),x2,opt(b.cy,6,v=>b.cy=v),del);c.append(r)})}
  if(featOn('boden')){c=card('rsFloor');seg(c,'floor','rsFloor',[[0,'fl_0'],[1,'fl_1']])}
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
- ['cBase'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
+ ['cBase','cBin'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
  const n=document.createElement('p');n.className='note';n.dataset.k='gfNote';c.append(n);
  cartCard()}
 function present(reframe){if(!built)return;const arr=built.ok?arrange(built.parts,S.view):[];
  setMeshes(arr.map(p=>({...p,tris:clean(p.tris)})));if(reframe&&arr.length)frame(arr);draw();
  document.querySelectorAll('.vt button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
- const i=built.info||{},mass=built.ok?built.parts.reduce((s,p)=>s+Math.abs(volume(p.tris)),0)/1000*1.24:0,f1=v=>(+v).toFixed(1);
- document.getElementById('stats').innerHTML=built.ok?[[tr('sGrid'),i.nx+' × '+i.ny],[tr('sParts'),i.n],[tr('sMat'),'≈ '+Math.round(mass)+' g']].map(a=>`<div class="stat"><span>${a[0]}</span><strong>${a[1]}</strong></div>`).join(''):'';
- status.innerHTML=built.ok?trf('rsInfo',i.nx,i.ny,f1(i.l),f1(i.r),f1(i.f),f1(i.b),i.n)+'<br><span class="note">'+tr('rsGap')+'</span>':'<b>'+built.err+'</b>';renderCart()}
+ const i=built.info||{},mass=built.ok?built.parts.reduce((s,p)=>s+Math.abs(volume(p.tris))*(p.qty||1),0)/1000*1.24:0,f1=v=>(+v).toFixed(1);
+ document.getElementById('stats').innerHTML=built.ok?[[tr('sGrid'),i.nx+' × '+i.ny],[tr('sParts'),i.n],[tr('sBins'),i.bins||0],[tr('sMat'),'≈ '+Math.round(mass)+' g']].map(a=>`<div class="stat"><span>${a[0]}</span><strong>${a[1]}</strong></div>`).join(''):'';
+ status.innerHTML=built.ok?trf('rsInfo',i.nx,i.ny,f1(i.l),f1(i.r),f1(i.f),f1(i.b),i.n)+(i.bad&&i.bad.length?'<br><b>'+trf('rkNoFit',i.bad.map(k=>tr('rkBin')+' '+(k+1)).join(', '))+'</b>':i.free?'<br><span class="note">'+trf('rkFree',i.free)+'</span>':'')+'<br><span class="note">'+tr('rsGap')+'</span>':'<b>'+built.err+'</b>';renderCart()}
 
 /* ================= Raster: Produktbeschreibung fuer den Kern ================= */
-const RS_KEYS=['W','D','al','floor','cBase'];
-const PRODUCT={id:'raster',name:'Raster-Grundplatte',file:'Raster-Grundplatte',store:'rs',dimKeys:['cBase'],
+const RS_KEYS=['W','D','al','floor','bon','bsz','U','lip','wt','bins','cBase','cBin'];
+let lastNN=(()=>{const P=rsPlan();return P.nx+'x'+P.ny})(),lastBsz=+S.bsz||2; /* Raster oder Kistengroesse geaendert -> Kisten neu aufteilen (wie bei ModuNest automatisch) */
+const PRODUCT={id:'raster',name:'Raster',file:'Raster',store:'rs',dimKeys:['cBase'],
+ onChange(){const P=rsPlan(),nn=P.nx+'x'+P.ny;if(P.nx>0&&P.ny>0&&((lastNN!==null&&nn!==lastNN)||(lastBsz!==null&&+S.bsz!==lastBsz)||!Array.isArray(S.bins)))S.bins=genBins(P.nx,P.ny,+S.bsz||2,false);lastNN=nn;lastBsz=+S.bsz},
+ color:p=>S[p.key],
  unit:{one:['Platte','plate'],n:['Platte(n)','plate(s)'],many:['Platten','plates']},
  build:(res,tol)=>buildPlate(res,tol),
- notice:'Diese Grundplatte ist kompatibel mit Gridfinity, einem offenen System von Zack Freedman.\nKeine Verbindung zu Zack Freedman oder Voidstar Lab LLC. Geometrie eigenstaendig nach den oeffentlichen Massen erstellt.\n\nGridfinity: MIT License, Copyright (c) 2023 Zachary Freedman and Voidstar Lab LLC.\n',
+ notice:'Grundplatte und Kisten sind kompatibel mit Gridfinity, einem offenen System von Zack Freedman.\nKeine Verbindung zu Zack Freedman oder Voidstar Lab LLC. Geometrie eigenstaendig nach den oeffentlichen Massen erstellt.\n\nGridfinity: MIT License, Copyright (c) 2023 Zachary Freedman and Voidstar Lab LLC.\n',
  snap(){const o={};RS_KEYS.forEach(k=>o[k]=S[k]);return{S:o}},
- applySnap(s){Object.assign(S,s.S)},
- snapName:s=>'Grundplatte '+s.S.W+'x'+s.S.D,
- snapCount:()=>1,
- snapInfo:s=>tr('cartOne')+' · '+s.S.W+' × '+s.S.D+' mm'};
+ applySnap(s){Object.assign(S,JSON.parse(JSON.stringify(s.S)));const P=rsPlan();lastNN=P.nx+'x'+P.ny;lastBsz=+S.bsz},
+ snapName:s=>'Raster '+s.S.W+'x'+s.S.D,
+ snapCount:s=>1+(s.S.bon&&Array.isArray(s.S.bins)?s.S.bins.length:0),
+ snapInfo:s=>tr('cartOne')+(s.S.bon&&s.S.bins?' + '+s.S.bins.length+' '+tr('sBins'):'')+' · '+s.S.W+' × '+s.S.D+' mm'};

@@ -1,8 +1,22 @@
 {
  "id": "raster",
- "name": {"de": "Raster-Grundplatte", "en": "Grid baseplate"},
- "text": {"de": "Grundplatte nach Mass für deine Schublade – kompatibel mit Gridfinity, mit Randstreifen und automatisch in Teile fürs Druckbett zerlegt.", "en": "Baseplate made to measure for your drawer – Gridfinity compatible, with edge fillers and split automatically to fit your print bed."},
+ "name": {
+  "de": "Raster mit Kisten",
+  "en": "Grid with bins"
+ },
+ "text": {
+  "de": "Grundplatte nach Mass für deine Schublade und passende Kisten, automatisch angeordnet – kompatibel mit Gridfinity, ohne Stützen druckbar.",
+  "en": "Made-to-measure baseplate for your drawer plus matching bins, arranged automatically – Gridfinity compatible, printable without supports."
+ },
  "standard": "test",
- "dateien": ["../../kern/figuren.js", "produkt.js"],
- "features": [{"id": "boden", "name": "Geschlossener Boden"}]
+ "dateien": [
+  "../../kern/figuren.js",
+  "produkt.js"
+ ],
+ "features": [
+  {
+   "id": "boden",
+   "name": "Geschlossener Boden"
+  }
+ ]
 }
