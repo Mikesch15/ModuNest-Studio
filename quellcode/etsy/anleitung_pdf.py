@@ -29,7 +29,7 @@ def logo():
     return RLImage(b, width=70, height=70)
 
 PROD = sys.argv[2] if len(sys.argv) > 2 else 'modunest'
-LINK = URL if PROD == 'modunest' else URL + 'app/namenspuzzle/'
+LINK = URL if PROD == 'modunest' else URL + 'app/' + PROD + '/'
 # Texte je Produkt: Titel, Untertitel, Schritte DE, Schritte EN, Zusatzabschnitt (Titel, Text) oder None
 TX = {
  'modunest': ('ModuNest Studio', 'Dein Box-Konfigurator von Art vom Hof · Your box configurator', [
@@ -46,6 +46,16 @@ TX = {
     'First print the small <b>fit test piece</b> and choose the number where the key goes in <b>with a little pressure</b> and does not wobble. It applies to connectors, lids, drawers and inserts.',
     'Open the 3MF file in Bambu Studio (or the STL files in your slicer) and print without supports. Optimised for Bambu Lab P1S (256 mm bed).'],
   ('Zusammenbau / Assembly', 'Kisten umgedreht nebeneinander legen und die Verbinder in die Taschen an den Nähten drücken – schmale Spitze zuerst, bis sie bündig sind. / Place the boxes upside down side by side and press the connectors into the pockets at the seams – narrow tip first, until flush.')),
+ 'raster': ('Raster mit Kisten', 'Grundplatte nach Mass und passende Kisten · Gridfinity-kompatibel', [
+    'Öffne den Link oben – am besten am Computer oder Tablet. Am Handy kannst du die Seite als App installieren.',
+    'Miss deine Schublade <b>innen</b> aus und gib Breite und Tiefe ein. Die Grundplatte füllt sie mit 42-mm-Feldern; der Rest wird zum Randstreifen. Kistengrösse, Höhe und Fächer wählen – die Kisten werden automatisch angeordnet. In der Draufsicht kannst du jede Kiste antippen und ändern. Die 3D-Vorschau ist kostenlos.',
+    'Tippe auf «Herunterladen» und gib deine <b>Etsy-Bestellnummer</b> ein (Etsy → Käufe, oder in der Bestätigungs-E-Mail). Die Grundplatte zählt 1, jede Kiste 1. Korrekturen sind 24 Stunden gratis, wenn sich die Masse höchstens 5 mm ändern.',
+    'Grosse Platten sind in Teile fürs Druckbett geteilt. Alles ohne Stützen drucken (Platte flach, Kisten aufrecht). Die Plattenteile mit den Puzzle-Nasen zusammenstecken und in die Schublade legen.'], [
+    'Open the link above (computer or tablet recommended). On a phone you can install it as an app.',
+    'Measure the <b>inside</b> of your drawer and enter width and depth. The baseplate fills it with 42 mm cells; the rest becomes an edge filler. Choose bin size, height and compartments – the bins are arranged automatically. In the top view you can tap any bin to change it. The 3D preview is free.',
+    'Tap «Download» and enter your <b>Etsy order number</b> (Etsy → Purchases, or your confirmation e-mail). The baseplate counts 1, each bin 1. Corrections are free for 24 hours if the sizes change by 5 mm at most.',
+    'Large plates are split into parts for the print bed. Print everything without supports (plate flat, bins upright). Join the plate parts with the puzzle tabs and lay them in the drawer.'],
+  ('Gridfinity', 'Kompatibel mit Gridfinity, einem offenen System von Zack Freedman (MIT License, Copyright (c) 2023 Zachary Freedman and Voidstar Lab LLC). Keine Verbindung zu Zack Freedman oder Voidstar Lab LLC. / Compatible with Gridfinity, an open system by Zack Freedman (MIT licence). Not affiliated with Zack Freedman or Voidstar Lab LLC.')),
  'namenspuzzle': ('Namenspuzzle', 'Dein persönliches Steckpuzzle von Art vom Hof · Your personal name puzzle', [
     'Öffne den Link oben – am besten am Computer oder Tablet. Am Handy kannst du die Seite als App installieren.',
     'Gib den Namen ein (bis 16 Zeichen, lange Namen kommen auf 2 Zeilen). Wähle auf Wunsch Figuren (Hof-Tiere, Herz, Stern …), eine gravierte zweite Zeile (z. B. Geburtsdatum), Grösse und Farben. Die 3D-Vorschau ist kostenlos.',
