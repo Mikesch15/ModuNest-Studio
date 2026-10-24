@@ -36,7 +36,7 @@ const S={W:400,D:300,al:'c',floor:0,bon:1,bsz:2,U:3,lip:1,wt:1.2,bins:null,view:
 try{Object.assign(S,JSON.parse(localStorage.getItem('rs-state')||'{}'))}catch(e){}
 
 /* ================= Raster: Geometrie ================= */
-const OV=.2,GF=42,PB=[.7,1.8,2.15],PH=4.65,RCELL=4,FLOOR=1.2,BED=250,ROUT=2,FIT=.5;
+const TNK=1,THK=1.8,TLK=5,TCLK=.15,TZK=2.2,PZK=2.4,OV=.2,GF=42,PB=[.7,1.8,2.15],PH=4.65,RCELL=4,FLOOR=1.2,BED=250,ROUT=2,FIT=.5;
 // Aufteilung: Felder, Raender (unter 2 mm weg), Teile (Spalten-/Zeilengruppen bis BED)
 function rsPlan(){const W=Math.max(0,+S.W-2*FIT),D=Math.max(0,+S.D-2*FIT),nx=Math.floor(W/GF),ny=Math.floor(D/GF);
  const mx=W-nx*GF,my=D-ny*GF,c=S.al!=='l',e=v=>v<2?0:v,l=e(c?mx/2:0),r=e(c?mx/2:mx),f=e(c?my/2:0),b=e(c?my/2:my);
@@ -46,7 +46,7 @@ function rsPlan(){const W=Math.max(0,+S.W-2*FIT),D=Math.max(0,+S.D-2*FIT),nx=Mat
 async function platePieces(P,res,tol){
  const F=S.floor&&featOn('boden')?FLOOR:0,parts=[],CELL=new Map(),Wt=P.l+P.nx*GF+P.r,Dt=P.f+P.ny*GF+P.b;
  // Profil-Baender: Einzug d der Zellenoeffnung je Band (an der Band-Oberkante -> Kiste hat nie weniger Platz)
- const bands=[];if(F)bands.push([0,F,null]);for(let k=0;k<7;k++)bands.push([F+k*.1,F+(k+1)*.1,2.85-(k+1)*.1]);bands.push([F+PB[0],F+PB[0]+PB[1],2.15]);
+ const bands=[];if(F)bands.push([0,F,null]);for(let k=0;k<7;k++)bands.push([F+k*.1,F+(k+1)*.1,2.85-(k+1)*.1]);bands.push([F+PB[0],F+PZK,2.15],[F+PZK,F+PB[0]+PB[1],2.15]); /* Grenze bei Taschenhoehe der Puzzle-Verbinder */
  const TOPD=.25,st=(PB[2]-TOPD)/8;for(let k=0;k<8;k++){const a=F+PB[0]+PB[1]+k*st;bands.push([a,a+st,PB[2]-(k+1)*st])} /* oben 0.5-mm-Stege statt Messerkante: druckbar, Kiste liegt auf den Schraegen */
  for(const[gi,[ix,kx]]of P.gx.entries())for(const[gj,[iy,ky]]of P.gy.entries()){
   const x0=ix===0?0:P.l+ix*GF,x1=P.l+(ix+kx)*GF+(ix+kx===P.nx?P.r:0),y0=iy===0?0:P.f+iy*GF,y1=P.f+(iy+ky)*GF+(iy+ky===P.ny?P.b:0),w=x1-x0,d=y1-y0,cx=(x0+x1)/2,cy=(y0+y1)/2;
@@ -55,14 +55,26 @@ async function platePieces(P,res,tol){
   /* Jedes Feld als eigener Rahmen (1 Loch) + Randstreifen separat: die Flaechen-Triangulierung scheitert bei vielen Loechern in einer Flaeche */
   let t=[];const ex=(rg,a,b,dx,dy)=>{const q=extrude(rg,a,b);for(let i=0;i<q.length;i+=3){q[i]+=dx;q[i+1]+=dy}t=t.concat(q)};
   const zT=bands[bands.length-1][1],gx0=P.l+ix*GF-cx,gy0=P.f+iy*GF-cy,gw=kx*GF,gd=ky*GF;
-  if(F)ex(pzRings(w+4,d+4,res,tol,x=>{x.beginPath();x.roundRect(-w/2,-d/2,w,d,R);x.fill()}),0,F,0,0);
+  /* Puzzle-Verbinder an den Fugen: unten in der Querwand am Feld-Kreuzungspunkt. Teil links/vorne hat die Nase, Teil rechts/hinten die Tasche (von unten offen).
+     Nase: Hals 2 mm, Kopf 3.6 mm, 5 mm ueber die Fuge, 2.2 mm hoch; Tasche ringsum 0.15 mm Luft, 2.4 mm hoch. Wand dort 4.3 mm breit. */
+  const tabs=[],pock=[];
+  const J=(a,k,o)=>{const r=[];for(let q=a+1;q<a+k;q++)r.push(o+q*GF);return r};
+  if(ix+kx<P.nx)for(const yy of J(iy,ky,P.f))tabs.push({sx:w/2,sy:yy-cy,ax:'x'});
+  if(ix>0)for(const yy of J(iy,ky,P.f))pock.push({sx:-w/2,sy:yy-cy,ax:'x'});
+  if(iy+ky<P.ny)for(const xx of J(ix,kx,P.l))tabs.push({sx:xx-cx,sy:d/2,ax:'y'});
+  if(iy>0)for(const xx of J(ix,kx,P.l))pock.push({sx:xx-cx,sy:-d/2,ax:'y'});
+  const nose=(x,q,e,dx,dy)=>{const pts=[[-.6-e,-TNK],[0,-TNK],[TLK,-THK],[TLK,THK],[0,TNK],[-.6-e,TNK]];x.beginPath();pts.forEach(([u,v],k)=>{const X=q.sx+dx+(q.ax==='x'?u:v),Y=q.sy+dy+(q.ax==='x'?v:u);k?x.lineTo(X,Y):x.moveTo(X,Y)});x.closePath();x.fill();if(e>0){x.lineJoin='round';x.lineWidth=2*e;x.stroke()}};
+  const pockIn=(x,dx,dy)=>{x.globalCompositeOperation='destination-out';for(const q of pock)nose(x,q,TCLK,dx,dy)};
+  for(const q of tabs)ex(pzRings(16,16,res,tol,x=>nose(x,{...q,sx:0,sy:0},0,0,0)),0,F+TZK,q.sx,q.sy);
+  if(F)ex(pzRings(w+4,d+4,res,tol,x=>{x.beginPath();x.roundRect(-w/2,-d/2,w,d,R);x.fill();pockIn(x,0,0)}),0,F,0,0);
   const edge=pzRings(w+4,d+4,res,tol,x=>{x.beginPath();x.roundRect(-w/2,-d/2,w,d,R);x.fill();x.globalCompositeOperation='destination-out';const sl=ix===0&&P.l>0?OV:0,sr=ix+kx===P.nx&&P.r>0?OV:0,sf=iy===0&&P.f>0?OV:0,sb=iy+ky===P.ny&&P.b>0?OV:0;x.fillRect(gx0+sl,gy0+sf,gw-sl-sr,gd-sf-sb)}); /* ueberlappt die Felder um OV */
   if(edge.length)ex(edge,0,zT,0,0);
   for(let i=ix;i<ix+kx;i++)for(let j=iy;j<iy+ky;j++){const ox=P.l+i*GF-cx,oy=P.f+j*GF-cy;
    /* Feld-Ecke an einer Plattenecke ohne Rand: dort gerundet wie die Platte */
    const cr=[ox<=-w/2+1e-6&&oy<=-d/2+1e-6&&R[0],ox+GF>=w/2-1e-6&&oy<=-d/2+1e-6&&R[1],ox+GF>=w/2-1e-6&&oy+GF>=d/2-1e-6&&R[2],ox<=-w/2+1e-6&&oy+GF>=d/2-1e-6&&R[3]].map(v=>v||0),key=cr.join();
-   for(const[a,b,dd]of bands){if(dd==null)continue;const o=[ox>-w/2+1e-6,ox+GF<w/2-1e-6,oy>-d/2+1e-6,oy+GF<d/2-1e-6].map(v=>v?OV:0),k=key+'|'+o.join()+'|'+dd.toFixed(3); /* innen 0.2 mm in Nachbarfeld/Rand: ein zusammenhaengender Koerper */
-    if(!CELL.has(k))CELL.set(k,pzRings(GF+4,GF+4,res,tol,x=>{x.beginPath();x.roundRect(-GF/2-o[0],-GF/2-o[2],GF+o[0]+o[1],GF+o[2]+o[3],cr);x.fill();x.globalCompositeOperation='destination-out';x.beginPath();x.roundRect(-GF/2+dd,-GF/2+dd,GF-2*dd,GF-2*dd,Math.max(.3,RCELL-dd));x.fill()}));
+   const near=pock.filter(q=>q.sx>ox-8&&q.sx<ox+GF+8&&q.sy>oy-8&&q.sy<oy+GF+8),cx0=ox+GF/2,cy0=oy+GF/2,pk=near.map(q=>(q.sx-cx0).toFixed(2)+':'+(q.sy-cy0).toFixed(2)+q.ax).join(';');
+   for(const[a,b,dd]of bands){if(dd==null)continue;const hp=near.length&&a<F+PZK-1e-6,o=[ox>-w/2+1e-6,ox+GF<w/2-1e-6,oy>-d/2+1e-6,oy+GF<d/2-1e-6].map(v=>v?OV:0),k=key+'|'+o.join()+'|'+dd.toFixed(3)+(hp?'|'+pk:''); /* innen 0.2 mm in Nachbarfeld/Rand: ein zusammenhaengender Koerper */
+    if(!CELL.has(k))CELL.set(k,pzRings(GF+4,GF+4,res,tol,x=>{x.beginPath();x.roundRect(-GF/2-o[0],-GF/2-o[2],GF+o[0]+o[1],GF+o[2]+o[3],cr);x.fill();x.globalCompositeOperation='destination-out';x.beginPath();x.roundRect(-GF/2+dd,-GF/2+dd,GF-2*dd,GF-2*dd,Math.max(.3,RCELL-dd));x.fill();if(hp)pockIn(x,-cx0,-cy0)}));
     ex(CELL.get(k),a,b,ox+GF/2,oy+GF/2)}}
   parts.push({key:'cBase',name:'Platte '+String.fromCharCode(65+gj)+(gi+1),tris:Float32Array.from(t),asm:[(X,Y,Z)=>[X+cx-Wt/2,Y+cy-Dt/2,Z]]})}
  return{parts,F,Wt,Dt}}
