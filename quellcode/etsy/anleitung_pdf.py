@@ -46,6 +46,15 @@ TX = {
     'First print the small <b>fit test piece</b> and choose the number where the key goes in <b>with a little pressure</b> and does not wobble. It applies to connectors, lids, drawers and inserts.',
     'Open the 3MF file in Bambu Studio (or the STL files in your slicer) and print without supports. Optimised for Bambu Lab P1S (256 mm bed).'],
   ('Zusammenbau / Assembly', 'Kisten umgedreht nebeneinander legen und die Verbinder in die Taschen an den Nähten drücken – schmale Spitze zuerst, bis sie bündig sind. / Place the boxes upside down side by side and press the connectors into the pockets at the seams – narrow tip first, until flush.')),
+ 'stecker': ('Pflanzenstecker-Set', 'Deine Gartenschilder von Art vom Hof · Your garden markers', [
+    'Öffne den Link oben – am besten am Computer oder Tablet. Am Handy kannst du die Seite als App installieren.',
+    'Gib deine Pflanzennamen ein, durch Komma getrennt (bis 12 Stecker pro Set, je bis 16 Zeichen). Wähle Symbol, Schrift, Schrifthöhe, Länge der Spitze und Farben. Die 3D-Vorschau ist kostenlos.',
+    'Tippe auf «Herunterladen» und gib deine <b>Etsy-Bestellnummer</b> ein (Etsy → Käufe, oder in der Bestätigungs-E-Mail). Jedes Set zählt 1. Korrekturen sind 24 Stunden gratis, solange die Namen gleich bleiben.',
+    'Flach und ohne Stützen drucken. Für zweifarbige Schrift in Bambu Studio auf der in der App angezeigten Höhe einen Farbwechsel einfügen (Rechtsklick auf den Höhenregler). Für draussen PETG oder ASA verwenden.'], [
+    'Open the link above (computer or tablet recommended). On a phone you can install it as an app.',
+    'Enter your plant names separated by commas (up to 12 markers per set, up to 16 characters each). Choose symbol, font, letter height, spike length and colours. The 3D preview is free.',
+    'Tap «Download» and enter your <b>Etsy order number</b> (Etsy → Purchases, or your confirmation e-mail). Each set counts 1. Corrections are free for 24 hours as long as the names stay the same.',
+    'Print flat without supports. For two-colour lettering add a colour change in Bambu Studio at the height shown in the app (right-click the layer slider). Use PETG or ASA outdoors.'], None),
  'raster': ('Raster mit Kisten', 'Grundplatte nach Mass und passende Kisten · Gridfinity-kompatibel', [
     'Öffne den Link oben – am besten am Computer oder Tablet. Am Handy kannst du die Seite als App installieren.',
     'Miss deine Schublade <b>innen</b> aus und gib Breite und Tiefe ein. Die Grundplatte füllt sie mit 42-mm-Feldern; der Rest wird zum Randstreifen. Kistengrösse, Höhe und Fächer wählen – die Kisten werden automatisch angeordnet. In der Draufsicht kannst du jede Kiste antippen und ändern. Die 3D-Vorschau ist kostenlos.',

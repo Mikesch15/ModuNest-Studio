@@ -18,7 +18,7 @@ Details/Geschichte: `quellcode/NOTIZEN.md` – **nur gezielt** lesen (grep), nic
 - modunest: `planner.js` (planSolve), `geo2.js` (buildMod, buildPlan), `geo.js` (Konstanten, keyShape, keyTris (gerade, Spitze abgestuft), fitTestTris), `produkt.js` (UI). Optionen: plan, drawer, tall, slide, hinge, tex.
 - Gemeinsam: `kern/figuren.js` (pzLetter, PZ_SHAPES 23 Figuren in 0..100 SVG-Koordinaten mit Gravur, pzShape, pzDeep Greifknopf, reliefBody, fitFont, pzText), `kern/puzzle.js` (Puzzle-Texte, buildPuzzle mit Figuren-Reihen S.perRow/S.maxShapes/S.Hs, buildPzTest, arrange/present). Einbinden per `dateien: ["../../kern/…"]`.
 - namenspuzzle (Optionen figuren, gravur), hofpuzzle (nur Figuren, Titel-Gravur; Option gravur), schild (Platte+Relief als 1 Körper, Vorschau 2-farbig über `prev`, Farbwechsel-Hinweis; Optionen figur, script, formen), stecker (Set bis 12 Namen, je Stecker 1 Körper; Optionen symbol, script), raster (Gridfinity-kompatible Grundplatte nach Schubladenmass, Teile fürs Bett; Option boden) mit automatisch angeordneten Kisten (Grösse/Fächer je Kiste, Höhe/Stapelrand global).
-- Neue Produkte: `produkt.json` «standard»: "test" = Status, solange im Admin nichts gespeichert ist (kein Supabase nötig). Namenspuzzle in settings auf test; hofpuzzle/schild/stecker/raster per standard test.
+- Neue Produkte: `produkt.json` «standard»: "test" = Status, solange im Admin nichts gespeichert ist (kein Supabase nötig). Namenspuzzle in settings auf test; hofpuzzle/schild/raster per standard test; stecker live (25.10.).
 - Geometrie: Aussenringe CCW, Löcher CW; alles ohne Stützen druckbar; Bett 256 mm (Brett ≤ 250).
 
 ## Server (Supabase «ModuNest Studio», ref sfoscpgsumukhihkdutw – andere Projekte nie anfassen)

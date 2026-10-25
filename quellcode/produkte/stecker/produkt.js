@@ -18,6 +18,9 @@ Object.assign(L,{
  i_stSize:['Schrifthöhe: Grösse der Namen. Länge: wie tief der Stecker in die Erde geht. Dicke 3 mm ist stabil genug; Relief = erhabene Schrift.','Letter height: size of the names. Length: how deep the marker goes into the soil. 3 mm thickness is sturdy enough; relief = raised letters.'],
  i_colors:['Die Farben sind für die Vorschau. Jeder Stecker ist ein Teil: für zwei Farben in Bambu Studio einen Farbwechsel auf der angezeigten Höhe einfügen.','Colours are for the preview. Each marker is one part: for two colours add a colour change at the shown height in Bambu Studio.'],
  next2:['Für zwei Farben: in Bambu Studio auf der in der App angezeigten Höhe einen Farbwechsel einfügen (Rechtsklick auf den Höhenregler).','For two colours: add a colour change in Bambu Studio at the height shown in the app (right-click the layer slider).'],
+ stBed:['Zu lang für dein Druckbett ({0} mm): {1}. Spitze kürzer stellen oder unter «Druckbett» ein grösseres wählen.','Too long for your print bed ({0} mm): {1}. Make the spike shorter or choose a bigger bed under «Print bed».'],
+ stPlates:['Passt auf ca. {0} Druckplatte(n) – in Bambu Studio mit «Anordnen» verteilen.','Fits on about {0} build plate(s) – spread them with «Arrange» in Bambu Studio.'],
+ bedSel:['Druckbett','Print bed'],bed180:['180 mm (z. B. A1 mini)','180 mm (e.g. A1 mini)'],bed220:['220 mm (z. B. Prusa MK4, Ender 3)','220 mm (e.g. Prusa MK4, Ender 3)'],bed256:['256 mm (Bambu P1S, X1, A1)','256 mm (Bambu P1S, X1, A1)'],bed300:['300 mm und grösser','300 mm and larger'],
  cartOne:['Stecker-Set','Marker set']
 });
 const S={names:'Tomate, Basilikum, Salat, Kürbis',font:'KFModern',sym:'blatt',H:14,Lg:120,T:3,h:1.2,view:'asm',hide:{},cBase:'#7aa35a',cText:'#fdfaf2'};
@@ -44,12 +47,15 @@ async function buildMarkers(res,tol){
 /* ================= Stecker: Oberflaeche, Vorschau ================= */
 // Vorschau: Set nebeneinander, zweifarbig; zum Drucken/Export je Stecker ein Koerper
 function arrange(parts,mode){return mode==='asm'?parts.flatMap(p=>p.prev.map(q=>({...q,tris:xf(q.tris,(X,Y,Z)=>[X+p.dx,Y,Z])}))):arrangePrint(parts.map(({prev,...p})=>p))}
+const BEDS=()=>{try{return +localStorage.getItem('mn-bed')||256}catch(e){return 256}}; /* gemeinsame Druckbett-Auswahl */
 function ui(){if(!featOn('symbol'))S.sym='';if(!featOn('script'))S.font='KFModern';
  let c=card('stNames');tInput(c,'names','stList');if(featOn('script'))seg(c,'font','scFont',[['KFModern','fn_KFModern'],['Script','fn_Script']]);
  if(featOn('symbol')){c=card('stSym');const sg=document.createElement('div');sg.className='seg shp';
   ['',...PZ_SHAPE_IDS].forEach(id=>{const b=document.createElement('button');b.dataset.k='sh_'+(id||'none');const upd=()=>{const on=(S.sym||'')===id;b.classList.toggle('on',on);b.dataset.n=on?'✓':''};upd();b._u=upd;
    b.onclick=()=>{S.sym=id;sg.querySelectorAll('button').forEach(x=>x._u());changed()};sg.append(b)});c.append(sg)}
- c=card('stSize');rng(c,'H','stH',8,20,1,'mm');rng(c,'Lg','stL',60,200,10,'mm');rng(c,'T','scT',2,5,.5,'mm');c.lastChild.classList.add('xp');rng(c,'h','scRel',.6,2,.2,'mm');c.lastChild.classList.add('xp');
+ c=card('stSize');rng(c,'H','stH',8,20,1,'mm');
+ {const l=document.createElement('label'),t=document.createElement('span'),sl=document.createElement('select');t.textContent=tr('bedSel');for(const v of[180,220,256,300]){const op=document.createElement('option');op.value=v;op.textContent=tr('bed'+v);if(v===BEDS())op.selected=true;sl.append(op)}
+  sl.onchange=()=>{try{localStorage.setItem('mn-bed',sl.value)}catch(e){}present(false)};l.append(t,sl);l.classList.add('xp');c.append(l)}rng(c,'Lg','stL',60,200,10,'mm');rng(c,'T','scT',2,5,.5,'mm');c.lastChild.classList.add('xp');rng(c,'h','scRel',.6,2,.2,'mm');c.lastChild.classList.add('xp');
  c=card('colors');const cc=document.createElement('div');cc.className='colors';
  ['cBase','cText'].forEach(k=>{const l=document.createElement('label'),s=document.createElement('span');s.dataset.k=k;const i=document.createElement('input');i.type='color';i.value=S[k];i.oninput=()=>{S[k]=i.value;draw();save()};l.append(s,i);cc.append(l)});c.append(cc);
  cartCard()}
@@ -58,7 +64,9 @@ function present(reframe){if(!built)return;const arr=built.ok?arrange(built.part
  document.querySelectorAll('.vt button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
  const i=built.info||{},mass=built.ok?built.parts.reduce((s,p)=>s+Math.abs(volume(p.tris)),0)/1000*1.24:0;
  document.getElementById('stats').innerHTML=built.ok?[[tr('sCount'),i.n],[tr('sThick'),(i.T+i.h).toFixed(1)+' mm'],[tr('sMat'),'≈ '+Math.round(mass)+' g']].map(a=>`<div class="stat"><span>${a[0]}</span><strong>${a[1]}</strong></div>`).join(''):'';
- status.innerHTML=built.ok?trf('scChange',i.T):'<b>'+built.err+'</b>';renderCart()}
+ let note='';if(built.ok){const bd=BEDS(),long=[];let fa=0;for(const p of built.parts){const q=bbox(p.tris),w=q.b[0]-q.a[0],d=q.b[1]-q.a[1];if(Math.max(w,d)>bd-4)long.push(p.name.replace(/^Stecker /,''));fa+=Math.abs(volume(p.tris))/(i.T+i.h*.3)*1.5} /* echte Flaeche (T-Form laesst sich verschachteln) + Abstand */
+  note=long.length?'<br><b>'+trf('stBed',bd,long.slice(0,5).join(', ')+(long.length>5?' …':''))+'</b>':'<br><span class="note">'+trf('stPlates',Math.max(1,Math.ceil(fa/(.8*(bd-10)*(bd-10)))))+'</span>'}
+ status.innerHTML=built.ok?trf('scChange',i.T)+note:'<b>'+built.err+'</b>';renderCart()}
 
 /* ================= Stecker: Produktbeschreibung fuer den Kern ================= */
 const ST_KEYS=['names','font','sym','H','Lg','T','h','cBase','cText'];
